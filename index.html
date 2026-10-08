@@ -608,7 +608,25 @@ button.primary{box-shadow:0 7px 22px rgba(90,15,25,.30),inset 0 1px 0 rgba(255,2
 #wh-more-panel button{min-height:54px}
 .screen.active{isolation:isolate}
 @media(max-width:430px){#wh-more-panel{grid-template-columns:repeat(2,1fr)!important}}
-</style></head>
+</style><style id="wh-game-ui-v7">
+#wh-settings-btn{position:fixed;top:calc(10px + env(safe-area-inset-top));left:10px;z-index:6001;width:42px;height:42px;border:1px solid rgba(201,162,75,.42);border-radius:13px;background:rgba(8,7,16,.9);color:#e8d39a;font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,.35);display:none}
+#wh-settings-screen{position:fixed!important;inset:0!important;z-index:6000!important;max-width:520px!important;margin:0 auto!important;background:linear-gradient(180deg,#0c0b14,#16111b)!important;padding:70px 16px 100px!important;overflow-y:auto!important}
+#wh-settings-screen.active{display:flex!important}
+#wh-settings-screen .wh-setting-card{background:rgba(28,22,16,.92);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+#wh-settings-screen .wh-setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+#wh-settings-screen .wh-setting-row:last-child{border-bottom:0}
+#wh-settings-screen .wh-setting-name{font-family:'Cinzel';color:var(--gold);font-size:14px}
+#wh-settings-screen .wh-setting-desc{font-size:11px;color:var(--dim);margin-top:3px}
+#wh-settings-screen .wh-setting-btn{background:var(--panel-2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono';font-size:11px}
+#wh-settings-close{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px}
+body.wh-settings-open #wh-game-nav,body.wh-settings-open #hud,body.wh-settings-open .bars,body.wh-settings-open .gold-line{visibility:hidden}
+body.wh-settings-open #wh-settings-btn{display:none!important}
+#hud-bars.wh-hidden,#hud-currency.wh-hidden{display:none!important}
+#hud-bars.wh-full{display:block}
+#hud-currency.wh-compact{display:flex}
+@media(max-width:430px){#wh-settings-btn{left:8px;top:8px;width:40px;height:40px}}
+</style>
+</head>
 <body>
 <div id="app">
 
@@ -7572,7 +7590,7 @@ body{overflow:hidden!important}
 </style>
 <script>
 (function(){
- const main={home:'screen-map',map:'screen-worldmap',chat:'screen-chat',shop:'screen-shop',social:'screen-social'};
+ const main={home:'screen-map',map:'screen-worldmap',chat:'screen-chat',shop:'screen-shop',social:'screen-social',char:'screen-char'};
  const secondary=[];
  const mainIds=new Set(Object.values(main));
  let currentMain='screen-map';
@@ -7600,12 +7618,82 @@ body{overflow:hidden!important}
  function setup(){
    if(document.getElementById('wh-game-nav'))return;
    const n=document.createElement('nav'); n.id='wh-game-nav';
-   n.innerHTML='<button data-key="home"><span class="wh-icon">⌂</span>خانه</button><button data-key="map"><span class="wh-icon">◈</span>نقشه</button><button data-key="chat"><span class="wh-icon">💬</span>گپ</button><button data-key="shop"><span class="wh-icon">🛒</span>فروشگاه</button><button data-key="social"><span class="wh-icon">♟</span>اجتماعی</button>';
+   n.innerHTML='<button data-key="home"><span class="wh-icon">⌂</span>خانه</button><button data-key="map"><span class="wh-icon">◈</span>نقشه</button><button data-key="chat"><span class="wh-icon">💬</span>گپ</button><button data-key="shop"><span class="wh-icon">🛒</span>فروشگاه</button><button data-key="social"><span class="wh-icon">♟</span>اجتماعی</button><button data-key="char"><span class="wh-icon">♙</span>شخصیت</button>';
    document.body.appendChild(n);
 
    n.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;go(main[b.dataset.key],b.dataset.key)});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
-</script></script></body>
+</script></script><script id="wh-game-ui-v7-js">
+(function(){
+  function setupV7(){
+    const gameWrap=document.getElementById('game-wrap');
+    const hudBars=document.querySelector('.bars');
+    const hudCurrency=document.querySelector('.gold-line');
+    if(!gameWrap||!hudBars||!hudCurrency)return;
+    hudBars.id='hud-bars'; hudCurrency.id='hud-currency';
+    if(!document.getElementById('wh-settings-btn')){
+      const b=document.createElement('button');
+      b.id='wh-settings-btn'; b.type='button'; b.setAttribute('aria-label','تنظیمات'); b.textContent='⚙️';
+      document.body.appendChild(b);
+      b.addEventListener('click',openSettings);
+    }
+    if(!document.getElementById('wh-settings-screen')){
+      const s=document.createElement('div');
+      s.id='wh-settings-screen'; s.className='screen';
+      s.innerHTML='<button id="wh-settings-close" class="secondary" type="button">✕ بستن</button><h2 class="section-title">⚙️ تنظیمات</h2><div class="wh-setting-card"><div class="wh-setting-row"><div><div class="wh-setting-name">🔊 صدا</div><div class="wh-setting-desc">صدای رابط و فضا</div></div><button class="wh-setting-btn" id="wh-sound-toggle">روشن</button></div><div class="wh-setting-row"><div><div class="wh-setting-name">✨ جلوه‌ها</div><div class="wh-setting-desc">انیمیشن‌های رابط بازی</div></div><button class="wh-setting-btn" id="wh-fx-toggle">کامل</button></div></div><div class="wh-setting-card"><div class="wh-setting-row"><div><div class="wh-setting-name">📱 حالت موبایل</div><div class="wh-setting-desc">چیدمان فشرده برای صفحه‌های کوچک</div></div><span style="color:var(--good);font-size:11px">فعال</span></div></div>';
+      gameWrap.appendChild(s);
+      document.getElementById('wh-settings-close').addEventListener('click',closeSettings);
+      const soundBtn=document.getElementById('wh-sound-toggle');
+      let soundOn=localStorage.getItem('warnehold_sound')!=='off';
+      soundBtn.textContent=soundOn?'روشن':'خاموش';
+      soundBtn.onclick=()=>{soundOn=!soundOn;localStorage.setItem('warnehold_sound',soundOn?'on':'off');if(window.__whAmbient){window.__whAmbient[2].gain.value=soundOn?.012:0}soundBtn.textContent=soundOn?'روشن':'خاموش';};
+      const fxBtn=document.getElementById('wh-fx-toggle');
+      let fxOn=localStorage.getItem('warnehold_fx')!=='reduced';
+      fxBtn.textContent=fxOn?'کامل':'سبک';
+      fxBtn.onclick=()=>{fxOn=!fxOn;localStorage.setItem('warnehold_fx',fxOn?'full':'reduced');document.documentElement.classList.toggle('wh-reduced-fx',!fxOn);fxBtn.textContent=fxOn?'کامل':'سبک';};
+      if(localStorage.getItem('warnehold_fx')==='reduced')document.documentElement.classList.add('wh-reduced-fx');
+    }
+    function updateHud(){
+      const active=document.querySelector('#game-wrap .screen.active');
+      const id=active?.id||'screen-map';
+      const full=id==='screen-char'||id==='screen-battle';
+      const showBars=full;
+      const noCurrency=['screen-chat','screen-social','screen-battle','screen-pvp','screen-settings'].includes(id);
+      hudBars.classList.toggle('wh-hidden',!showBars);
+      hudCurrency.classList.toggle('wh-hidden',noCurrency);
+      hudCurrency.classList.toggle('wh-compact',!full && !noCurrency);
+      const settingsBtn=document.getElementById('wh-settings-btn');
+      if(settingsBtn)settingsBtn.style.display=(gameWrap.style.display!=='none'&&!document.body.classList.contains('wh-settings-open'))?'block':'none';
+      document.querySelectorAll('#wh-game-nav button').forEach(btn=>{
+        btn.classList.toggle('active',btn.dataset.key==='char'&&id==='screen-char');
+      });
+    }
+    window.__whUpdateHudV7=updateHud;
+    const observer=new MutationObserver(updateHud);
+    observer.observe(gameWrap,{subtree:true,attributes:true,attributeFilter:['class','style']});
+    const oldSwitch=window.switchScreen;
+    window.switchScreen=function(name){
+      if(document.body.classList.contains('wh-settings-open'))closeSettings();
+      const r=oldSwitch?.apply(this,arguments);
+      setTimeout(updateHud,0);
+      return r;
+    };
+    window.openSettings=openSettings;
+    window.closeSettings=closeSettings;
+    function openSettings(){
+      const s=document.getElementById('wh-settings-screen'); if(!s)return;
+      s.classList.add('active'); document.body.classList.add('wh-settings-open'); updateHud();
+    }
+    function closeSettings(){
+      document.getElementById('wh-settings-screen')?.classList.remove('active');
+      document.body.classList.remove('wh-settings-open'); updateHud();
+    }
+    updateHud();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupV7);else setupV7();
+})();
+</script>
+</body>
 <!-- wh-v4-ready --></html>
