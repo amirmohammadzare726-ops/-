@@ -473,6 +473,32 @@
     .auth-step{animation:none}
   }
 
+  /* ---------- Cinematic full-screen transitions ---------- */
+  #wh-cinematic{
+    position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;
+    pointer-events:none;display:none;overflow:hidden;isolation:isolate;
+    background:rgba(5,3,2,.0);
+  }
+  #wh-cinematic.play{display:block;animation:whCineCurtain .82s cubic-bezier(.18,.75,.18,1) both}
+  #wh-cinematic .cine-flash{
+    position:absolute;inset:-20%;
+    background:radial-gradient(circle at 50% 50%,rgba(255,249,220,.98) 0%,rgba(201,162,75,.62) 5%,rgba(138,31,43,.22) 22%,rgba(5,3,2,.82) 55%,rgba(5,3,2,1) 100%);
+    transform:scale(.08);opacity:0;
+  }
+  #wh-cinematic.play .cine-flash{animation:whCineFlash .82s cubic-bezier(.12,.72,.18,1) both}
+  #wh-cinematic .cine-ring{position:absolute;left:50%;top:50%;width:24px;height:24px;border:2px solid rgba(244,236,226,.95);border-radius:50%;transform:translate(-50%,-50%) scale(.05);opacity:0;box-shadow:0 0 35px rgba(201,162,75,.8)}
+  #wh-cinematic.play .cine-ring{animation:whCineRing .72s cubic-bezier(.05,.8,.2,1) .03s both}
+  #wh-cinematic .cine-ring.r2{border-color:rgba(201,162,75,.65);box-shadow:0 0 70px rgba(138,31,43,.55)}
+  #wh-cinematic.play .cine-ring.r2{animation-delay:.09s}
+  #wh-cinematic .cine-burst{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#fff9dd;box-shadow:0 0 18px 8px rgba(201,162,75,.95),0 0 55px 18px rgba(138,31,43,.48);transform:translate(-50%,-50%) scale(.1);opacity:0}
+  #wh-cinematic.play .cine-burst{animation:whCineBurst .42s cubic-bezier(.1,.8,.2,1) both}
+  @keyframes whCineCurtain{0%{opacity:0}12%{opacity:1}72%{opacity:1}100%{opacity:0}}
+  @keyframes whCineFlash{0%{transform:scale(.08);opacity:0}18%{transform:scale(.35);opacity:1}48%{transform:scale(1.1);opacity:.82}100%{transform:scale(1.9);opacity:0}}
+  @keyframes whCineRing{0%{transform:translate(-50%,-50%) scale(.05);opacity:0}12%{opacity:1}100%{transform:translate(-50%,-50%) scale(55);opacity:0}}
+  @keyframes whCineBurst{0%{transform:translate(-50%,-50%) scale(.1);opacity:0}28%{transform:translate(-50%,-50%) scale(8);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+  .auth-explosion{display:none!important}
+  @media (prefers-reduced-motion:reduce){#wh-cinematic.play{animation:none;display:none}.auth-explosion{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -1119,8 +1145,10 @@ async function restoreAccountSession(){
 }
 
 function showAuthStep(id){
-  $$('.auth-step').forEach(x=>x.classList.remove('active'));
-  $('#'+id).classList.add('active');
+  playCinematicTransition(()=>{
+    $('.auth-step').forEach(x=>x.classList.remove('active'));
+    $('#'+id).classList.add('active');
+  });
 }
 
 function showAuthError(msg){
@@ -5005,7 +5033,7 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 1800);
 }
 
-function switchScreen(name){
+function switchScreenCore(name){
   $$('.screen').forEach(s=>s.classList.remove('active'));
   const map = {map:'screen-map', battle:'screen-battle', char:'screen-char', inv:'screen-inv', shop:'screen-shop', chat:'screen-chat', admin:'screen-admin', social:'screen-social', pvp:'screen-pvp', blacksmith:'screen-blacksmith', villagemap:'screen-village-map', worldmap:'screen-worldmap', notifcenter:'screen-notifcenter', animeshop:'screen-animeshop', collection:'screen-collection', welcome:'screen-welcome', auction:'screen-auction', journey:'screen-journey', quest:'screen-quest', job:'screen-job', transfer:'screen-transfer'};
   $('#'+map[name]).classList.add('active');
@@ -5038,6 +5066,26 @@ function switchScreen(name){
   if(name==='collection'){ renderCollection(); }
   if(name==='pvp' && !pvpBattleId && state.pvpBattleId){ openPvpBattle(state.pvpBattleId); }
   updateNotifBadge();
+}
+
+function playCinematicTransition(done){
+  let fx=$('#wh-cinematic');
+  if(!fx){
+    fx=document.createElement('div');
+    fx.id='wh-cinematic';
+    fx.setAttribute('aria-hidden','true');
+    fx.innerHTML='<div class="cine-flash"></div><div class="cine-burst"></div><div class="cine-ring"></div><div class="cine-ring r2"></div>';
+    document.body.appendChild(fx);
+  }
+  fx.classList.remove('play');
+  void fx.offsetWidth;
+  fx.classList.add('play');
+  setTimeout(()=>{ try{ done(); }catch(e){ console.error(e); } },120);
+  setTimeout(()=>fx.classList.remove('play'),850);
+}
+
+function switchScreen(name){
+  playCinematicTransition(()=>switchScreenCore(name));
 }
 
 function renderHUD(){
