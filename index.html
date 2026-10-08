@@ -8021,4 +8021,111 @@ body{overflow:hidden!important}
 })();
 </script>
 
+
+<style id="wh-real-visual-pack-v9">
+:root{
+  --wh-bg-city:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg');
+  --wh-bg-map:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f171f5f3-ab32-418d-b2cb-0cdbf636a751.jpg');
+  --wh-bg-battle:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/4c513103-7b0c-477e-ac43-0c4248d9e3ec.jpg');
+  --wh-bg-shop:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg');
+  --wh-bg-village:url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg');
+}
+#game-wrap{position:relative;isolation:isolate;background:#090807}
+#game-wrap::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(circle at 50% 20%,rgba(201,162,75,.10),transparent 42%),linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.58));}
+#game-wrap .screen{position:relative;min-height:100dvh;overflow:hidden;background-color:transparent!important;background-image:none!important;}
+#game-wrap .screen::before{content:"";position:absolute;inset:0;z-index:-2;background-position:center;background-size:cover;background-repeat:no-repeat;filter:saturate(.82) contrast(1.04);transform:scale(1.025);}
+#game-wrap .screen::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(7,6,5,.18),rgba(7,6,5,.78) 82%);pointer-events:none;}
+#game-wrap .screen > *{position:relative;z-index:1}
+#screen-map::before{background-image:var(--wh-bg-city)}
+#screen-worldmap::before,#screen-village-map::before,#screen-journey::before{background-image:var(--wh-bg-map)}
+#screen-battle::before,#screen-pvp::before{background-image:var(--wh-bg-battle)}
+#screen-shop::before,#screen-animeshop::before,#screen-auction::before{background-image:var(--wh-bg-shop)}
+#screen-welcome::before,#screen-quest::before,#screen-job::before{background-image:var(--wh-bg-village)}
+#screen-char::before,#screen-inv::before,#screen-blacksmith::before,#screen-social::before,#screen-chat::before,#screen-notifcenter::before,#screen-transfer::before,#screen-collection::before{background-image:var(--wh-bg-city);opacity:.58}
+#screen-map .wh-v8-home,#screen-battle .enemy-card,#screen-battle .combat-log,#screen-char .identity-card,#screen-shop .shop-item,#screen-worldmap .region,#screen-village-map .region{backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);background:rgba(20,15,11,.72)!important;box-shadow:0 12px 32px rgba(0,0,0,.28);}
+#wh-game-nav{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(12,9,7,.88)!important;box-shadow:0 -8px 28px rgba(0,0,0,.28)}
+#wh-game-nav button{transition:transform .16s,filter .16s,color .16s}
+#wh-game-nav button:active{transform:scale(.94)}
+.wh-real-enter{animation:whRealEnter .34s cubic-bezier(.2,.8,.2,1) both}
+@keyframes whRealEnter{from{opacity:.35;transform:scale(1.015) translateY(7px);filter:brightness(.7)}to{opacity:1;transform:none;filter:none}}
+.wh-real-pulse{animation:whRealPulse .42s ease-out}
+@keyframes whRealPulse{0%{box-shadow:0 0 0 0 rgba(201,162,75,.45)}100%{box-shadow:0 0 0 16px rgba(201,162,75,0)}}
+.wh-real-spark{position:fixed;width:6px;height:6px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9999;animation:whSpark .5s ease-out forwards}
+@keyframes whSpark{to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+.wh-real-lowfx *{animation:none!important;transition:none!important}
+</style>
+<script id="wh-real-visual-pack-v9-js">
+(function(){
+  if(window.__whRealVisualPackV9)return;
+  window.__whRealVisualPackV9=true;
+  const audio={ctx:null,enabled:localStorage.getItem('warnehold_sound')!=='off'};
+  function unlockAudio(){
+    if(!audio.enabled)return;
+    try{
+      audio.ctx=audio.ctx||new (window.AudioContext||window.webkitAudioContext)();
+      if(audio.ctx.state==='suspended')audio.ctx.resume();
+    }catch(e){}
+  }
+  function tone(freq,dur=.055,type='sine',gain=.025){
+    if(!audio.enabled)return;
+    unlockAudio(); if(!audio.ctx)return;
+    try{
+      const o=audio.ctx.createOscillator(),g=audio.ctx.createGain();
+      o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(gain,audio.ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001,audio.ctx.currentTime+dur);
+      o.connect(g);g.connect(audio.ctx.destination);o.start();o.stop(audio.ctx.currentTime+dur);
+    }catch(e){}
+  }
+  function clickFx(){tone(520,.045,'sine',.018)}
+  function successFx(){tone(660,.07,'triangle',.025);setTimeout(()=>tone(880,.09,'triangle',.022),55)}
+  function battleFx(){tone(120,.09,'sawtooth',.018);setTimeout(()=>tone(210,.12,'triangle',.02),45)}
+  function spark(x,y){
+    if(document.documentElement.classList.contains('wh-real-lowfx'))return;
+    for(let i=0;i<5;i++){
+      const s=document.createElement('i');s.className='wh-real-spark';s.style.left=x+'px';s.style.top=y+'px';
+      const a=Math.PI*2*i/5, d=24+Math.random()*28;
+      s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');
+      document.body.appendChild(s);setTimeout(()=>s.remove(),520);
+    }
+  }
+  document.addEventListener('pointerdown',e=>{
+    unlockAudio();
+    const b=e.target.closest('button');
+    if(!b)return;
+    clickFx();spark(e.clientX,e.clientY);
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('button');
+    if(!b)return;
+    const txt=(b.textContent||'');
+    if(/شروع|ورود|ثبت|خرید|دریافت|تایید|قبول|برنده/.test(txt))successFx();
+    if(/نبرد|حمله|قدرت|فایت|جنگ/.test(txt))battleFx();
+  });
+  const base=window.switchScreen;
+  if(typeof base==='function'){
+    window.switchScreen=function(name){
+      const r=base.apply(this,arguments);
+      setTimeout(()=>{
+        const s=document.querySelector('#game-wrap .screen.active');
+        if(s){s.classList.remove('wh-real-enter');void s.offsetWidth;s.classList.add('wh-real-enter');}
+      },0);
+      return r;
+    };
+  }
+  const observer=new MutationObserver(()=>{
+    const s=document.querySelector('#game-wrap .screen.active');
+    if(s&&!s.classList.contains('wh-real-enter')){s.classList.add('wh-real-enter');}
+  });
+  const wrap=document.getElementById('game-wrap');
+  if(wrap)observer.observe(wrap,{subtree:true,attributes:true,attributeFilter:['class']});
+  window.addEventListener('storage',e=>{
+    if(e.key==='warnehold_sound')audio.enabled=e.newValue!=='off';
+    if(e.key==='warnehold_low'){
+      document.documentElement.classList.toggle('wh-real-lowfx',e.newValue==='on');
+    }
+  });
+  document.documentElement.classList.toggle('wh-real-lowfx',localStorage.getItem('warnehold_low')==='on');
+})();
+</script>
+
 <!-- wh-v4-ready --></html>
