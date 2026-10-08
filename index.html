@@ -1326,32 +1326,58 @@ async function migrateLegacyDeviceSave(legacyScope, newAccountId){
   }
 }
 
+function writeRememberedAccount(){
+  try{
+    if(accountSession){
+      localStorage.setItem('warnehold_account_session',accountSession);
+      sessionStorage.setItem('warnehold_account_session',accountSession);
+      document.cookie='warnehold_account_session='+encodeURIComponent(accountSession)+'; Max-Age=2592000; Path=/; SameSite=Lax; Secure';
+    }
+    if(accountId){
+      localStorage.setItem('warnehold_account_id',accountId);
+      sessionStorage.setItem('warnehold_account_id',accountId);
+    }
+    if(accountUsername){
+      localStorage.setItem('warnehold_account_username',accountUsername);
+      sessionStorage.setItem('warnehold_account_username',accountUsername);
+    }
+  }catch(e){ console.warn('remember account storage failed',e); }
+}
+function readRememberedAccount(){
+  let session='';
+  try{ session=localStorage.getItem('warnehold_account_session')||''; }catch(e){}
+  if(!session){ try{ session=sessionStorage.getItem('warnehold_account_session')||''; }catch(e){} }
+  if(!session){
+    try{
+      const m=document.cookie.match(/(?:^|; )warnehold_account_session=([^;]*)/);
+      if(m) session=decodeURIComponent(m[1]);
+    }catch(e){}
+  }
+  return session;
+}
 function setAccountSession(data){
   accountSession = data.session || '';
   accountId = data.accountId || '';
   accountUsername = data.username || '';
-  if(accountSession) localStorage.setItem('warnehold_account_session',accountSession);
-  if(accountId) localStorage.setItem('warnehold_account_id',accountId);
-  if(accountUsername) localStorage.setItem('warnehold_account_username',accountUsername);
+  writeRememberedAccount();
 }
 
 function clearAccountSession(){
   accountSession=''; accountId=''; accountUsername='';
-  localStorage.removeItem('warnehold_account_session');
-  localStorage.removeItem('warnehold_account_id');
-  localStorage.removeItem('warnehold_account_username');
+  try{localStorage.removeItem('warnehold_account_session');localStorage.removeItem('warnehold_account_id');localStorage.removeItem('warnehold_account_username');}catch(e){}
+  try{sessionStorage.removeItem('warnehold_account_session');sessionStorage.removeItem('warnehold_account_id');sessionStorage.removeItem('warnehold_account_username');}catch(e){}
+  document.cookie='warnehold_account_session=; Max-Age=0; Path=/; SameSite=Lax; Secure';
 }
 
 async function restoreAccountSession(){
-  accountSession=localStorage.getItem('warnehold_account_session')||accountSession||'';
+  accountSession=readRememberedAccount()||accountSession||'';
   if(!accountSession)return false;
   try{
     const data=await accountRequest({action:'session',session:accountSession,username:'session',password:'000000'});
-    accountId=data.accountId||localStorage.getItem('warnehold_account_id')||'';
-    accountUsername=data.username||localStorage.getItem('warnehold_account_username')||'';
+    accountId=data.accountId||accountId||'';
+    accountUsername=data.username||accountUsername||'';
     if(!accountId||!accountUsername)throw new Error('اطلاعات حساب از سرور کامل نیست');
-    localStorage.setItem('warnehold_account_id',accountId);
-    localStorage.setItem('warnehold_account_username',accountUsername);
+    writeRememberedAccount();
     const legacyScope=localStorage.getItem('warnhold_device_id')||'';
     await migrateLegacyDeviceSave(legacyScope,accountId);
     return true;
