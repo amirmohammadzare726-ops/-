@@ -244,6 +244,7 @@
   .chat-input-row input[type=text]{flex:1; font-size:14px; padding:11px 12px;}
   .chat-send{background:var(--blood); border:1px solid #5e141c; color:#f4ece2; font-family:'Cinzel'; font-size:13px; padding:0 16px; border-radius:5px; cursor:pointer;}
   .chat-send:disabled{opacity:0.35;}
+  .wh-ai-send{background:linear-gradient(180deg,rgba(117,74,180,.42),rgba(50,28,78,.58));border:1px solid rgba(158,105,224,.68);color:#e7d6ff;font-family:'Cinzel';font-size:12px;padding:0 12px;border-radius:5px;cursor:pointer;white-space:nowrap}.wh-ai-send:disabled{opacity:.4}.wh-ai-status{font-size:10px;color:var(--dim);margin:5px 0 8px;text-align:center}.wh-ai-msg{background:rgba(111,70,170,.12);border-color:rgba(158,105,224,.55)!important}
   .empty-note.small{padding:14px; font-size:13px;}
 
   /* ---------- Admin ---------- */
@@ -1105,7 +1106,9 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
       <div class="chat-input-row" id="chat-input-row">
         <input type="text" id="chat-input" placeholder="پیام..." maxlength="200">
         <button class="chat-send" id="chat-send">ارسال</button>
+        <button class="wh-ai-send" id="wh-ai-send" type="button">🤖 AI</button>
       </div>
+      <div class="wh-ai-status" id="wh-ai-status"></div>
     </div>
 
     <!-- ADMIN (chat moderation + world config) -->
@@ -8391,6 +8394,57 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
 <style id="wh-real-audio-pack-v12">#wh-war-audio{display:none!important}</style>
 <script id="wh-real-audio-pack-v12-js">
 (function(){if(window.__whRealAudioV12)return;window.__whRealAudioV12=true;const SRC='https://cdn.creativeclaw.co/u/3f8a5c32/audio/d2e0f630-5758-4181-b47f-028b6e5db070.mp3';let enabled=localStorage.getItem('warnehold_sound')!=='off';let a=null;function ensure(){if(!enabled)return;try{if(!a){a=new Audio(SRC);a.loop=true;a.preload='auto';a.volume=.16;a.id='wh-war-audio';document.body.appendChild(a)}const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}function sync(){enabled=localStorage.getItem('warnehold_sound')!=='off';if(enabled)ensure();else if(a){a.pause();a.currentTime=0}}document.addEventListener('pointerdown',ensure,{passive:true});document.addEventListener('touchstart',ensure,{passive:true});window.addEventListener('storage',e=>{if(e.key==='warnehold_sound')sync()});window.whWarneholdMusic={start:ensure,stop:function(){if(a)a.pause()},setEnabled:function(v){enabled=!!v;localStorage.setItem('warnehold_sound',enabled?'on':'off');sync()}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync);else sync();})();
+</script>
+<script id="wh-groq-ai-v1">
+(function(){
+  const AI_API = SUPABASE_URL + '/functions/v1/warnehold-ai';
+  function aiStatus(t){const el=document.getElementById('wh-ai-status');if(el)el.textContent=t||'';}
+  function aiSession(){return accountSession || readRememberedAccount() || '';}
+  function addAIMessage(answer){
+    const box=document.getElementById('chat-messages'); if(!box)return;
+    const row=document.createElement('div'); row.className='msg-row wh-ai-msg';
+    row.innerHTML='<div class="msg-bubble"><div class="msg-from">🤖 وارنهولد AI</div><div class="msg-text"></div><div class="msg-meta"><span>AI</span></div></div>';
+    row.querySelector('.msg-text').textContent=answer;
+    box.appendChild(row); box.scrollTop=box.scrollHeight;
+  }
+  async function askWarneholdAI(){
+    const input=document.getElementById('chat-input'); const btn=document.getElementById('wh-ai-send');
+    const message=(input?.value||'').trim();
+    if(!message){aiStatus('اول پیام خودت را بنویس');return;}
+    const session=aiSession();
+    if(!session){aiStatus('ابتدا وارد حساب بازی شو');return;}
+    if(message.length>4000){aiStatus('پیام خیلی طولانی است');return;}
+    if(btn)btn.disabled=true;
+    aiStatus('🤖 در حال پاسخ گرفتن از هوش مصنوعی...');
+    try{
+      const res=await fetch(AI_API,{method:'POST',headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_KEY,
+        'Authorization':'Bearer '+SUPABASE_KEY,
+        'x-warnehold-session':session
+      },body:JSON.stringify({
+        message,
+        system:'تو هوش مصنوعی بازی سایه‌های وارنهولد هستی. فارسی و طبیعی جواب بده. به قوانین و اطلاعات بازی احترام بگذار. خودت نمی‌توانی سکه جم HP آیتم حساب یا نتیجه فایت را تغییر بدهی. اگر اطلاعات واقعی بازی را نداری حدس نزن. پاسخ را کوتاه و کاربردی نگه دار.'
+      })});
+      const data=await res.json().catch(()=>({ok:false,error:'پاسخ نامعتبر'}));
+      if(!res.ok||!data.ok) throw new Error(data.error||'اتصال AI ناموفق بود');
+      addAIMessage(data.answer||'پاسخی دریافت نشد');
+      input.value='';
+      aiStatus('پاسخ از Groq دریافت شد');
+    }catch(e){
+      console.error('Warnehold AI error',e);
+      aiStatus(e.message||'خطا در اتصال AI');
+    }finally{if(btn)btn.disabled=false;}
+  }
+  window.warneholdAskAI=askWarneholdAI;
+  function setupAI(){
+    const btn=document.getElementById('wh-ai-send'); if(!btn||btn.dataset.bound)return;
+    btn.dataset.bound='1'; btn.addEventListener('click',askWarneholdAI);
+    const input=document.getElementById('chat-input');
+    if(input)input.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.shiftKey===false&&document.activeElement===input&&e.ctrlKey)askWarneholdAI();});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupAI);else setupAI();
+})();
 </script>
 <!-- wh-real-audio-pack-v12 -->
 </html>
