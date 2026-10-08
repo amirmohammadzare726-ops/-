@@ -705,7 +705,47 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
 #screen-auth .auth-panel{
   padding:24px 18px 20px !important;
 }
-</style>\n</head>
+</style>\n
+<style id="wh-boss-event-v1">
+#screen-boss-event{padding:0 12px 88px;min-height:100svh;background:radial-gradient(circle at 50% 8%,rgba(201,162,75,.13),transparent 32%),linear-gradient(180deg,#090709,#160c0d 55%,#090709);overflow:hidden}
+.wh-boss-shell{position:relative;min-height:calc(100svh - 88px);display:flex;flex-direction:column;gap:9px}
+.wh-boss-visual{position:relative;min-height:210px;border:1px solid rgba(201,162,75,.38);border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 48%,rgba(178,58,58,.26),transparent 35%),radial-gradient(circle at 20% 20%,rgba(74,122,165,.18),transparent 30%),#08080b;box-shadow:inset 0 0 55px rgba(0,0,0,.8),0 0 35px rgba(178,58,58,.08)}
+#wh-boss-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.wh-boss-head{position:relative;z-index:2;padding:14px;text-align:center;text-shadow:0 2px 12px #000}
+.wh-boss-kicker{font:10px 'JetBrains Mono';letter-spacing:.16em;color:var(--gold-dim)}
+.wh-boss-name{font:25px 'Cinzel';color:#eee0bf;margin-top:4px}
+.wh-boss-title{font-size:12px;color:#bfae8b;margin-top:2px}
+.wh-boss-hp{position:relative;z-index:3;padding:0 14px 12px;margin-top:75px}
+.wh-boss-hp .bar-track{height:13px;background:#08080a;border-color:#5a2228;box-shadow:0 0 16px rgba(178,58,58,.18)}
+.wh-boss-hp .bar-fill{background:linear-gradient(90deg,#5d111b,#d13f45,#ff9b52);box-shadow:0 0 14px rgba(209,63,69,.45)}
+.wh-boss-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.wh-boss-stat{background:rgba(20,15,14,.82);border:1px solid var(--line);border-radius:8px;padding:8px 4px;text-align:center}
+.wh-boss-stat b{display:block;font:12px 'JetBrains Mono';color:var(--gold)}
+.wh-boss-stat span{font-size:9px;color:var(--dim)}
+.wh-boss-card{background:rgba(20,15,14,.88);border:1px solid var(--line);border-radius:10px;padding:10px}
+.wh-boss-card h3{font-size:13px;color:var(--gold);margin-bottom:6px}
+.wh-boss-tags{display:flex;flex-wrap:wrap;gap:5px}
+.wh-boss-tag{font:9px 'JetBrains Mono';color:var(--dim);border:1px solid var(--line);border-radius:12px;padding:5px 7px}
+.wh-boss-log{max-height:115px;overflow:auto;font-size:12px;line-height:1.6;color:#cfc2a7}
+.wh-boss-log div{padding:3px 0;border-bottom:1px solid rgba(58,46,32,.5)}
+.wh-boss-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.wh-boss-actions button{min-height:48px;background:linear-gradient(180deg,rgba(48,27,24,.95),rgba(20,14,13,.95));border:1px solid var(--line);color:var(--parchment);border-radius:9px;font-family:'Cinzel';font-size:12px}
+.wh-boss-actions button.danger{border-color:#6a2029;color:#f07b75}
+.wh-boss-actions button:disabled{opacity:.35}
+.wh-boss-cooldown{text-align:center;border:1px solid #5b2b31;background:rgba(91,43,49,.16);border-radius:8px;padding:9px;color:#e9a3a0;font:11px 'JetBrains Mono'}
+.wh-boss-reward{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--dim);margin-top:4px}
+.wh-boss-phase{font:11px 'JetBrains Mono';color:#e8c76a;text-align:center;margin-top:4px}
+.wh-boss-dmg{font:18px 'Cinzel';color:#f0d58b;text-align:center}
+.wh-boss-back{width:100%;margin-bottom:2px}
+.wh-boss-flash{animation:whBossFlash .38s ease-out}
+@keyframes whBossFlash{0%{filter:brightness(1)}35%{filter:brightness(2.1)}100%{filter:brightness(1)}}
+.wh-boss-shake{animation:whBossShake .34s ease-out}
+@keyframes whBossShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.wh-boss-reveal{animation:whBossReveal .7s ease-out}
+@keyframes whBossReveal{0%{opacity:0;transform:scale(.96)}100%{opacity:1;transform:scale(1)}}
+@media(max-width:380px){.wh-boss-name{font-size:21px}.wh-boss-stat b{font-size:10px}.wh-boss-actions button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.wh-boss-flash,.wh-boss-shake,.wh-boss-reveal{animation:none}}
+</style></head>
 <body>
 <div id="app">
 
@@ -929,6 +969,13 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
       <div id="welcome-content"></div>
     </div>
 
+
+    <div class="screen" id="screen-boss-event">
+      <div class="wh-boss-shell">
+        <button class="secondary wh-boss-back" id="wh-boss-back">🔙 بازگشت به نقشه</button>
+        <div id="wh-boss-event-content"></div>
+      </div>
+    </div>
     <!-- BATTLE -->
     <div class="screen" id="screen-battle">
       <div id="battle-idle" class="empty-note">اکنون در نبرد نیستید. از نقشه یک منطقه را انتخاب کنید تا با دشمنی روبرو شوید.</div>
@@ -8555,4 +8602,182 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
   };
 </script>
 <!-- wh-real-audio-pack-v12 -->
+
+<script id="wh-boss-event-v1">
+(function(){
+  if(window.__whBossV1)return; window.__whBossV1=true;
+  var BOSS_COOLDOWN=10*60*60*1000;
+  var WOUND_TIME=12*60*60*1000;
+  var TODAY_ZONE='UTC';
+  var bossAnim=null;
+  function dayKey(){var d=new Date();return new Intl.DateTimeFormat('en-CA',{timeZone:TODAY_ZONE,year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+  function seedForDay(k){var h=0;for(var i=0;i<k.length;i++)h=((h<<5)-h+k.charCodeAt(i))|0;return Math.abs(h).toString(36)}
+  function esc(v){return String(v??'').replace(/[&<>"']/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]})}
+  function parseAI(s){
+    try{return JSON.parse(s)}catch(e){}
+    var m=String(s||'').match(/\{[\s\S]*\}/); if(!m)return null;
+    try{return JSON.parse(m[0])}catch(e){return null}
+  }
+  function fallbackBoss(date){
+    var n=parseInt(seedForDay(date),36)||1;
+    var forms=['فرمانروای زره‌پوش','هیولای بال‌دار','شبح چندچشم','غول بلورین','شکارچی خلأ'];
+    var names=['وارث خاکستر','نگهبان شکاف','سلطان بی‌چهره','بلعنده نور','پادشاه هزارتو'];
+    var powers=['موج سایه','شکاف سنگین','باران تیغه','انفجار خلأ','زنجیره آذر'];
+    var f=forms[n%forms.length], name=names[(n>>2)%names.length], p=powers[(n>>3)%powers.length];
+    return {name:name,title:f,visual:{form:f,aura:'هاله متغیر و سنگین',core:'هسته انرژی ناشناخته',palette:'قرمز تیره و طلایی'},difficulty:Math.min(95,35+(n%40)),hp:3200+(n%5)*500,defense:28+(n%18),speed:12+(n%10),weakness:['Physical','Magical','Elemental'][n%3],resistance:['Physical','Magical','Mental'][(n>>2)%3],powers:[{name:p,effect:'حمله اصلی باس با شدت متغیر'}],phases:[{at:.7,name:'فاز خشم',change:'قدرت حمله افزایش می‌یابد'},{at:.35,name:'فاز شکاف',change:'مقاومت باس تغییر می‌کند'},{at:.1,name:'فاز آخر',change:'باس وارد حالت بحرانی می‌شود'}],lore:'این باس برای یک روز وارد وارنهولد شده و پس از پایان Event حذف می‌شود.',arena:'محوطه ناشناخته',eventText:'امروز فقط یک فرصت واقعی برای رویارویی داری.',lootTheme:'یادگار باس',baseReward:60}
+  }
+  function addLog(t){
+    var r=state.bossRun||{}; r.log=r.log||[]; r.log.unshift(t); r.log=r.log.slice(0,8); state.bossRun=r
+  }
+  function fmt(ms){var s=Math.max(0,Math.ceil(ms/1000)),h=Math.floor(s/3600);s%=3600;var m=Math.floor(s/60);s%=60;return (h?h+'س ':'')+(m?m+'د ':'')+s+'ث'}
+  function playerPower(){var st=effectiveStats?effectiveStats():{atk:10,def:5};return Math.max(1,Math.round((st.atk||0)*1.2+(st.def||0)*.7+(state.level||1)*4))}
+  async function callBossAI(action,ev){
+    if(!window.warneholdAI||!window.warneholdAI.ask)throw new Error('AI در دسترس نیست');
+    if(window.warneholdAI.modes)window.warneholdAI.modes.boss_director={label:'مدیر Boss',system:'تو مدیر کامل Boss Event هستی و فقط JSON معتبر برای طراحی و مدیریت باس تولید کن.'};
+    var data=await window.warneholdAI.ask(
+      action==='generate'?'برای امروز یک Boss کاملا جدید بساز. هر چیزی که امروز ساخته می‌شود باید با باس‌های قبلی متفاوت باشد. ظاهر، قدرت، مقاومت، فازها، میدان و Loot Theme را خودت طراحی کن.':action==='turn'?'برای این نوبت فقط روایت و حرکت باس را با توجه به وضعیت فعلی بده.': 'Event تمام شده است. فقط روایت پایان و هدف کوتاه بعدی را بده.',
+      'boss_director',
+      {action:action,eventDate:dayKey(),seed:seedForDay(dayKey()),turn:(state.bossRun&&state.bossRun.turn)||0,phase:(ev&&ev.phase)||1,boss:ev&&ev.boss||null,player:{level:state.level||1,power:playerPower(),hp:state.hp||0,energy:state.energy||0},history:(await loadSharedList('boss_event_history')).slice(0,5)}
+    );
+    var parsed=parseAI(data.answer); if(!parsed)throw new Error('پاسخ ساختاریافته AI نامعتبر بود'); return parsed;
+  }
+  async function archiveBoss(ev){
+    var h=await loadSharedList('boss_event_history');
+    h.unshift({dateKey:ev.dateKey,name:ev.boss.name,title:ev.boss.title,defeated:ev.hp<=0,hpMax:ev.hpMax,participants:Object.entries(ev.participants||{}).sort(function(a,b){return (b[1].damage||0)-(a[1].damage||0)}).slice(0,10).map(function(x){return {playerId:x[0],name:x[1].name,damage:x[1].damage||0}}),finishedAt:Date.now()});
+    await saveSharedList('boss_event_history',h.slice(0,30))
+  }
+  async function ensureDailyBossActive(){
+    return withActionLock('daily-boss-ensure',async function(){
+      var today=dayKey(), ev=await loadGlobalEvent();
+      if(ev&&ev.dateKey===today)return ev;
+      if(ev&&ev.dateKey&&ev.dateKey!==today){try{await archiveBoss(ev)}catch(e){}}
+      var boss;
+      try{boss=await callBossAI('generate',null)}catch(e){console.warn('Boss AI generation fallback',e);boss=fallbackBoss(today)}
+      var hp=Math.max(1500,Number(boss.hp)||3000);
+      var newEv={status:'active',type:'world_boss',aiManaged:true,dateKey:today,seed:seedForDay(today),boss:boss,hp:hp,hpMax:hp,phase:1,participants:{},rewardsClaimed:{},startedAt:Date.now(),cooldownMs:BOSS_COOLDOWN};
+      await saveGlobalEvent(newEv);
+      return newEv;
+    })
+  }
+  function phaseFor(ev){
+    var ratio=ev.hp/Math.max(1,ev.hpMax), p=1;
+    (ev.boss.phases||[]).forEach(function(x,i){if(ratio<=Number(x.at||0))p=i+2});
+    return Math.min(4,p)
+  }
+  function renderBossCanvas(ev){
+    var can=document.getElementById('wh-boss-canvas');if(!can)return;
+    var ctx=can.getContext('2d'),w=can.width=can.clientWidth*devicePixelRatio,h=can.height=can.clientHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    var W=can.clientWidth,H=can.clientHeight,t=performance.now()/1000,seed=(parseInt(ev.seed,36)||9)%1000;
+    ctx.clearRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<28;i++){var x=(Math.sin(t*(.3+i*.017)+seed*i)*.5+.5)*W,y=(Math.cos(t*(.2+i*.013)+i)*.5+.5)*H*.75,r=1+(i%4);ctx.fillStyle=i%3===0?'rgba(201,162,75,.55)':'rgba(178,58,58,.35)';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+    var cx=W/2,cy=H*.52,scale=Math.min(W,H)/220;ctx.fillStyle='rgba(8,6,8,.96)';ctx.strokeStyle='rgba(201,162,75,.55)';ctx.lineWidth=2;
+    ctx.beginPath();for(var j=0;j<18;j++){var a=j*Math.PI*2/18,rad=(72+(Math.sin(seed+j*1.7)*14))*scale;var x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad*.72;if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.shadowBlur=28;ctx.shadowColor='rgba(178,58,58,.75)';ctx.fillStyle='rgba(178,58,58,.7)';ctx.beginPath();ctx.arc(cx,cy,30*scale,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(232,223,202,.9)';for(var k=0;k<3;k++){ctx.beginPath();ctx.arc(cx+(-22+k*22)*scale,cy-8*scale,4*scale,0,Math.PI*2);ctx.fill()}
+    bossAnim=requestAnimationFrame(function(){renderBossCanvas(ev)})
+  }
+  function stopBossCanvas(){if(bossAnim)cancelAnimationFrame(bossAnim);bossAnim=null}
+  function openBossScreen(){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById('screen-boss-event').classList.add('active');renderBossEvent()}
+  function bossEntryState(ev){
+    var cd=Number(state.bossCooldownUntil||0),w=state.bossWound||null,seals=Number(state.bossSeals??1);
+    return {cd:cd,wound:w,seals:seals,locked:Date.now()<cd||!!(w&&Date.now()<w.until)||seals<1}
+  }
+  function renderBossEvent(){
+    var box=document.getElementById('wh-boss-event-content');if(!box)return;
+    loadGlobalEvent().then(function(ev){
+      if(!ev||ev.status!=='active'){stopBossCanvas();box.innerHTML='<div class="empty-note">امروز Boss فعالی وجود ندارد. برای روز بعد آماده باش.</div>';return}
+      var b=ev.boss||fallbackBoss(ev.dateKey), ratio=Math.max(0,ev.hp/Math.max(1,ev.hpMax)), phase=phaseFor(ev), st=bossEntryState(ev), run=state.bossRun;
+      var me=(ev.participants||{})[state.playerId]||{damage:0}, ranked=Object.entries(ev.participants||{}).sort(function(a,b){return (b[1].damage||0)-(a[1].damage||0)}).slice(0,5);
+      var cd=Number(state.bossCooldownUntil||0),w=state.bossWound||null;
+      var html='<div class="wh-boss-visual wh-boss-reveal"><canvas id="wh-boss-canvas"></canvas><div class="wh-boss-head"><div class="wh-boss-kicker">DAILY AI BOSS · '+esc(ev.dateKey)+'</div><div class="wh-boss-name">'+esc(b.name)+'</div><div class="wh-boss-title">'+esc(b.title||'')+'</div></div><div class="wh-boss-hp"><div class="bar-track"><div class="bar-fill" style="width:'+(ratio*100)+'%"></div></div><div class="wh-boss-phase">فاز '+phase+' · '+Math.max(0,Math.round(ev.hp))+' / '+Math.round(ev.hpMax)+'</div></div></div>';
+      html+='<div class="wh-boss-meta"><div class="wh-boss-stat"><b>'+esc(b.difficulty)+'</b><span>خطر</span></div><div class="wh-boss-stat"><b>'+esc(b.defense)+'</b><span>دفاع</span></div><div class="wh-boss-stat"><b>'+esc(b.speed)+'</b><span>سرعت</span></div><div class="wh-boss-stat"><b>'+esc(state.bossSeals??1)+'</b><span>Seal</span></div></div>';
+      html+='<div class="wh-boss-card"><h3>☠️ باس امروز</h3><div style="font-size:12px;color:var(--dim);line-height:1.55">'+esc(b.lore||b.eventText||'')+'</div><div class="wh-boss-tags" style="margin-top:7px"><span class="wh-boss-tag">ضعف: '+esc(b.weakness)+'</span><span class="wh-boss-tag">مقاومت: '+esc(b.resistance)+'</span><span class="wh-boss-tag">میدان: '+esc(b.arena)+'</span></div><div class="wh-boss-tags" style="margin-top:6px">'+(b.powers||[]).map(function(p){return '<span class="wh-boss-tag">'+esc(p.name)+'</span>'}).join('')+'</div></div>';
+      if(run&&run.eventDate===ev.dateKey){
+        html+='<div class="wh-boss-card"><h3>⚔️ فایت جاری · نوبت '+run.turn+'/5</h3><div class="wh-boss-dmg">+'+Math.round(run.damage||0)+' DMG</div><div class="wh-boss-log">'+(run.log||[]).map(function(x){return '<div>'+esc(x)+'</div>'}).join('')+'</div></div>';
+        html+='<div class="wh-boss-actions"><button data-boss-action="strike">⚔️ ضربه سنگین</button><button data-boss-action="power">✨ قدرت ویژه</button><button data-boss-action="guard">🛡️ دفاع</button><button class="danger" data-boss-action="risk">🔥 حمله پرریسک</button></div>';
+      }else{
+        if(Date.now()<cd)html+='<div class="wh-boss-cooldown">⏳ زمان باقی‌مانده تا فایت بعدی: '+fmt(cd-Date.now())+'</div>';
+        if(w&&Date.now()<w.until)html+='<div class="wh-boss-cooldown">🩸 Wound فعال · '+fmt(w.until-Date.now())+' · شدت '+w.level+'</div>';
+        html+='<div class="wh-boss-card"><h3>🎁 پاداش</h3><div class="wh-boss-reward"><span>مشارکت</span><b>'+Math.max(10,Number(b.baseReward)||50)+' ین</b></div><div class="wh-boss-reward"><span>Loot Rare</span><b>با Damage بیشتر شانس بالاتر</b></div><div class="wh-boss-reward"><span>حتی با مرگ</span><b>پاداش مشارکت حفظ می‌شود</b></div></div>';
+        html+='<button class="primary" id="wh-boss-start" '+(st.locked?'disabled':'')+'>⚔️ شروع فایت باس · 1 Seal</button>';
+      }
+      html+='<div class="wh-boss-card"><h3>🏆 بیشترین Damage</h3>'+(ranked.length?ranked.map(function(x,i){return '<div class="wh-boss-reward"><span>'+(i+1)+'. '+esc(x[1].name)+(x[0]===state.playerId?' (شما)':'')+'</span><b>'+Math.round(x[1].damage||0)+'</b></div>'}).join(''):'<div class="empty-note" style="padding:8px">هنوز کسی وارد فایت نشده</div>')+'</div>';
+      box.innerHTML=html;
+      renderBossCanvas(ev);
+      var start=document.getElementById('wh-boss-start');if(start)start.onclick=startBossFight;
+      box.querySelectorAll('[data-boss-action]').forEach(function(btn){btn.onclick=function(){bossTurn(btn.dataset.bossAction)}});
+    }).catch(function(e){box.innerHTML='<div class="empty-note">خطا در بارگذاری Boss Event</div>';console.error(e)})
+  }
+  async function startBossFight(){
+    return withActionLock('boss-start:'+state.playerId,async function(){
+      var ev=await loadGlobalEvent();if(!ev||ev.status!=='active')return;
+      var now=Date.now(),st=bossEntryState(ev);
+      if(st.cd>now){showToast('هنوز زمان فایت بعدی نرسیده');return}
+      if(st.wound&&st.wound.until>now){showToast('Wound هنوز فعال است');return}
+      if(st.seals<1){showToast('Boss Seal کافی نیست');return}
+      state.bossSeals=st.seals-1;state.bossRun={eventDate:ev.dateKey,turn:0,damage:0,log:['ورود به محوطه باس'],guard:false};state.bossCooldownUntil=now+BOSS_COOLDOWN;
+      ev.participants=ev.participants||{};ev.participants[state.playerId]=ev.participants[state.playerId]||{name:state.name,damage:0,attempts:0};ev.participants[state.playerId].attempts++;
+      await saveGlobalEvent(ev);await saveState();renderBossEvent();
+    })
+  }
+  async function finishBossFight(ev,won,died){
+    var run=state.bossRun;if(!run)return;
+    var dmg=Math.max(0,Math.round(run.damage||0));var p=ev.participants[state.playerId];if(p)p.damage=(p.damage||0)+dmg;
+    var reward=Math.max(10,Math.round((ev.boss.baseReward||50)*(0.5+Math.min(.5,dmg/Math.max(1,ev.hpMax)))));
+    state.gold=(state.gold||0)+reward;
+    var rareChance=Math.min(.55,0.04+0.5*(dmg/Math.max(1,ev.hpMax)));
+    if(won)rareChance=Math.min(.85,rareChance+.12);
+    if(Math.random()<rareChance){
+      var rarity=dmg/Math.max(1,ev.hpMax)>.6?'legendary':dmg/Math.max(1,ev.hpMax)>.3?'epic':'rare';
+      var id='boss_'+ev.dateKey.replace(/-/g,'')+'_'+rarity;
+      var existing=(state.inventory||[]).find(function(x){return x.id===id});
+      if(existing)existing.qty=(existing.qty||0)+1;else state.inventory.push({id:id,name:ev.boss.name+' — '+ev.boss.lootTheme,type:'Special Items',qty:1,rarity:rarity,source:'Daily Boss Event'});
+      addLog('🎁 Loot '+rarity+' دریافت شد');
+    }
+    if(died){
+      var loss=Math.max(20,Math.round((state.level||1)*15));state.xp=Math.max(0,(state.xp||0)-loss);
+      var wl=state.bossWound&&state.bossWound.level||0;state.bossWound={level:Math.min(3,wl+1),until:Date.now()+WOUND_TIME};
+      addLog('☠️ شکست — '+loss+' XP از دست رفت و Wound گرفتی');
+    }else if(won){state.bossDefeats=(state.bossDefeats||0)+1;addLog('👑 Boss امروز نابود شد')}
+    state.bossRun=null;await saveState();renderHUD();
+    if(ev.hp<=0){ev.status='ended';ev.defeatedAt=Date.now();await saveGlobalEvent(ev);try{var ai=await callBossAI('finish',ev);ev.aiFinish=ai}catch(e){}await archiveBoss(ev);await saveGlobalEvent({status:'none',dateKey:ev.dateKey,endedAt:Date.now(),lastBoss:ev.boss.name});showToast('👑 Boss امروز برای همیشه حذف شد')}
+    else{await saveGlobalEvent(ev);showToast('فایت تمام شد · '+reward+' ین')}
+    renderBossEvent();renderWorldEventBanner();
+  }
+  async function bossTurn(action){
+    return withActionLock('boss-turn:'+state.playerId,async function(){
+      var ev=await loadGlobalEvent(),run=state.bossRun;if(!ev||ev.status!=='active'||!run)return;
+      run.turn=(run.turn||0)+1;var phase=phaseFor(ev),st=effectiveStats?effectiveStats():{atk:10,def:5};var mult=action==='risk'?2.0:action==='power'?1.55:action==='guard'?.72:1.15;
+      var dmg=Math.max(4,Math.round((st.atk||10)*mult-(Number(ev.boss.defense)||20)*.42+(Math.random()*12-6)));
+      if(action==='guard')run.guard=true;else run.guard=false;if(action==='risk'&&Math.random()<.18)dmg=Math.round(dmg*.35);
+      ev.hp=Math.max(0,ev.hp-dmg);run.damage+=dmg;addLog('⚔️ '+(action==='power'?'قدرت ویژه':action==='risk'?'حمله پرریسک':action==='guard'?'دفاع':'ضربه سنگین')+' · '+dmg+' DMG');
+      if(ev.participants[state.playerId])ev.participants[state.playerId].damage=(ev.participants[state.playerId].damage||0)+dmg;
+      ev.phase=phaseFor(ev);
+      var incoming=Math.max(3,Math.round((Number(ev.boss.difficulty)||45)*.65-(st.def||5)*.28+(Math.random()*8-4)));if(run.guard)incoming=Math.round(incoming*.4);
+      if(action==='risk'&&Math.random()<.12)incoming=Math.round(incoming*1.45);
+      state.hp=Math.max(0,(state.hp||1)-incoming);addLog('☠️ '+incoming+' آسیب از باس');
+      if(window.warneholdAI&&window.warneholdAI.ask){try{var ai=await callBossAI('turn',ev);if(ai.narration)addLog('🧠 '+ai.narration);if(ai.bossMove)addLog('👑 '+ai.bossMove)}catch(e){}}
+      if(ev.hp<=0){await finishBossFight(ev,true,false);return}
+      if(state.hp<=0||run.turn>=5){await finishBossFight(ev,false,state.hp<=0);return}
+      await saveGlobalEvent(ev);await saveState();renderBossEvent();
+      var root=document.getElementById('screen-boss-event');if(root){root.classList.remove('wh-boss-shake');void root.offsetWidth;root.classList.add('wh-boss-shake')}
+    })
+  }
+  function patchBanner(){
+    var box=document.getElementById('world-event-banner');if(!box)return;
+    loadGlobalEvent().then(function(ev){
+      if(!ev||ev.status!=='active'){box.innerHTML='';return}
+      var b=ev.boss||{};var ratio=Math.max(0,ev.hp/Math.max(1,ev.hpMax));
+      box.innerHTML='<div class="world-event-card"><b>👑 Boss روز · '+esc(b.name||'Boss ناشناخته')+'</b><br><span style="color:var(--dim)">فقط امروز فعال است · '+Math.round(ratio*100)+'٪ HP باقی مانده</span><div class="bar-track" style="margin:6px 0"><div class="bar-fill hp" style="width:'+(ratio*100)+'%"></div></div><button class="primary" id="wh-open-boss" style="width:100%">👑 ورود به Boss Event</button></div>';
+      var x=document.getElementById('wh-open-boss');if(x)x.onclick=openBossScreen;
+    })
+  }
+  window.whEnsureDailyBoss=ensureDailyBossActive;window.whOpenBossScreen=openBossScreen;window.whRenderBossEvent=renderBossEvent;
+  var oldEnter=window.enterGame;if(typeof oldEnter==='function'){window.enterGame=function(){var r=oldEnter.apply(this,arguments);setTimeout(function(){ensureDailyBossActive().then(patchBanner)},250);return r}}
+  var oldRenderBanner=window.renderWorldEventBanner;window.renderWorldEventBanner=patchBanner;
+  document.addEventListener('click',function(e){if(e.target&&e.target.id==='wh-boss-back'){stopBossCanvas();if(typeof switchScreen==='function')switchScreen('map')}});
+  setInterval(function(){var s=document.getElementById('screen-boss-event');if(s&&s.classList.contains('active'))renderBossEvent()},1000);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){ensureDailyBossActive().then(patchBanner)});else setTimeout(function(){ensureDailyBossActive().then(patchBanner)},900);
+})();
+</script>
 </html>
