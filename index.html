@@ -8305,4 +8305,10 @@ window.whWarneholdSfx=s;
 window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_sound',enabled?'on':'off');if(enabled)init()},get(){return enabled}};
 })();
 </script>
-\n<!-- wh-v4-ready --></html>
+\n<!-- wh-v4-ready -->
+<style id="wh-real-audio-pack-v12">#wh-war-audio{display:none!important}</style>
+<script id="wh-real-audio-pack-v12-js">
+(function(){if(window.__whRealAudioV12)return;window.__whRealAudioV12=true;const SRC='https://cdn.creativeclaw.co/u/3f8a5c32/audio/d2e0f630-5758-4181-b47f-028b6e5db070.mp3';let enabled=localStorage.getItem('warnehold_sound')!=='off';let a=null;function ensure(){if(!enabled)return;try{if(!a){a=new Audio(SRC);a.loop=true;a.preload='auto';a.volume=.16;a.id='wh-war-audio';document.body.appendChild(a)}const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}function sync(){enabled=localStorage.getItem('warnehold_sound')!=='off';if(enabled)ensure();else if(a){a.pause();a.currentTime=0}}document.addEventListener('pointerdown',ensure,{passive:true});document.addEventListener('touchstart',ensure,{passive:true});window.addEventListener('storage',e=>{if(e.key==='warnehold_sound')sync()});window.whWarneholdMusic={start:ensure,stop:function(){if(a)a.pause()},setEnabled:function(v){enabled=!!v;localStorage.setItem('warnehold_sound',enabled?'on':'off');sync()}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync);else sync();})();
+</script>
+<!-- wh-real-audio-pack-v12 -->
+</html>
