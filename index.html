@@ -8277,4 +8277,32 @@ body{overflow:hidden!important}
 })();
 </script>
 
-<!-- wh-v4-ready --></html>
+<style id="wh-direct-game-v11">
+#game-wrap .screen{isolation:isolate;overflow:hidden!important;min-height:100dvh!important;height:100dvh!important}
+#game-wrap .screen::before{z-index:-3!important;transform:scale(1.045)!important;filter:saturate(.95) contrast(1.08) brightness(.82)!important;transition:transform .8s ease,filter .8s ease!important}
+#game-wrap .screen.active::before{transform:scale(1.01)!important;filter:saturate(1) contrast(1.06) brightness(.9)!important}
+#game-wrap .screen::after{z-index:-2!important;background:radial-gradient(circle at 50% 42%,rgba(0,0,0,.02),rgba(0,0,0,.28) 72%),linear-gradient(180deg,rgba(5,4,3,.18),rgba(5,4,3,.52))!important;pointer-events:none!important}
+#game-wrap .screen .panel,#game-wrap .screen .card,#game-wrap .screen .box,#game-wrap .screen .modal,#game-wrap .screen .section-card,#game-wrap .screen .list-card{background:rgba(10,8,7,.38)!important;border-color:rgba(201,162,75,.22)!important;box-shadow:0 14px 45px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.035)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
+#game-wrap .screen h1,#game-wrap .screen h2,#game-wrap .screen h3{text-shadow:0 3px 18px rgba(0,0,0,.8)!important}
+#game-wrap button{border-radius:10px!important;min-height:42px;box-shadow:0 5px 18px rgba(0,0,0,.25)!important;transition:transform .12s ease,filter .12s ease,background .18s ease!important}
+#game-wrap button:active{transform:scale(.965)!important;filter:brightness(1.18)!important}
+#wh-game-nav{background:linear-gradient(180deg,rgba(8,6,5,.82),rgba(8,6,5,.48))!important;border-top:1px solid rgba(201,162,75,.16)!important;box-shadow:0 -10px 35px rgba(0,0,0,.28)!important;backdrop-filter:blur(10px)!important}
+#wh-game-nav button{background:rgba(17,13,10,.34)!important;border:1px solid rgba(201,162,75,.12)!important}
+#wh-game-nav button.active,#wh-game-nav button[aria-current="page"]{background:linear-gradient(180deg,rgba(201,162,75,.24),rgba(100,58,25,.18))!important;border-color:rgba(201,162,75,.48)!important;box-shadow:0 0 22px rgba(201,162,75,.13)!important}
+#screen-map .panel,#screen-worldmap .panel,#screen-village-map .panel,#screen-shop .panel,#screen-animeshop .panel,#screen-battle .panel{background:rgba(8,6,5,.28)!important}
+@media(max-width:520px){#game-wrap .screen{height:100svh!important;min-height:100svh!important}}
+</style>
+<script id="wh-direct-game-v11-js">
+(function(){if(window.__whV11)return;window.__whV11=true;
+const AC=window.AudioContext||window.webkitAudioContext;let ac=null,master=null,enabled=localStorage.getItem('warnehold_sound')!=='off';
+function init(){if(!enabled||!AC)return false;try{if(!ac){ac=new AC();master=ac.createGain();master.gain.value=.14;master.connect(ac.destination)}if(ac.state==='suspended')ac.resume();return true}catch(e){return false}}
+function tone(a,b,c,d){if(!init())return;const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type=c||'sine';o.frequency.value=a;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(d||.05,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+b);o.connect(g);g.connect(master);o.start(t);o.stop(t+b+.02)}
+const s={tap:()=>tone(620,.06,'sine',.045),open:()=>{tone(330,.12,'triangle',.04);setTimeout(()=>tone(660,.14,'triangle',.035),70)},ok:()=>{tone(520,.08,'triangle',.05);setTimeout(()=>tone(780,.12,'sine',.04),65)},soft:()=>tone(420,.12,'sine',.035)};
+document.addEventListener('pointerdown',e=>{init();const b=e.target.closest('button,[role="button"]');if(!b)return;const t=(b.textContent||'');if(/خرید|دریافت|ثبت|ذخیره|تایید/.test(t))s.ok();else if(/شروع|ورود|باز/.test(t))s.open();else s.tap()},{passive:true});
+document.addEventListener('touchstart',init,{passive:true});
+const old=window.switchScreen;if(typeof old==='function'){window.switchScreen=function(){const r=old.apply(this,arguments);setTimeout(()=>s.soft(),80);return r}}
+window.whWarneholdSfx=s;
+window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_sound',enabled?'on':'off');if(enabled)init()},get(){return enabled}};
+})();
+</script>
+\n<!-- wh-v4-ready --></html>
