@@ -614,6 +614,9 @@ button.primary{box-shadow:0 7px 22px rgba(90,15,25,.30),inset 0 1px 0 rgba(255,2
   .wh-ai-card[data-mode="world"]{border-color:rgba(74,122,165,.55)}
   .wh-ai-card[data-mode="guide"]{border-color:rgba(90,138,90,.55)}
   .wh-ai-card[data-mode="npc"]{border-color:rgba(178,58,58,.5)}
+
+  .wh-ai-screen-card{position:relative;z-index:20;margin:8px auto;max-width:min(92%,720px);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+  .wh-ai-screen-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.wh-ai-screen-title{font-family:'Cinzel';font-size:12px;color:#e7d6ff}.wh-ai-screen-btn{background:rgba(138,74,192,.22);border:1px solid rgba(158,105,224,.6);color:#f1e7ff;border-radius:7px;padding:7px 10px;font-size:11px}.wh-ai-screen-btn:disabled{opacity:.45}.wh-ai-screen-result{font-size:12px;line-height:1.6;margin-top:8px;color:var(--parchment)}
   @media (prefers-reduced-motion:reduce){.wh-ai-pulse,.wh-ai-typing i,.wh-ai-card{animation:none!important}}
 </style>
 <style id="wh-game-ui-v4">
@@ -5364,9 +5367,44 @@ function switchScreenCore(name){
   if(name==='collection'){ renderCollection(); }
   if(name==='pvp' && !pvpBattleId && state.pvpBattleId){ openPvpBattle(state.pvpBattleId); }
   updateNotifBadge();
+  mountWarneholdAIScreen(name);
 }
 
-function playCinematicTransition(done){
+function mountWarneholdAIScreen(name){
+  const configs={
+    map:['guide','🧭 راهنمای هوشمند','از روی وضعیت فعلی بازی بگو الان برای پیشرفت چه بخش هایی به درد من می خورند'],
+    worldmap:['world','🌍 هوش جهان','یک رویداد داستانی کوتاه و غیرقطعی برای این بخش پیشنهاد بده'],
+    villagemap:['npc','🧑‍🤝‍🧑 شخصیت هوشمند','یک شخصیت محلی مناسب این محل بساز و یک شروع گفتگوی کوتاه بده'],
+    quest:['quest','📜 سازنده مأموریت','یک مأموریت متناسب با سطح فعلی من پیشنهاد بده و شرایطش را واضح بگو'],
+    job:['quest','🧰 راهنمای کارها','برای این بخش چند ایده کار کوتاه و متناسب با بازیکن پیشنهاد بده'],
+    social:['social','💬 دستیار اجتماعی','یک پیشنهاد کوتاه برای تعامل اجتماعی سالم داخل بازی بده'],
+    char:['guide','✨ راهنمای شخصیت','بر اساس وضعیت فعلی من بگو کدام بخش های شخصیت را بهتر است بررسی کنم'],
+    collection:['guide','📚 راهنمای مجموعه','کمک کن بفهمم برای تکمیل مجموعه از کجا شروع کنم'],
+    journey:['guide','🧭 راهنمای سفر','یک مسیر پیشنهادی کوتاه برای ادامه بازی بده']
+  };
+  const cfg=configs[name]; if(!cfg)return;
+  const sid=({'map':'screen-map','worldmap':'screen-worldmap','villagemap':'screen-village-map','quest':'screen-quest','job':'screen-job','social':'screen-social','char':'screen-char','collection':'screen-collection','journey':'screen-journey'})[name];
+  const host=document.getElementById(sid); if(!host)return;
+  let box=host.querySelector('.wh-ai-screen-card');
+  if(!box){
+    box=document.createElement('div'); box.className='wh-ai-screen-card wh-ai-card wh-ai-pulse';
+    box.innerHTML='<div class="wh-ai-screen-head"><span class="wh-ai-screen-title"></span><button type="button" class="wh-ai-screen-btn">پرسیدن از AI</button></div><div class="wh-ai-screen-result" aria-live="polite"></div>';
+    const anchor=host.firstElementChild;
+    if(anchor)host.insertBefore(box,anchor); else host.appendChild(box);
+    box.querySelector('.wh-ai-screen-btn').onclick=async()=>{
+      const btn=box.querySelector('.wh-ai-screen-btn'), out=box.querySelector('.wh-ai-screen-result');
+      btn.disabled=true; out.innerHTML='<span class="wh-ai-typing"><i></i><i></i><i></i></span>';
+      try{
+        const answer=await warneholdAIModule(cfg[0],cfg[2],{section:name});
+        out.textContent=answer;
+      }catch(e){out.textContent=e.message||'اتصال AI ناموفق بود';}
+      finally{btn.disabled=false;}
+    };
+  }
+  box.querySelector('.wh-ai-screen-title').textContent=cfg[1];
+  box.dataset.mode=cfg[0];
+}
+
   let fx=$('#wh-cinematic');
   if(!fx){
     fx=document.createElement('div');
