@@ -1286,18 +1286,16 @@ let accountUsername = localStorage.getItem('warnehold_account_username') || '';
 let authMode = 'register';
 
 async function accountRequest(payload){
-  const res = await fetch(ACCOUNT_API,{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'apikey':SUPABASE_KEY,
-      'Authorization':'Bearer '+SUPABASE_KEY
-    },
-    body:JSON.stringify(payload)
-  });
-  const data = await res.json().catch(()=>({ok:false,error:'پاسخ نامعتبر از سرور حساب'}));
-  if(!res.ok || !data.ok) throw new Error(data.error || 'خطا در حساب');
-  return data;
+  let lastError=null;
+  for(let attempt=0;attempt<2;attempt++){
+    try{
+      const res=await fetch(ACCOUNT_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify(payload)});
+      const data=await res.json().catch(()=>({ok:false,error:'پاسخ نامعتبر از سرور حساب'}));
+      if(!res.ok||!data.ok){const err=new Error(data.error||'خطا در حساب');err.status=res.status;throw err;}
+      return data;
+    }catch(e){lastError=e;if(attempt===0)await new Promise(r=>setTimeout(r,700));}
+  }
+  throw lastError||new Error('خطا در حساب');
 }
 
 async function migrateLegacyDeviceSave(legacyScope, newAccountId){
@@ -1345,27 +1343,21 @@ function clearAccountSession(){
 }
 
 async function restoreAccountSession(){
-  if(!accountSession) return false;
+  accountSession=localStorage.getItem('warnehold_account_session')||accountSession||'';
+  if(!accountSession)return false;
   try{
-    // نسخه فعلی Edge Function قبل از بررسی action، username/password را validate می‌کند.
-    // برای action=session این دو مقدار اصلاً استفاده نمی‌شوند، اما باید از validation عبور کنند.
-    const data=await accountRequest({
-      action:'session',
-      session:accountSession,
-      username:'session',
-      password:'000000'
-    });
-    accountId=data.accountId; accountUsername=data.username;
+    const data=await accountRequest({action:'session',session:accountSession,username:'session',password:'000000'});
+    accountId=data.accountId||localStorage.getItem('warnehold_account_id')||'';
+    accountUsername=data.username||localStorage.getItem('warnehold_account_username')||'';
+    if(!accountId||!accountUsername)throw new Error('اطلاعات حساب از سرور کامل نیست');
     localStorage.setItem('warnehold_account_id',accountId);
     localStorage.setItem('warnehold_account_username',accountUsername);
-
-    // اگر Save قدیمی هنوز روی scope دستگاه مانده باشد، یک‌بار به scope حساب منتقلش می‌کنیم.
-    const legacyScope = localStorage.getItem('warnhold_device_id') || '';
-    await migrateLegacyDeviceSave(legacyScope, accountId);
+    const legacyScope=localStorage.getItem('warnhold_device_id')||'';
+    await migrateLegacyDeviceSave(legacyScope,accountId);
     return true;
   }catch(e){
     console.error('account session restore failed',e);
-    clearAccountSession();
+    if(e&&(e.status===401||e.status===403))clearAccountSession();
     return false;
   }
 }
