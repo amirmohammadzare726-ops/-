@@ -395,6 +395,33 @@ button,.pick-card,.region,.shop-item,.item-row,.npc-card,.quest-card,.enemy-card
 }
 
 </style>
+
+<style id="warnehold-gfx-v2-css">
+/* WARNEHOLD GRAPHICS ENGINE v2 — atmosphere layer */
+:root{--gx-gold:rgba(226,185,84,.9);--gx-blue:rgba(80,155,255,.75);--gx-red:rgba(235,70,70,.78)}
+body.gx-atmo:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9990;background:radial-gradient(circle at 50% 18%,rgba(210,170,70,.055),transparent 35%),radial-gradient(circle at 20% 80%,rgba(70,110,180,.045),transparent 38%);mix-blend-mode:screen}
+#gx-scene{position:fixed;inset:0;pointer-events:none;z-index:9988;overflow:hidden;opacity:1;transition:opacity .35s ease}
+.gx-orb{position:absolute;border-radius:50%;filter:blur(18px);opacity:.16;animation:gxFloat 8s ease-in-out infinite alternate}
+.gx-orb.o1{width:180px;height:180px;left:-60px;top:12%;background:var(--gx-gold)}
+.gx-orb.o2{width:220px;height:220px;right:-80px;bottom:8%;background:var(--gx-blue);animation-delay:-3s}
+.gx-orb.o3{width:120px;height:120px;left:42%;top:-50px;background:var(--gx-red);animation-delay:-5s}
+.gx-mist{position:absolute;inset:-20%;background:repeating-radial-gradient(ellipse at 50% 55%,transparent 0 9%,rgba(255,255,255,.012) 10% 11%,transparent 12% 19%);filter:blur(8px);animation:gxMist 22s linear infinite}
+.gx-scan{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.025) 50%,transparent 51%);background-size:100% 7px;opacity:.16;mix-blend-mode:overlay}
+@keyframes gxFloat{to{transform:translate3d(18px,-14px,0) scale(1.08)}}
+@keyframes gxMist{to{transform:translate3d(5%,0,0) rotate(1deg)}}
+body.gx-scene-map #gx-scene{background:radial-gradient(circle at 50% 45%,rgba(90,160,110,.05),transparent 58%)}
+body.gx-scene-battle #gx-scene{background:radial-gradient(circle at 50% 50%,rgba(190,45,45,.08),transparent 50%)}
+body.gx-scene-pvp #gx-scene{background:radial-gradient(circle at 50% 50%,rgba(110,70,220,.08),transparent 52%)}
+body.gx-scene-shop #gx-scene{background:radial-gradient(circle at 50% 28%,rgba(220,170,70,.075),transparent 48%)}
+body.gx-scene-worldmap #gx-scene{background:radial-gradient(circle at 50% 50%,rgba(40,120,180,.08),transparent 60%)}
+body.gx-scene-danger #gx-scene{background:radial-gradient(circle at 50% 50%,rgba(220,50,50,.11),transparent 54%)}
+.gx-power-pulse{animation:gxPowerPulse .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes gxPowerPulse{0%{filter:brightness(1)}35%{filter:brightness(1.8) saturate(1.45)}100%{filter:brightness(1)}}
+.gx-hit-ring{position:fixed;width:18px;height:18px;border:2px solid rgba(255,220,130,.85);border-radius:50%;pointer-events:none;z-index:10020;transform:translate(-50%,-50%);animation:gxRing .55s ease-out forwards;box-shadow:0 0 22px rgba(255,190,70,.65)}
+@keyframes gxRing{to{width:230px;height:230px;opacity:0;border-width:1px}}
+@media(max-width:600px){.gx-orb{opacity:.11}.gx-scan{opacity:.08}}
+@media(prefers-reduced-motion:reduce){#gx-scene,.gx-orb,.gx-mist{animation:none!important}.gx-power-pulse,.gx-hit-ring{animation:none!important}}
+</style>
 </head>
 <body>
 <div id="app">
@@ -6994,6 +7021,52 @@ document.addEventListener('visibilitychange', ()=>{
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
+</script>
+
+<script id="warnehold-gfx-v2-js">
+(function(){
+'use strict';
+const sceneIds=['map','village-map','worldmap','quest','job','battle','char','inv','blacksmith','social','pvp','shop','transfer','journey','auction','chat','admin','animeshop','collection','welcome','notifcenter'];
+function makeScene(){
+ if(document.getElementById('gx-scene')) return;
+ const s=document.createElement('div');s.id='gx-scene';
+ s.innerHTML='<div class="gx-orb o1"></div><div class="gx-orb o2"></div><div class="gx-orb o3"></div><div class="gx-mist"></div><div class="gx-scan"></div>';
+ document.body.appendChild(s);
+ document.body.classList.add('gx-atmo');
+}
+function activeId(){
+ const el=document.querySelector('.screen.active');
+ return el?el.id.replace('screen-',''):'start';
+}
+function setScene(){
+ const id=activeId();
+ document.body.classList.forEach?.(()=>{});
+ [...document.body.classList].filter(x=>x.indexOf('gx-scene-')===0).forEach(x=>document.body.classList.remove(x));
+ document.body.classList.add('gx-scene-'+id);
+ const danger=document.querySelector('#screen-map .region.current .rdanger');
+ if(danger && /[5-9]|10/.test(danger.textContent||'')) document.body.classList.add('gx-scene-danger');
+}
+function ring(x,y){
+ const r=document.createElement('div');r.className='gx-hit-ring';r.style.left=x+'px';r.style.top=y+'px';document.body.appendChild(r);
+ setTimeout(()=>r.remove(),600);
+}
+function pulse(el){if(!el)return;el.classList.remove('gx-power-pulse');void el.offsetWidth;el.classList.add('gx-power-pulse');setTimeout(()=>el.classList.remove('gx-power-pulse'),650)}
+function hook(){
+ makeScene();setScene();
+ const obs=new MutationObserver(()=>setTimeout(setScene,0));
+ obs.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+ document.addEventListener('click',e=>{
+   const el=e.target.closest('#act-attack,#act-powers,#act-items,#act-defend,#act-run,#pvp-act-attack,#pvp-act-powers,#pvp-act-defend,.region,.world-node,.power-card,.ability-card,.enemy-card');
+   if(!el)return;
+   ring(e.clientX||innerWidth/2,e.clientY||innerHeight/2); pulse(el);
+   if(window.WarneholdGraphics){
+     const type=el.id.includes('attack')?'red':(el.id.includes('powers')?'blue':'gold');
+     window.WarneholdGraphics.burst(type,18,e.clientX,e.clientY);
+   }
+ },{passive:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hook,{once:true});else hook();
+})();
 </script>
 </body>
 </html>
