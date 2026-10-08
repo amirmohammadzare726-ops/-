@@ -1292,20 +1292,27 @@ function getDeviceId(){
 }
 
 async function sbFetch(path, options){
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    ...options,
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      ...(options && options.headers ? options.headers : {}),
-    },
-  });
-  if(!res.ok){
-    const txt = await res.text().catch(()=> '');
-    throw new Error('Supabase error ' + res.status + ': ' + txt);
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 8000);
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        ...(options && options.headers ? options.headers : {}),
+      },
+    });
+    if(!res.ok){
+      const txt = await res.text().catch(()=> '');
+      throw new Error('Supabase error ' + res.status + ': ' + txt);
+    }
+    return res;
+  } finally {
+    clearTimeout(timer);
   }
-  return res;
 }
 
 window.storage = {
@@ -1451,7 +1458,18 @@ async function restoreAccountSession(){
     return true;
   }catch(e){
     console.error('account session restore failed',e);
-    if(e&&(e.status===401||e.status===403))clearAccountSession();
+    if(e&&(e.status===401||e.status===403)){
+      clearAccountSession();
+      return false;
+    }
+    try{
+      const cacheKey='warnehold_cached_character_'+String(accountId||'');
+      const hasCached=!!accountId && !!accountUsername && !!localStorage.getItem(cacheKey);
+      if(hasCached){
+        window.whOfflineMode=true;
+        return true;
+      }
+    }catch(_){}
     return false;
   }
 }
@@ -5204,9 +5222,14 @@ function newCharacter(cfg){
 
 /* ---------- persistence ---------- */
 async function saveState(){
+  try{
+    if(state && (accountId||accountUsername)){
+      localStorage.setItem('warnehold_cached_character_'+String(accountId||''), JSON.stringify(state));
+    }
+  }catch(e){ console.warn('local character cache failed',e); }
   try{ await window.storage.set('character', JSON.stringify(state), false); }
   catch(e){ console.error('save failed', e); }
-  if(state && state.seasonId) upsertRegistryEntry(false); // throttled — فقط هر ۳۰ ثانیه یک‌بار می‌نویسد
+  if(state && state.seasonId) upsertRegistryEntry(false);
 }
 async function loadState(){
   try{
@@ -5291,8 +5314,24 @@ async function loadState(){
     if(s.guildId===undefined) s.guildId = null;
     if(!s.pvpBattleId) s.pvpBattleId = null;
     if(!s.activeTradeId) s.activeTradeId = null;
+    try{
+      if(accountId||accountUsername){
+        localStorage.setItem('warnehold_cached_character_'+String(accountId||''), JSON.stringify(s));
+      }
+    }catch(_){}
     return s;
-  }catch(e){ return null; }
+  }catch(e){
+    try{
+      const raw=(accountId||accountUsername) ? localStorage.getItem('warnehold_cached_character_'+String(accountId||'')) : null;
+      if(raw){
+        const s=JSON.parse(raw);
+        if(!s.equipment || Array.isArray(s.equipment)) s.equipment={weapon:null,armor:null,helmet:null,boots:null,accessory:null};
+        if(!s.equipUpgrades) s.equipUpgrades={};
+        return s;
+      }
+    }catch(_){}
+    return null;
+  }
 }
 
 /* ---------- combat math (Game Engine — authoritative, never the AI) ---------- */
@@ -7943,6 +7982,41 @@ body{overflow:hidden!important}
     updateHud();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupV7);else setupV7();
+})();
+</script>
+<script id="wh-stability-v1">
+(function(){
+  if(window.__whStabilityV1)return;
+  window.__whStabilityV1=true;
+  function installStatus(){
+    if(document.getElementById('wh-network-status'))return;
+    const el=document.createElement('div');
+    el.id='wh-network-status';
+    el.setAttribute('aria-live','polite');
+    el.style.cssText='position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top));transform:translateX(-50%);z-index:999999;display:none;max-width:92vw;padding:7px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(12,10,18,.92);color:#e8dfc9;font:600 12px system-ui;box-shadow:0 8px 24px #0008;pointer-events:none;text-align:center';
+    document.body.appendChild(el);
+  }
+  function status(text,show){
+    const el=document.getElementById('wh-network-status'); if(!el)return;
+    el.textContent=text||''; el.style.display=show?'block':'none';
+  }
+  function sync(){
+    if(!navigator.onLine) status('📡 اینترنت قطع است · بازی از ذخیره محلی استفاده می‌کند',true);
+    else if(window.whOfflineMode) status('🔄 اتصال ضعیف · بازی با ذخیره محلی ادامه دارد',true);
+    else status('',false);
+  }
+  window.addEventListener('offline',()=>status('📡 اینترنت قطع است · بازی از ذخیره محلی استفاده می‌کند',true));
+  window.addEventListener('online',()=>{
+    status('🔄 اتصال برگشت · ذخیره‌ها دوباره همگام می‌شوند',true);
+    setTimeout(()=>{window.whOfflineMode=false;status('',false);},2200);
+  });
+  function register(){
+    try{
+      if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{});
+    }catch(_){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{installStatus();sync();setTimeout(register,700)});
+  else{installStatus();sync();setTimeout(register,700)}
 })();
 </script>
 </body>
