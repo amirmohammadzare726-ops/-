@@ -8523,7 +8523,7 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
     return row;
   }
   function aiContext(mode){
-    const s=window.state||{};
+    const s=state||{};
     return {
       mode,
       username:accountUsername||'',
@@ -8895,7 +8895,7 @@ var relics=[
 var activeRegion=regions[0].id,filterText="",filterType="all";
 var requiredByType={spirit:{label:"روحی",ability:"تعامل روحی",icon:"👻"},dark:{label:"تاریکی",ability:"تعامل با تاریکی",icon:"🌑"},phase:{label:"فازی",ability:"تعامل با موجودات فازی",icon:"🌀"},cursed:{label:"نفرین‌شده",ability:"مقاومت در برابر نفرین",icon:"📿"},crystal:{label:"کریستالی",ability:"تعامل با کریستال",icon:"💎"},chaos:{label:"آشوبی",ability:"پایدارسازی آشوب",icon:"🌀"}};
 function playerTags(){
-var s=window.state||{},tags=[];
+var s=state||{},tags=[];
 var race=String(s.race||"").toLowerCase(),style=String(s.style||s.class||s.combatStyle||"").toLowerCase(),bg=String(s.background||"").toLowerCase();
 if(/undead|مرده|نامرده|مرده.?متحرک/.test(race))tags.push("spirit","dark","cursed");
 if(/dark_elf|الف تاریک|الف تاریکی/.test(race))tags.push("spirit","dark");
@@ -8908,7 +8908,7 @@ var powers=Array.isArray(s.powers)?s.powers:[];
 powers.forEach(function(p){var d=window.PDEF?window.PDEF(p.id):null;var n=String((d&&d.name)||p.name||"").toLowerCase();if(/روح|ارواح|soul|spirit|اثیری/.test(n))tags.push("spirit");if(/تاریکی|سایه|dark|shadow/.test(n))tags.push("dark");if(/فاز|نامرئی|phase|void/.test(n))tags.push("phase");if(/پاک.?کن|نور مقدس|holy|cleanse/.test(n))tags.push("cursed");if(/کریستال|بلور|crystal/.test(n))tags.push("crystal");if(/آشوب|chaos|پایدار/.test(n))tags.push("chaos")});
 return Array.from(new Set(tags));
 }
-function relicCounts(){var s=window.state||{};s.whRelics=s.whRelics&&typeof s.whRelics==="object"?s.whRelics:{};return s.whRelics}
+function relicCounts(){var s=state||{};s.whRelics=s.whRelics&&typeof s.whRelics==="object"?s.whRelics:{};return s.whRelics}
 function ownsRelic(id){return (Number(relicCounts()[id])||0)>0}
 function missingTags(c){
 var tags=playerTags(),inv=relicCounts(),missing=[];
@@ -8923,7 +8923,7 @@ function regionCreatures(){return creatures.filter(function(c){return c.region==
 function renderExpansion(){
 var root=document.getElementById("whx-root");if(!root)return;
 var reg=regions.find(function(r){return r.id===activeRegion})||regions[0];
-var s=window.state||{},discovered=creatures.filter(function(c){return (s.defeatedMonsterIds||[]).includes(c.id)}).length;
+var s=state||{},discovered=creatures.filter(function(c){return (s.defeatedMonsterIds||[]).includes(c.id)}).length;
 var head='<div class="whx-head"><div class="whx-kicker">WARNEHOLD · BESTIARY / BATTLE ENGINE</div><div class="whx-title">جهان موجودات</div><div class="whx-sub">ده قلمرو اختصاصی · پنج موجود در هر قلمرو · قوانین ورود واقعی و فایت متصل به موتور اصلی بازی</div><div class="whx-statrow"><div class="whx-stat"><b>۱۰</b><span>قلمرو</span></div><div class="whx-stat"><b>۵۰</b><span>موجود ثبت‌شده</span></div><div class="whx-stat"><b>'+discovered+'/۵۰</b><span>موجود شکست‌داده‌شده</span></div></div></div>';
 var rg='<div class="whx-section-title">انتخاب قلمرو</div><div class="whx-region-grid">';
 regions.forEach(function(r){rg+='<button class="whx-region '+(r.id===activeRegion?"active":"")+'" data-whx-region="'+r.id+'" style="--glow:'+r.glow+'"><span class="em">'+r.icon+'</span><b>'+r.name+'</b><small>'+r.desc+'</small><span class="lvl">خطر '+r.danger+' · Level '+r.level+'+</span></button>'});rg+='</div>';
@@ -8947,25 +8947,25 @@ var back=document.getElementById("whx-back");if(back)back.addEventListener("clic
 }
 function openExpansion(){document.querySelectorAll(".screen").forEach(function(x){x.classList.remove("active")});var s=document.getElementById("screen-wh-creatures");if(s)s.classList.add("active");renderExpansion();if(window.stopChatPolling)stopChatPolling()}
 function buyRelic(id){
-var r=relics.find(function(x){return x.id===id}),s=window.state;if(!r||!s)return;
+var r=relics.find(function(x){return x.id===id}),s=state;if(!r||!s)return;
 if((Number(s.gold)||0)<r.cost){showToast("ین کافی نداری");return}
 s.gold-=r.cost;var inv=relicCounts();inv[id]=(Number(inv[id])||0)+1;
 if(typeof saveState==="function")saveState();if(typeof renderHUD==="function")renderHUD();renderExpansion();showToast(r.name+" خریداری شد");
 }
 function startCreatureFight(id){
-var c=byId[id],s=window.state;if(!c||!s)return;
+var c=byId[id],s=state;if(!c||!s)return;
 var missing=missingTags(c);if(missing.length){showToast("قابلیت لازم را نداری: "+missing.map(function(t){return requiredByType[t].ability}).join("، "));return}
 if(Number(s.level||1)<c.level){showToast("برای این موجود حداقل Level "+c.level+" لازم است");return}
 if(s.battle&&!s.battle.over){showToast("اول فایت فعلی را تمام کن");return}
-if(!window.ENEMIES[id]){showToast("داده دشمن آماده نیست");return}
+if(!ENEMIES[id]){showToast("داده دشمن آماده نیست");return}
 window.__whPendingCreature=id;openOriginalBattle(id);
 }
 var openOriginalBattle=window.startBattle||null;
 function installEnemyData(){
-if(!window.ENEMIES)return;
+if(!ENEMIES)return;
 creatures.forEach(function(c){
-if(window.ENEMIES[c.id])return;
-window.ENEMIES[c.id]={name:c.name,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,xp:Math.round(c.level*16+(c.tier==="boss"?90:0)),gold:[Math.max(5,c.level*7),Math.max(12,c.level*13)],weakTo:c.weak,resistTo:c.resist,tier:c.tier,minLevel:c.level,core:c.tier==="boss"?"core_boss":"core_weak_beast",powerRank:c.tier==="boss"?"Boss":c.tier==="rare"?"Elite":"Normal",behavior:c.behavior,loot:[],whCreatureId:c.id});
+if(ENEMIES[c.id])return;
+ENEMIES[c.id]={name:c.name,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,xp:Math.round(c.level*16+(c.tier==="boss"?90:0)),gold:[Math.max(5,c.level*7),Math.max(12,c.level*13)],weakTo:c.weak,resistTo:c.resist,tier:c.tier,minLevel:c.level,core:c.tier==="boss"?"core_boss":"core_weak_beast",powerRank:c.tier==="boss"?"Boss":c.tier==="rare"?"Elite":"Normal",behavior:c.behavior,loot:[],whCreatureId:c.id});
 });
 }
 function installScreen(){
@@ -8990,10 +8990,10 @@ var c=byId[id];
 if(c){
 var missing=missingTags(c);
 if(missing.length){showToast("این موجود قابل هدف‌گیری نیست؛ نیاز داری: "+missing.map(function(t){return requiredByType[t].ability}).join("، "));return}
-if(Number((window.state||{}).level||1)<c.level){showToast("برای این فایت حداقل Level "+c.level+" لازم است");return}
+if(Number((state||{}).level||1)<c.level){showToast("برای این فایت حداقل Level "+c.level+" لازم است");return}
 }
 var out=original.apply(this,arguments);
-if(c&&window.state&&window.state.battle){window.state.battle.whCreatureId=c.id;window.state.battle.whCreatureTypes=c.types.slice();window.state.battle.whPhase=1;window.state.battle.whHistory=[];if(typeof pushLog==="function")pushLog("sys","⚔️ "+c.name+" وارد فایت شد | سبک: "+c.personality);if(typeof renderBattleUI==="function")renderBattleUI();if(typeof saveState==="function")saveState()}
+if(c&&state&&state.battle){state.battle.whCreatureId=c.id;state.battle.whCreatureTypes=c.types.slice();state.battle.whPhase=1;state.battle.whHistory=[];if(typeof pushLog==="function")pushLog("sys","⚔️ "+c.name+" وارد فایت شد | سبک: "+c.personality);if(typeof renderBattleUI==="function")renderBattleUI();if(typeof saveState==="function")saveState()}
 return out;
 };
 wrapped.__whxWrapped=true;window.startBattle=wrapped;
@@ -9002,10 +9002,10 @@ function installVictoryHook(){
 if(typeof window.endBattle!=="function"||window.endBattle.__whxWrapped)return;
 var original=window.endBattle;
 var wrapped=async function(won){
-var b=window.state&&window.state.battle,c=b&&byId[b.whCreatureId];
+var b=state&&state.battle,c=b&&byId[b.whCreatureId];
 if(c&&won){
-window.state.whCreatureDefeats=window.state.whCreatureDefeats||{};
-window.state.whCreatureDefeats[c.id]=(Number(window.state.whCreatureDefeats[c.id])||0)+1;
+state.whCreatureDefeats=state.whCreatureDefeats||{};
+state.whCreatureDefeats[c.id]=(Number(state.whCreatureDefeats[c.id])||0)+1;
 if(c.tier==="boss"&&Math.random()<0.12){var reward=relics[Math.floor(Math.random()*relics.length)],inv=relicCounts();inv[reward.id]=(Number(inv[reward.id])||0)+1;pushLog("sys","✨ غنیمت ویژه: "+reward.name+" ×1")}
 }
 return original.apply(this,arguments);
@@ -9016,17 +9016,17 @@ function installAiNarration(){
 if(typeof window.playerAction!=="function"||window.playerAction.__whxWrapped)return;
 var original=window.playerAction,aiBusy=false;
 var wrapped=async function(kind,powerId){
-var b=window.state&&window.state.battle,c=b&&byId[b.whCreatureId];
+var b=state&&state.battle,c=b&&byId[b.whCreatureId];
 var before=b?b.log.length:0,prevHp=b?b.enemyHp:0;
 var out=await original.apply(this,arguments);
-if(c&&window.state&&window.state.battle&&window.state.battle.log){
-var now=window.state.battle,entry={turn:now.log.length,action:String(kind||"attack"),hpBefore:prevHp,hpAfter:now.enemyHp,enemyHp:now.enemyHp,phase:now.enemyHp<=now.enemyHpMax*.3?3:now.enemyHp<=now.enemyHpMax*.65?2:1};
+if(c&&state&&state.battle&&state.battle.log){
+var now=state.battle,entry={turn:now.log.length,action:String(kind||"attack"),hpBefore:prevHp,hpAfter:now.enemyHp,enemyHp:now.enemyHp,phase:now.enemyHp<=now.enemyHpMax*.3?3:now.enemyHp<=now.enemyHpMax*.65?2:1};
 now.whPhase=entry.phase;now.whHistory=Array.isArray(now.whHistory)?now.whHistory:[];now.whHistory.push(entry);if(now.whHistory.length>5)now.whHistory.shift();
 if(!aiBusy&&window.warneholdAIHooks&&window.warneholdAIHooks.battle&&!now.over){
 aiBusy=true;
 try{
 var text=await window.warneholdAIHooks.battle("برای موجود زیر یک جمله روایی کوتاه و متفاوت برای اتفاق واقعی این نوبت بنویس. هیچ عدد یا نتیجه‌ای نساز. موجود: "+c.name+"؛ شخصیت: "+c.personality+"؛ رفتار: "+c.behavior+"؛ نوع‌ها: "+c.types.join("، ")+"؛ فاز: "+entry.phase+"؛ اقدام بازیکن: "+kind+"؛ HP دشمن قبل و بعد: "+prevHp+" و "+now.enemyHp+"؛ تاریخچه اخیر: "+JSON.stringify(now.whHistory.slice(-3)),{enemy:c.name,enemyTypes:c.types,personality:c.personality,behavior:c.behavior,phase:entry.phase,turnHistory:now.whHistory.slice(-3),screen:"screen-battle"});
-if(text&&window.state&&window.state.battle===now&&!now.over){pushLog("narr",String(text).slice(0,260));renderBattleUI();saveState()}
+if(text&&state&&state.battle===now&&!now.over){pushLog("narr",String(text).slice(0,260));renderBattleUI();saveState()}
 }catch(e){console.debug("Creature AI narration skipped",e)}finally{aiBusy=false}
 }
 }
@@ -9035,14 +9035,14 @@ return out;
 wrapped.__whxWrapped=true;window.playerAction=wrapped;
 }
 function install(){
-if(!window.state||!window.ENEMIES)return;
+if(!state||!ENEMIES)return;
 installEnemyData();installScreen();installBattleGuard();installVictoryHook();installAiNarration();
-var s=window.state;if(!s.whRelics)s.whRelics={};if(!s.whCreatureDefeats)s.whCreatureDefeats={};
+var s=state;if(!s.whRelics)s.whRelics={};if(!s.whCreatureDefeats)s.whCreatureDefeats={};
 if(!window.__whxHooksInstalled){window.__whxHooksInstalled=true;var orig=window.enterGame;if(typeof orig==="function"){window.enterGame=function(){var r=orig.apply(this,arguments);setTimeout(function(){installEnemyData();installScreen();installBattleGuard();installVictoryHook();installAiNarration()},50);return r}}}
 }
 window.whCreatureWorld={regions:regions,creatures:creatures,relics:relics,open:openExpansion,render:renderExpansion,playerTags:playerTags,missingTags:missingTags};
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(install,1200)});else setTimeout(install,1200);
-var tries=0;var timer=setInterval(function(){tries++;try{install()}catch(e){console.error("Creature expansion init",e)}if(window.state&&window.ENEMIES&&document.getElementById("screen-wh-creatures")||tries>30)clearInterval(timer)},700);
+var tries=0;var timer=setInterval(function(){tries++;try{install()}catch(e){console.error("Creature expansion init",e)}if(state&&ENEMIES&&document.getElementById("screen-wh-creatures")||tries>30)clearInterval(timer)},700);
 })();
 </script>
 
