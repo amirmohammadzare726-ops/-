@@ -8128,4 +8128,153 @@ body{overflow:hidden!important}
 })();
 </script>
 
+
+<style id="wh-direct-art-ui-v10">
+/* Warnehold v10: direct-on-artwork UI */
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked){
+  padding:14px 14px 82px!important;
+  background:transparent!important;
+}
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked)::after{
+  background:linear-gradient(180deg,rgba(4,4,4,.10) 0%,rgba(4,4,4,.28) 48%,rgba(4,4,4,.72) 100%)!important;
+}
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) > h1,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) > h2,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) > h3,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) > .section-title{
+  text-shadow:0 3px 16px #000,0 0 7px rgba(0,0,0,.7);
+}
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .identity-card,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .item-row,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .stat-box,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .shop-item,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .region,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .npc-card,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .quest-card,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .social-row,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .req-row,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .notif-row,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .registry-row,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .admin-report,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .equip-slot-row,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .combat-log,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .enemy-card,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) #power-panel{
+  background:rgba(12,10,8,.48)!important;
+  border-color:rgba(201,162,75,.26)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.20)!important;
+  backdrop-filter:blur(4px)!important;
+  -webkit-backdrop-filter:blur(4px)!important;
+}
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .pick-card,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .action-btn,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .shop-tab,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .chat-tab,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .mini-btn,
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) .buy-btn{
+  background:rgba(10,8,7,.54)!important;
+  border-color:rgba(201,162,75,.25)!important;
+  backdrop-filter:blur(3px)!important;
+  -webkit-backdrop-filter:blur(3px)!important;
+}
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) input[type=text]{
+  background:rgba(8,7,6,.50)!important;
+  border-color:rgba(201,162,75,.28)!important;
+}
+#screen-map .wh-v8-home{
+  background:rgba(10,8,6,.34)!important;
+  border-color:rgba(201,162,75,.38)!important;
+}
+#screen-map .wh-v8-quick button{
+  background:rgba(8,7,6,.38)!important;
+}
+#screen-char .bars,#screen-char #hud-bars,#screen-char #hud-currency{
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  background:rgba(8,7,6,.58)!important;
+}
+#game-wrap .screen.active .wh-v10-title{
+  animation:whV10Title .35s ease-out both;
+}
+@keyframes whV10Title{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* Sound status */
+#wh-sound-state{font:10px 'JetBrains Mono';color:var(--dim);text-align:center;margin-top:7px}
+</style>
+<script id="wh-direct-art-ui-v10-js">
+(function(){
+  if(window.__whV10)return; window.__whV10=true;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  let ctx=null,master=null;
+  let soundOn=localStorage.getItem('warnehold_sound')!=='off';
+  function ensureAudio(){
+    if(!soundOn||!AC)return false;
+    try{
+      if(!ctx){ctx=new AC();master=ctx.createGain();master.gain.value=.14;master.connect(ctx.destination)}
+      if(ctx.state==='suspended')ctx.resume();
+      return true;
+    }catch(e){return false}
+  }
+  function beep(freq,dur,kind,vol){
+    if(!ensureAudio())return;
+    try{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type=kind||'sine';o.frequency.setValueAtTime(freq,ctx.currentTime);
+      g.gain.setValueAtTime(vol||.07,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+dur);
+      o.connect(g);g.connect(master);o.start();o.stop(ctx.currentTime+dur);
+    }catch(e){}
+  }
+  function clickSound(){beep(560,.065,'sine',.055)}
+  function openSound(){beep(440,.07,'triangle',.05);setTimeout(()=>beep(660,.09,'triangle',.045),65)}
+  function battleSound(){beep(150,.11,'sawtooth',.045);setTimeout(()=>beep(230,.10,'triangle',.045),55)}
+  function updateSoundState(){
+    const el=document.getElementById('wh-sound-state');
+    if(el)el.textContent=soundOn?'🔊 صدا روشن':'🔇 صدا خاموش';
+  }
+  function injectSoundControl(){
+    const s=document.getElementById('wh-settings-screen');
+    if(!s||s.querySelector('#wh-v10-sound'))return;
+    const box=document.createElement('div');
+    box.id='wh-v10-sound';
+    box.style.cssText='margin-top:12px;text-align:center';
+    box.innerHTML='<button type="button" id="wh-v10-sound-btn" class="wh-v8-settings-grid" style="width:100%;min-height:46px;background:rgba(10,8,7,.55);border:1px solid rgba(201,162,75,.3);border-radius:7px;color:var(--parchment);font:11px JetBrains Mono">🔊 فعال‌سازی صدای بازی</button><div id="wh-sound-state"></div>';
+    s.appendChild(box);
+    box.querySelector('button').addEventListener('click',()=>{
+      soundOn=!soundOn;localStorage.setItem('warnehold_sound',soundOn?'on':'off');
+      if(soundOn){ensureAudio();openSound()} else if(ctx){try{ctx.suspend()}catch(e){}}
+      updateSoundState();
+    });
+    updateSoundState();
+  }
+  document.addEventListener('pointerdown',e=>{
+    ensureAudio();
+    const b=e.target.closest('button');
+    if(!b)return;
+    clickSound();
+    const t=(b.textContent||'');
+    if(/نبرد|حمله|فایت|جنگ|قدرت/.test(t))battleSound();
+    if(/شروع|ورود|ثبت|خرید|دریافت|تایید|قبول|برنده|ورود به/.test(t))openSound();
+  },{passive:true});
+  document.addEventListener('touchstart',()=>ensureAudio(),{passive:true,once:false});
+  const old=window.switchScreen;
+  if(typeof old==='function'){
+    window.switchScreen=function(name){
+      const r=old.apply(this,arguments);
+      setTimeout(()=>{
+        const s=document.querySelector('#game-wrap .screen.active');
+        if(s){
+          s.classList.remove('wh-v10-title');void s.offsetWidth;s.classList.add('wh-v10-title');
+        }
+        injectSoundControl();
+        updateSoundState();
+      },40);
+      return r;
+    };
+  }
+  const mo=new MutationObserver(()=>{injectSoundControl();updateSoundState()});
+  const wrap=document.getElementById('game-wrap');
+  if(wrap)mo.observe(wrap,{subtree:true,attributes:true,attributeFilter:['class','style']});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',injectSoundControl);else injectSoundControl();
+})();
+</script>
+
 <!-- wh-v4-ready --></html>
