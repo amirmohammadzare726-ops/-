@@ -9096,7 +9096,7 @@ const EVENTS=[
 {id:"ev_chaos",name:"شکاف آشوب",region:9,desc:"رویدادهای غیرقابل پیش‌بینی در قلمرو آشوب رخ می‌دهد",bonus:"chaos"}
 ];
 const regName=i=>(window.whCreatureWorld&&window.whCreatureWorld.regions&&window.whCreatureWorld.regions[i]&&window.whCreatureWorld.regions[i].name)||(["پایتخت وارنهولد","جنگل سایه‌ها","قله‌های یخ‌زده","بیابان سرخ","سرزمین آتشفشان","مرداب نفرین‌شده","جزایر مه‌آلود","سرزمین ارواح","قلمرو کریستال","قلمرو آشوب"][i]||"منطقه");
-function ww(){return state.whLivingWorld||(state.whLivingWorld={missions:{},npcTalk:{},regionDefeats:{},totalDefeats:0,eventSeed:""});}
+function ww(){return state.whLivingWorld||(state.whLivingWorld={missions:{},npcTalk:{},regionDefeats:{},typeDefeats:{},totalDefeats:0,eventSeed:""});}
 function todayKey(){return new Date().toISOString().slice(0,10);}
 function activeEvent(){const seed=todayKey();let n=0;for(let i=0;i<seed.length;i++)n+=seed.charCodeAt(i)*(i+3);return EVENTS[n%EVENTS.length];}
 function npcById(id){return NPCS.find(x=>x.id===id);}
