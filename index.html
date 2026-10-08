@@ -7573,17 +7573,13 @@ body{overflow:hidden!important}
 <script>
 (function(){
  const main={home:'screen-map',map:'screen-worldmap',chat:'screen-chat',shop:'screen-shop',social:'screen-social'};
- const secondary=[['screen-quest','⚔','فعالیت'],['screen-job','🧰','کار'],['screen-char','♙','شخصیت'],['screen-inv','🎒','کیف'],['screen-village-map','🏘','روستا'],['screen-journey','🧭','سفر'],['screen-blacksmith','⚒','آهنگری'],['screen-auction','🔨','حراج'],['screen-transfer','⇄','انتقال'],['screen-notifcenter','🔔','اعلان‌ها'],['screen-pvp','⚔','رقابت'],['screen-animeshop','✦','قدرت‌ها'],['screen-collection','◈','مجموعه'],['screen-admin','⚙','مدیریت']];
+ const secondary=[];
  const mainIds=new Set(Object.values(main));
  let currentMain='screen-map';
  const owner=()=>localStorage.getItem('warnehold_account_role')==='owner';
  function core(name){if(typeof window.switchScreen==='function')return window.switchScreen(name)}
  const original=window.switchScreen;
- function closeSecondary(){
-   document.querySelectorAll('.screen.wh-secondary').forEach(s=>s.classList.remove('wh-secondary','active'));
-   document.getElementById('wh-secondary-back')?.classList.remove('show');
-   if(currentMain) original?.(currentMain.replace(/^screen-/,''));
- }
+ function closeSecondary(){ if(currentMain) original?.(currentMain.replace(/^screen-/,'')); }
  window.switchScreen=function(name){
    const id='screen-'+String(name).replace(/^screen-/,'');
    if(id==='screen-admin'&&!owner()){if(typeof window.showToast==='function')window.showToast('دسترسی مدیریت فقط برای مالک فعال است');return}
@@ -7594,14 +7590,7 @@ body{overflow:hidden!important}
      original?.(id.replace(/^screen-/,''));
      return;
    }
-   const target=document.getElementById(id);
-   if(!target){original?.(name);return}
-   document.querySelectorAll('.screen.wh-secondary').forEach(s=>s.classList.remove('wh-secondary','active'));
-   target.classList.add('wh-secondary','active');
-   const back=document.getElementById('wh-secondary-back'); if(back)back.classList.add('show');
    original?.(name);
-   target.classList.add('wh-secondary','active');
-   document.getElementById('wh-more-panel')?.classList.remove('open');
  };
  function go(id,key){
    if(id==='screen-admin'&&!owner()){window.showToast?.('دسترسی مدیریت فقط برای مالک فعال است');return}
@@ -7611,19 +7600,11 @@ body{overflow:hidden!important}
  function setup(){
    if(document.getElementById('wh-game-nav'))return;
    const n=document.createElement('nav'); n.id='wh-game-nav';
-   n.innerHTML='<button data-key="home"><span class="wh-icon">⌂</span>خانه</button><button data-key="map"><span class="wh-icon">◈</span>نقشه</button><button data-key="chat"><span class="wh-icon">💬</span>گپ</button><button data-key="shop"><span class="wh-icon">🛒</span>فروشگاه</button><button data-key="social"><span class="wh-icon">♟</span>اجتماعی</button><button data-key="more"><span class="wh-icon">☰</span>بیشتر</button>';
+   n.innerHTML='<button data-key="home"><span class="wh-icon">⌂</span>خانه</button><button data-key="map"><span class="wh-icon">◈</span>نقشه</button><button data-key="chat"><span class="wh-icon">💬</span>گپ</button><button data-key="shop"><span class="wh-icon">🛒</span>فروشگاه</button><button data-key="social"><span class="wh-icon">♟</span>اجتماعی</button>';
    document.body.appendChild(n);
-   const p=document.createElement('div');p.id='wh-more-panel';
-   secondary.forEach(x=>{const b=document.createElement('button');b.dataset.target=x[0];b.innerHTML=x[1]+'<br>'+x[2];if(x[0]==='screen-admin')b.dataset.admin='1';p.appendChild(b)});
-   document.body.appendChild(p);
-   const back=document.createElement('button');back.id='wh-secondary-back';back.textContent='‹  برگشت';back.addEventListener('click',closeSecondary);document.body.appendChild(back);
-   n.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.key==='more'){p.classList.toggle('open');return}go(main[b.dataset.key],b.dataset.key)});
-   p.addEventListener('click',e=>{const b=e.target.closest('button');if(b)window.switchScreen(b.dataset.target.replace(/^screen-/,''))});
-   document.addEventListener('click',e=>{if(!e.target.closest('#wh-game-nav,#wh-more-panel'))p.classList.remove('open')},{passive:true});
-   const adm=p.querySelector('[data-admin]');if(adm)adm.style.display=owner()?'':'none';
+
+   n.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;go(main[b.dataset.key],b.dataset.key)});
  }
- const oldFinish=window.finishAuthGate;
- window.finishAuthGate=function(){const r=oldFinish?.apply(this,arguments);const b=document.querySelector('#wh-more-panel [data-admin]');if(b)b.style.display=owner()?'':'none';return r};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
 </script></script></body>
