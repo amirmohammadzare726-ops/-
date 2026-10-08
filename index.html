@@ -1145,8 +1145,8 @@ async function restoreAccountSession(){
 }
 
 function showAuthStep(id){
-  $('.auth-step').forEach(x=>x.classList.remove('active'));
-  const step=$('#'+id);
+  document.querySelectorAll('.auth-step').forEach(x=>x.classList.remove('active'));
+  const step=document.getElementById(id);
   if(step) step.classList.add('active');
 }
 
