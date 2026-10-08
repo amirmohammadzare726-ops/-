@@ -8649,7 +8649,7 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
   async function ensureDailyBossActive(){
     return withActionLock('daily-boss-ensure',async function(){
       var today=dayKey(), ev=await loadGlobalEvent();
-      if(ev&&ev.dateKey===today)return ev;
+      if(ev&&ev.dateKey===today){if(state.bossSealDate!==today){state.bossSealDate=today;state.bossSeals=Math.min(2,Number(state.bossSeals??0)+1);await saveState()}return ev;}
       if(ev&&ev.dateKey&&ev.dateKey!==today){try{await archiveBoss(ev)}catch(e){}}
       var boss;
       try{boss=await callBossAI('generate',null)}catch(e){console.warn('Boss AI generation fallback',e);boss=fallbackBoss(today)}
@@ -8715,7 +8715,7 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
       if(st.cd>now){showToast('هنوز زمان فایت بعدی نرسیده');return}
       if(st.wound&&st.wound.until>now){showToast('Wound هنوز فعال است');return}
       if(st.seals<1){showToast('Boss Seal کافی نیست');return}
-      state.bossSeals=st.seals-1;state.bossRun={eventDate:ev.dateKey,turn:0,damage:0,log:['ورود به محوطه باس'],guard:false};state.bossCooldownUntil=now+BOSS_COOLDOWN;
+      state.bossSeals=st.seals-1;state.bossSealDate=dayKey();state.bossRun={eventDate:ev.dateKey,turn:0,damage:0,log:['ورود به محوطه باس'],guard:false};state.bossCooldownUntil=now+BOSS_COOLDOWN;
       ev.participants=ev.participants||{};ev.participants[state.playerId]=ev.participants[state.playerId]||{name:state.name,damage:0,attempts:0};ev.participants[state.playerId].attempts++;
       await saveGlobalEvent(ev);await saveState();renderBossEvent();
     })
