@@ -8649,7 +8649,8 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
   async function ensureDailyBossActive(){
     return withActionLock('daily-boss-ensure',async function(){
       var today=dayKey(), ev=await loadGlobalEvent();
-      if(ev&&ev.dateKey===today){if(state.bossSealDate!==today){state.bossSealDate=today;state.bossSeals=Math.min(2,Number(state.bossSeals??0)+1);await saveState()}return ev;}
+      if(state.bossSealDate!==today){state.bossSealDate=today;state.bossSeals=Math.min(2,Number(state.bossSeals??0)+1);await saveState()}
+      if(ev&&ev.dateKey===today)return ev;
       if(ev&&ev.dateKey&&ev.dateKey!==today){try{await archiveBoss(ev)}catch(e){}}
       var boss;
       try{boss=await callBossAI('generate',null)}catch(e){console.warn('Boss AI generation fallback',e);boss=fallbackBoss(today)}
