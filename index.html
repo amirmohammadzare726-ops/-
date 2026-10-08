@@ -2194,8 +2194,14 @@ function renderAnimeShop(){
           <div class="sdesc" style="color:var(--dim);">Mana/Energy: ${p.cost} · Cooldown: ${p.cd} · نیاز به Level ${p.levelReq}${p.duration?` · مدت: ${p.duration} نوبت`:''}</div>
           <div class="sdesc" style="color:var(--blood-bright);">⚠️ محدودیت: ${p.lim}</div>
         </div>
-        <button class="buy-btn mono" ${owned||locked||state.gold<p.price?'disabled':''}>${owned?'✅ دارید':(locked?`Lv.${p.levelReq}`:p.price+' ین')}</button>`;
-      if(!owned && !locked) row.querySelector('.buy-btn').onclick = ()=> buyAnimeShopPower(p.id);
+        <div class="shop-buy-actions">
+          <button class="buy-btn mono coin-buy" ${owned||locked||state.gold<p.price?'disabled':''}>${owned?'✅ دارید':(locked?`Lv.${p.levelReq}`:p.price+' ین')}</button>
+          <button class="buy-btn mono gem-buy" ${owned||locked||state.gems<getAnimePowerGemPrice(p)?'disabled':''}>${owned?'':`💎 ${getAnimePowerGemPrice(p)}`}</button>
+        </div>`;
+      if(!owned && !locked){
+        row.querySelector('.coin-buy').onclick = ()=> buyAnimeShopPower(p.id);
+        row.querySelector('.gem-buy').onclick = ()=> buyAnimeShopPowerWithGems(p.id);
+      }
       list.appendChild(row);
     });
   } else {
@@ -2210,11 +2216,33 @@ function renderAnimeShop(){
           <div class="sdesc" style="color:var(--dim);">نیاز به Level ${req}</div>
           <div class="sdesc" style="color:var(--blood-bright);">⚠️ محدودیت: ${it.limitation}</div>
         </div>
-        <button class="buy-btn mono" ${state.gold<it.price?'disabled':''}>${it.price} ین</button>`;
-      row.querySelector('.buy-btn').onclick = ()=> buyAnimeGearItem(it.id);
+        <div class="shop-buy-actions">
+          <button class="buy-btn mono coin-buy" ${state.gold<it.price?'disabled':''}>${it.price} ین</button>
+          <button class="buy-btn mono gem-buy" ${state.gems<getItemGemPrice(it)?'disabled':''}>💎 ${getItemGemPrice(it)}</button>
+        </div>`;
+      row.querySelector('.coin-buy').onclick = ()=> buyAnimeGearItem(it.id);
+      row.querySelector('.gem-buy').onclick = ()=> buyItemWithGems(it.id).then(()=>renderAnimeShop());
       list.appendChild(row);
     });
   }
+}
+function getAnimePowerGemPrice(p){ return Math.max(5, Math.round((Math.max(1,Number(p.price)||1))/10)); }
+async function buyAnimeShopPowerWithGems(id){
+  return withActionLock('gem-anime-power:'+id, async ()=>{
+    const p=ANIME_POWERS_SHOP.find(x=>x.id===id);
+    if(!p) return;
+    if(ownsPower(id)){ showToast('این Power را از قبل دارید.'); return; }
+    if(state.level<p.levelReq){ showToast('نیاز به Level '+p.levelReq); return; }
+    const gemPrice=getAnimePowerGemPrice(p);
+    if(state.gems<gemPrice){ showToast('💎 جم کافی ندارید'); return; }
+    if(!spendGems(gemPrice,'خرید جم Power: '+p.name)) return;
+    state.powers.push({id:p.id,mastery:0,evolved:false,isAnime:true});
+    await saveState();
+    renderAnimeShop(); renderHUD();
+    playPurchaseFX('gem');
+    showToast('💎 '+p.name+' با جم خریداری شد!');
+    pushPersonalNotif('combat','💎 Power جدید با جم کسب شد: '+p.name+' ('+p.anime+')');
+  });
 }
 async function buyAnimeShopPower(id){
   const p = ANIME_POWERS_SHOP.find(x=>x.id===id);
@@ -6002,8 +6030,12 @@ async function renderShop(){
           <div class="sname"><span class="rarity-badge r-${it.rarity}">${it.rarity}</span>${it.name}</div>
           <div class="sdesc">${it.desc}${it.slot?` · نیاز به Level ${req}`:''}</div>
         </div>
-        <button class="buy-btn mono" ${state.gold<price?'disabled':''}>${price} ین</button>`;
-      row.querySelector('.buy-btn').onclick = ()=> buyItem(it.id);
+        <div class="shop-buy-actions">
+          <button class="buy-btn mono coin-buy" ${state.gold<price?'disabled':''}>${price} ین</button>
+          <button class="buy-btn mono gem-buy" ${state.gems<getItemGemPrice(it)?'disabled':''}>💎 ${getItemGemPrice(it)}</button>
+        </div>`;
+      row.querySelector('.coin-buy').onclick = ()=> buyItem(it.id);
+      row.querySelector('.gem-buy').onclick = ()=> buyItemWithGems(it.id);
       list.appendChild(row);
     });
   } else {
@@ -6026,6 +6058,41 @@ async function renderShop(){
   }
 }
 
+function getItemGemPrice(it){
+  if(!it) return 0;
+  return Math.max(2, Math.round((Math.max(1, Number(it.price)||1))/10));
+}
+function playPurchaseFX(kind){
+  try{
+    const root=document.getElementById('game-wrap')||document.body;
+    root.classList.remove('wh-purchase-flash'); void root.offsetWidth; root.classList.add('wh-purchase-flash');
+    const burst=document.createElement('div'); burst.className='wh-purchase-burst '+(kind==='gem'?'gem':'coin');
+    for(let i=0;i<14;i++){
+      const p=document.createElement('i');
+      p.style.setProperty('--a',(i/14)*360+'deg');
+      p.style.setProperty('--d',(34+Math.random()*52)+'px');
+      burst.appendChild(p);
+    }
+    document.body.appendChild(burst); setTimeout(()=>burst.remove(),700);
+  }catch(e){}
+}
+async function buyItemWithGems(itemId){
+  return withActionLock('gem-buy:'+itemId, async ()=>{
+    const it=SHOP_ITEMS.find(x=>x.id===itemId);
+    if(!it) return;
+    const gemPrice=getItemGemPrice(it);
+    if(state.gems<gemPrice){ showToast('💎 جم کافی ندارید'); return; }
+    if(!spendGems(gemPrice,'خرید جم: '+it.name)) return;
+    const existing=state.inventory.find(x=>x.id===it.id);
+    if(existing) existing.qty+=1;
+    else state.inventory.push({id:it.id,name:it.name,type:it.type,qty:1});
+    await saveState();
+    renderHUD(); renderInventory(); renderShop();
+    playPurchaseFX('gem');
+    showToast('💎 '+it.name+' با جم خریداری شد');
+    pushPersonalNotif('trade','💎 خریداری شد: '+it.name);
+  });
+}
 async function buyItem(itemId){
   // Game Engine — authoritative purchase logic. Client cannot set its own gold.
   const it = SHOP_ITEMS.find(x=>x.id===itemId);
@@ -6039,8 +6106,9 @@ async function buyItem(itemId){
   await saveState();
   await bumpEconomyPrice(itemId, 1);
   renderHUD(); renderInventory(); renderShop();
-  showToast(`${it.name} خریداری شد`);
-  pushPersonalNotif('trade', `🛒 خریداری شد: ${it.name}`);
+  playPurchaseFX('coin');
+  showToast(it.name+' خریداری شد');
+  pushPersonalNotif('trade','🛒 خریداری شد: '+it.name);
 }
 async function sellItem(itemId){
   const item = state.inventory.find(x=>x.id===itemId);
@@ -8306,6 +8374,20 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
 })();
 </script>
 \n<!-- wh-v4-ready -->
+<style id="wh-gem-purchase-v13">
+.shop-buy-actions{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.shop-buy-actions .buy-btn{min-width:62px;padding:8px 7px;font-size:10px;transition:transform .14s,filter .14s,box-shadow .2s}
+.shop-buy-actions .gem-buy{color:#d9b8ff;border-color:rgba(150,95,220,.62);background:linear-gradient(180deg,rgba(116,69,171,.35),rgba(45,25,69,.52))}
+.shop-buy-actions .coin-buy{color:var(--gold)}
+.shop-buy-actions .buy-btn:not(:disabled):active{transform:scale(.92);filter:brightness(1.35)}
+.wh-purchase-flash{animation:whPurchaseFlash .5s ease-out}
+@keyframes whPurchaseFlash{0%{filter:brightness(1)}35%{filter:brightness(1.22)}100%{filter:brightness(1)}}
+.wh-purchase-burst{position:fixed;left:50%;top:46%;width:8px;height:8px;z-index:99999;pointer-events:none}
+.wh-purchase-burst i{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:whPurchaseParticle .62s cubic-bezier(.15,.8,.2,1) forwards;transform:rotate(var(--a)) translateX(0)}
+.wh-purchase-burst.gem i{background:#c79cff;box-shadow:0 0 12px #9b63e6}
+@keyframes whPurchaseParticle{0%{opacity:1;transform:rotate(var(--a)) translateX(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(.1)}}
+@media(max-width:420px){.shop-buy-actions .buy-btn{min-width:56px;padding-inline:5px}}
+</style>
 <style id="wh-real-audio-pack-v12">#wh-war-audio{display:none!important}</style>
 <script id="wh-real-audio-pack-v12-js">
 (function(){if(window.__whRealAudioV12)return;window.__whRealAudioV12=true;const SRC='https://cdn.creativeclaw.co/u/3f8a5c32/audio/d2e0f630-5758-4181-b47f-028b6e5db070.mp3';let enabled=localStorage.getItem('warnehold_sound')!=='off';let a=null;function ensure(){if(!enabled)return;try{if(!a){a=new Audio(SRC);a.loop=true;a.preload='auto';a.volume=.16;a.id='wh-war-audio';document.body.appendChild(a)}const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}function sync(){enabled=localStorage.getItem('warnehold_sound')!=='off';if(enabled)ensure();else if(a){a.pause();a.currentTime=0}}document.addEventListener('pointerdown',ensure,{passive:true});document.addEventListener('touchstart',ensure,{passive:true});window.addEventListener('storage',e=>{if(e.key==='warnehold_sound')sync()});window.whWarneholdMusic={start:ensure,stop:function(){if(a)a.pause()},setEnabled:function(v){enabled=!!v;localStorage.setItem('warnehold_sound',enabled?'on':'off');sync()}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync);else sync();})();
