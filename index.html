@@ -324,13 +324,23 @@
   .wm-node.current .wm-label{color:var(--gold);}
   .wm-node.locked{cursor:default; opacity:0.5;}
   .wm-node.locked .wm-dot{background:#555; border-color:#777;}
-/* SAFE BACKGROUND FX: behind the game UI, never above it */
-#wh-bg-fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.9}
-body{position:relative;isolation:isolate}
-#app{position:relative;z-index:2}
-#game-wrap,#screen-start,#hud,#nav{position:relative}
-#wh-bg-glow{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(circle at 18% 20%,rgba(201,162,75,.055),transparent 28%),radial-gradient(circle at 82% 72%,rgba(138,31,43,.065),transparent 30%),radial-gradient(circle at 50% 100%,rgba(63,110,99,.045),transparent 34%)}
-@media(prefers-reduced-motion:reduce){#wh-bg-fx{display:none}#wh-bg-glow{opacity:.45}}</style>
+
+/* WARNEHOLD V9 BACKGROUND FX — isolated visual layer only */
+#wh-v9-bg{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  pointer-events:none;
+  z-index:0;
+  opacity:.92;
+}
+#app{
+  position:relative;
+  z-index:2;
+}
+</style>
 </head>
 <body>
 <div id="app">
@@ -6817,6 +6827,90 @@ document.addEventListener('visibilitychange', ()=>{
     // ویزارد ساخت شخصیت به‌صورت پیش‌فرض نمایش داده می‌شود
   }
 })();
+
+/* WARNEHOLD V9 BACKGROUND FX — never captures input and never changes game state */
+(function(){
+  const canvas=document.createElement('canvas');
+  canvas.id='wh-v9-bg';
+  canvas.setAttribute('aria-hidden','true');
+  document.body.prepend(canvas);
+  const ctx=canvas.getContext('2d',{alpha:true});
+  if(!ctx)return;
+
+  let w=0,h=0,dpr=1,raf=0,last=0,scene='default',visible=true;
+  const reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const count=Math.min(reduced?10:34, Math.max(10, Math.floor((navigator.hardwareConcurrency||4)*4)));
+  const dots=Array.from({length:count},(_,i)=>({
+    x:Math.random(),y:Math.random(),r:.5+Math.random()*1.5,
+    a:.08+Math.random()*.20,s:.00025+Math.random()*.00055,
+    p:Math.random()*Math.PI*2
+  }));
+
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,1.25);
+    w=Math.max(1,innerWidth); h=Math.max(1,innerHeight);
+    canvas.width=Math.floor(w*dpr); canvas.height=Math.floor(h*dpr);
+    canvas.style.width=w+'px'; canvas.style.height=h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function detectScene(){
+    const active=document.querySelector('.screen.active');
+    const id=active&&active.id||'';
+    if(id.includes('battle'))scene='battle';
+    else if(id.includes('pvp'))scene='pvp';
+    else if(id.includes('shop')||id.includes('auction'))scene='shop';
+    else if(id.includes('worldmap')||id.includes('village-map'))scene='map';
+    else if(id.includes('quest')||id.includes('journey'))scene='quest';
+    else scene='default';
+  }
+  function palette(){
+    if(scene==='battle'||scene==='pvp')return ['rgba(138,31,43,.12)','rgba(201,162,75,.035)'];
+    if(scene==='shop')return ['rgba(201,162,75,.10)','rgba(74,122,165,.025)'];
+    if(scene==='map'||scene==='quest')return ['rgba(63,110,99,.09)','rgba(201,162,75,.035)'];
+    return ['rgba(138,31,43,.07)','rgba(201,162,75,.025)'];
+  }
+  function frame(t){
+    if(!visible){raf=0;return;}
+    if(!last)last=t;
+    const dt=Math.min(32,t-last); last=t;
+    const [c1,c2]=palette();
+    ctx.clearRect(0,0,w,h);
+
+    const g=ctx.createRadialGradient(w*.5,h*.05,0,w*.5,h*.05,Math.max(w,h)*.85);
+    g.addColorStop(0,c1); g.addColorStop(.55,c2); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+
+    const time=t*.001;
+    for(const d of dots){
+      d.y-=d.s*dt;
+      if(d.y<-.03)d.y=1.03;
+      const pulse=.55+.45*Math.sin(time*1.2+d.p);
+      ctx.beginPath();
+      ctx.arc(d.x*w,d.y*h,d.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(201,162,75,'+(d.a*pulse)+')';
+      ctx.fill();
+    }
+
+    const vg=ctx.createRadialGradient(w*.5,h*.5,Math.min(w,h)*.15,w*.5,h*.5,Math.max(w,h)*.72);
+    vg.addColorStop(0,'rgba(0,0,0,0)');
+    vg.addColorStop(1,'rgba(0,0,0,.16)');
+    ctx.fillStyle=vg; ctx.fillRect(0,0,w,h);
+
+    raf=requestAnimationFrame(frame);
+  }
+  function start(){
+    if(!raf){last=0;raf=requestAnimationFrame(frame);}
+  }
+  window.addEventListener('resize',resize,{passive:true});
+  document.addEventListener('visibilitychange',()=>{
+    visible=!document.hidden;
+    if(visible)start();
+  },{passive:true});
+  resize();
+  detectScene();
+  new MutationObserver(detectScene).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+  if(!reduced)start(); else { frame(0); }
+})();
 </script>
-<script id="warnehold-safe-background-fx">(function(){'use strict';function start(){if(document.getElementById('wh-bg-fx'))return;const c=document.createElement('canvas');c.id='wh-bg-fx';const g=document.createElement('div');g.id='wh-bg-glow';document.body.insertBefore(c,document.body.firstChild);document.body.insertBefore(g,document.body.firstChild);const x=c.getContext('2d',{alpha:true});let w=0,h=0,d=1,p=[],raf=0;const red=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;function size(){d=Math.min(devicePixelRatio||1,1.25);w=innerWidth;h=innerHeight;c.width=Math.floor(w*d);c.height=Math.floor(h*d);x.setTransform(d,0,0,d,0,0);const n=Math.min(55,Math.max(24,Math.floor(w/9)));while(p.length<n)p.push({x:Math.random()*w,y:Math.random()*h,r:.6+Math.random()*1.7,v:.08+Math.random()*.22,a:.12+Math.random()*.28});p.length=n}function frame(){x.clearRect(0,0,w,h);if(!document.hidden&&!red())for(const q of p){q.y-=q.v;if(q.y<-5){q.y=h+5;q.x=Math.random()*w}x.globalAlpha=q.a;x.fillStyle='rgb(201,162,75)';x.shadowBlur=6;x.shadowColor='rgba(201,162,75,.35)';x.beginPath();x.arc(q.x,q.y,q.r,0,Math.PI*2);x.fill()}x.globalAlpha=1;x.shadowBlur=0;raf=requestAnimationFrame(frame)}addEventListener('resize',size,{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)x.clearRect(0,0,w,h)});size();if(!red())raf=requestAnimationFrame(frame)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start()})();</script></body>
+</body>
 </html>
