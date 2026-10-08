@@ -1145,10 +1145,8 @@ async function restoreAccountSession(){
 }
 
 function showAuthStep(id){
-  playCinematicTransition(()=>{
-    $('.auth-step').forEach(x=>x.classList.remove('active'));
-    $('#'+id).classList.add('active');
-  });
+  $('.auth-step').forEach(x=>x.classList.remove('active'));
+  $('#'+id).classList.add('active');
 }
 
 function showAuthError(msg){
@@ -1172,6 +1170,7 @@ function finishAuthGate(){
 
 function ensureAccountGate(){
   return new Promise(async resolve=>{
+    setTimeout(()=>playCinematicTransition(()=>{}),40);
     if(await restoreAccountSession()){
       finishAuthGate();
       resolve(true);
