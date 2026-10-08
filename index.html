@@ -1291,9 +1291,7 @@ async function restoreAccountSession(){
     // برای action=session این دو مقدار اصلاً استفاده نمی‌شوند، اما باید از validation عبور کنند.
     const data=await accountRequest({
       action:'session',
-      session:accountSession,
-      username:'session',
-      password:'000000'
+      session:accountSession
     });
     accountId=data.accountId; accountUsername=data.username;
     localStorage.setItem('warnehold_account_id',accountId);
