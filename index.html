@@ -7697,88 +7697,60 @@ body{overflow:hidden!important}
 </script>
 </body>
 
-<style id="wh-ui-v8">
-#wh-settings-btn{
- position:fixed!important;top:calc(10px + env(safe-area-inset-top));left:10px!important;right:auto!important;
- width:42px;height:42px;border-radius:13px;border:1px solid rgba(201,162,75,.45);
- background:rgba(8,7,16,.9);color:#e8dfca;font-size:20px;z-index:7000;
- box-shadow:0 8px 24px rgba(0,0,0,.35);backdrop-filter:blur(12px)
-}
-#wh-settings-screen{position:fixed!important;inset:0!important;z-index:6500!important;width:100%!important;max-width:520px!important;margin:0 auto!important;background:var(--bg)!important;padding-top:62px!important;overflow-y:auto!important}
+<style id="wh-game-ui-final">
+#wh-settings-btn{position:fixed!important;top:calc(10px + env(safe-area-inset-top));left:10px!important;right:auto!important;width:42px;height:42px;border-radius:13px;border:1px solid rgba(201,162,75,.45);background:rgba(8,7,16,.92);color:#e8dfca;font-size:20px;z-index:7000}
+#wh-settings-screen{position:fixed!important;inset:0!important;z-index:6500!important;width:100%!important;max-width:520px!important;margin:0 auto!important;background:var(--bg)!important;padding:62px 16px 90px!important;overflow-y:auto!important}
 #wh-settings-close{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;width:auto;padding:9px 13px}
 .wh-setting-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
 .wh-setting-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--line)}
-.wh-setting-row:last-child{border-bottom:0}
-.wh-setting-name{font-family:'Cinzel';font-size:14px;color:var(--gold)}
-.wh-setting-desc{font-size:11px;color:var(--dim);margin-top:3px}
-.wh-setting-btn{background:var(--panel-2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:6px;padding:7px 12px;font-family:'JetBrains Mono';font-size:10px}
-.wh-owner-card{border-color:rgba(201,162,75,.5)}
-.wh-owner-badge{font-family:'JetBrains Mono';font-size:9px;color:var(--gold-dim);margin-top:3px}
-.wh-owner-btn{width:100%;margin-top:8px;background:linear-gradient(180deg,#8a1f2b,#5d141c);border:1px solid #b23a3a;color:#f4ece2;border-radius:7px;padding:11px;font-family:'Cinzel';font-size:13px}
+.wh-setting-row:last-child{border-bottom:0}.wh-setting-name{font-family:'Cinzel';font-size:14px;color:var(--gold)}.wh-setting-desc{font-size:11px;color:var(--dim);margin-top:3px}.wh-setting-btn{background:var(--panel-2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:6px;padding:7px 12px;font-family:'JetBrains Mono';font-size:10px}
+.wh-owner-card{border-color:rgba(201,162,75,.5)}.wh-owner-btn{width:100%;margin-top:8px;background:linear-gradient(180deg,#8a1f2b,#5d141c);border:1px solid #b23a3a;color:#f4ece2;border-radius:7px;padding:11px;font-family:'Cinzel';font-size:13px}
 #hud-bars.wh-hidden,#hud-currency.wh-hidden{display:none!important}
-#hud-currency.wh-compact{padding-top:5px;padding-bottom:7px}
-#hud-currency.wh-compact .wh-full-stat{display:none!important}
+#hud-currency.wh-compact{padding-top:6px;padding-bottom:8px}
 .wh-reduced-fx *, .wh-reduced-fx *:before, .wh-reduced-fx *:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
-@media(max-width:430px){#wh-settings-btn{left:8px!important;top:calc(8px + env(safe-area-inset-top));width:40px;height:40px}}
 </style>
-<script id="wh-game-ui-v8">
+<script id="wh-game-ui-final-js">
 (function(){
- function boot(){
-   const wrap=document.getElementById('game-wrap');
-   const settings=document.getElementById('wh-settings-screen');
-   if(!wrap||!settings)return;
-   const isOwner=()=>localStorage.getItem('warnehold_account_role')==='owner' ||
-     String(localStorage.getItem('warnehold_account_username')||'').trim().toLowerCase()==='pain1';
-   function addOwnerPanel(){
-     if(document.getElementById('wh-owner-card'))return;
-     const card=document.createElement('div');
-     card.id='wh-owner-card'; card.className='wh-setting-card wh-owner-card';
-     card.innerHTML='<div class="wh-setting-row"><div><div class="wh-setting-name">👑 مدیریت و مالکیت</div><div class="wh-owner-badge">فقط حساب مالک</div></div><span style="color:var(--gold)">OWNER</span></div><div style="font-size:11px;color:var(--dim);line-height:1.6">مدیریت بازیکنان اقتصاد آیتم‌ها رویدادها فصل اعلان‌ها چت و گزارش‌های مدیریتی از اینجا در دسترس است</div><button id="wh-owner-open" class="wh-owner-btn" type="button">ورود به پنل مدیریت</button>';
-     settings.appendChild(card);
-     document.getElementById('wh-owner-open').onclick=function(){
-       if(!isOwner()){window.showToast?.('این بخش فقط برای مالک است');return}
-       settings.classList.remove('active');document.body.classList.remove('wh-settings-open');
-       if(typeof window.switchScreen==='function')window.switchScreen('admin');
-     };
-   }
-   addOwnerPanel();
-   const oldOpen=window.openSettings;
-   window.openSettings=function(){
-     if(isOwner())addOwnerPanel();
-     settings.classList.add('active');document.body.classList.add('wh-settings-open');
-     document.getElementById('wh-settings-btn').style.display='none';
-   };
-   const oldClose=window.closeSettings;
-   window.closeSettings=function(){
-     settings.classList.remove('active');document.body.classList.remove('wh-settings-open');
-     const b=document.getElementById('wh-settings-btn');if(b)b.style.display='block';
-   };
-   const oldSwitch=window.switchScreen;
-   window.switchScreen=function(name){
-     const r=oldSwitch?.apply(this,arguments);
-     setTimeout(function(){
-       const id=document.querySelector('#game-wrap .screen.active')?.id||'';
-       const full=id==='screen-char'||id==='screen-battle';
-       const hideCurrency=['screen-chat','screen-social','screen-battle'].includes(id);
-       const bars=document.getElementById('hud-bars'), cur=document.getElementById('hud-currency');
-       if(bars)bars.classList.toggle('wh-hidden',!full);
-       if(cur)cur.classList.toggle('wh-hidden',hideCurrency);
-       if(cur)cur.classList.toggle('wh-compact',!full&&!hideCurrency);
-     },0);
-     return r;
-   };
-   const observer=new MutationObserver(function(){
-     const id=document.querySelector('#game-wrap .screen.active')?.id||'';
-     const full=id==='screen-char'||id==='screen-battle';
-     const hideCurrency=['screen-chat','screen-social','screen-battle'].includes(id);
-     document.getElementById('hud-bars')?.classList.toggle('wh-hidden',!full);
-     document.getElementById('hud-currency')?.classList.toggle('wh-hidden',hideCurrency);
-     document.getElementById('hud-currency')?.classList.toggle('wh-compact',!full&&!hideCurrency);
-   });
-   observer.observe(wrap,{subtree:true,attributes:true,attributeFilter:['class','style']});
+ const main={home:'screen-map',map:'screen-worldmap',chat:'screen-chat',shop:'screen-shop',social:'screen-social',char:'screen-char'};
+ const owner=()=>localStorage.getItem('warnehold_account_role')==='owner'||String(localStorage.getItem('warnehold_account_username')||'').trim().toLowerCase()==='pain1';
+ const baseSwitch=window.switchScreen;
+ function activeId(){return document.querySelector('#game-wrap .screen.active')?.id||''}
+ function hud(){
+   const id=activeId(), full=id==='screen-char'||id==='screen-battle';
+   const hideCurrency=['screen-chat','screen-social','screen-battle'].includes(id);
+   document.getElementById('hud-bars')?.classList.toggle('wh-hidden',!full);
+   document.getElementById('hud-currency')?.classList.toggle('wh-hidden',hideCurrency);
+   document.getElementById('hud-currency')?.classList.toggle('wh-compact',!full&&!hideCurrency);
+   document.querySelectorAll('#wh-game-nav button').forEach(b=>b.classList.toggle('active',main[b.dataset.key]===id));
  }
+ window.switchScreen=function(name){
+   if(String(name)==='admin'&&!owner()){window.showToast?.('دسترسی مدیریت فقط برای مالک است');return}
+   const r=baseSwitch?.apply(this,arguments);setTimeout(hud,0);return r;
+ };
+ function settings(){
+   if(document.getElementById('wh-settings-btn'))return;
+   const b=document.createElement('button');b.id='wh-settings-btn';b.type='button';b.textContent='⚙️';b.setAttribute('aria-label','تنظیمات');document.body.appendChild(b);
+   const s=document.createElement('div');s.id='wh-settings-screen';s.className='screen';
+   s.innerHTML='<button id="wh-settings-close" class="secondary" type="button">✕ بستن</button><h2 class="section-title">⚙️ تنظیمات</h2><div class="wh-setting-card"><div class="wh-setting-row"><div><div class="wh-setting-name">🔊 صدا</div><div class="wh-setting-desc">صدای رابط و فضای بازی</div></div><button class="wh-setting-btn" id="wh-sound-toggle">روشن</button></div><div class="wh-setting-row"><div><div class="wh-setting-name">✨ جلوه‌ها</div><div class="wh-setting-desc">انیمیشن و جلوه‌های رابط</div></div><button class="wh-setting-btn" id="wh-fx-toggle">کامل</button></div><div class="wh-setting-row"><div><div class="wh-setting-name">📱 حالت کم‌مصرف</div><div class="wh-setting-desc">مناسب گوشی‌های ضعیف‌تر</div></div><button class="wh-setting-btn" id="wh-low-toggle">خاموش</button></div></div><div id="wh-owner-slot"></div>';
+   document.getElementById('game-wrap')?.appendChild(s);
+   b.onclick=()=>{s.classList.add('active');b.style.display='none';document.body.classList.add('wh-settings-open')};
+   document.getElementById('wh-settings-close').onclick=()=>{s.classList.remove('active');b.style.display='block';document.body.classList.remove('wh-settings-open')};
+   let snd=localStorage.getItem('warnehold_sound')!=='off',fx=localStorage.getItem('warnehold_fx')!=='reduced',low=localStorage.getItem('warnehold_low')==='on';
+   const sb=document.getElementById('wh-sound-toggle'),fb=document.getElementById('wh-fx-toggle'),lb=document.getElementById('wh-low-toggle');
+   const refresh=()=>{sb.textContent=snd?'روشن':'خاموش';fb.textContent=fx?'کامل':'سبک';lb.textContent=low?'روشن':'خاموش';document.documentElement.classList.toggle('wh-reduced-fx',!fx||low)};
+   sb.onclick=()=>{snd=!snd;localStorage.setItem('warnehold_sound',snd?'on':'off');refresh()};
+   fb.onclick=()=>{fx=!fx;localStorage.setItem('warnehold_fx',fx?'full':'reduced');refresh()};
+   lb.onclick=()=>{low=!low;localStorage.setItem('warnehold_low',low?'on':'off');refresh()};refresh();
+   const slot=document.getElementById('wh-owner-slot');
+   if(owner()){const card=document.createElement('div');card.className='wh-setting-card wh-owner-card';card.innerHTML='<div class="wh-setting-row"><div><div class="wh-setting-name">👑 مدیریت و مالکیت</div><div class="wh-setting-desc">داشبورد مالک و مدیریت کامل بازی</div></div><span style="color:var(--gold)">OWNER</span></div><button class="wh-owner-btn" type="button">ورود به پنل مدیریت</button>';slot.appendChild(card);card.querySelector('button').onclick=()=>{s.classList.remove('active');b.style.display='block';document.body.classList.remove('wh-settings-open');window.switchScreen('admin')}}
+ }
+ function nav(){
+   if(document.getElementById('wh-game-nav'))return;
+   const n=document.createElement('nav');n.id='wh-game-nav';n.innerHTML='<button data-key="home"><span class="wh-icon">⌂</span>خانه</button><button data-key="map"><span class="wh-icon">◈</span>نقشه</button><button data-key="chat"><span class="wh-icon">💬</span>گپ</button><button data-key="shop"><span class="wh-icon">🛒</span>فروشگاه</button><button data-key="social"><span class="wh-icon">♟</span>اجتماعی</button><button data-key="char"><span class="wh-icon">♙</span>شخصیت</button>';document.body.appendChild(n);
+   n.addEventListener('click',e=>{const x=e.target.closest('button');if(!x)return;baseSwitch?.(main[x.dataset.key].replace('screen-',''));setTimeout(hud,0)});
+ }
+ function boot(){const bars=document.querySelector('.bars'),cur=document.querySelector('.gold-line');if(bars)bars.id='hud-bars';if(cur)cur.id='hud-currency';nav();settings();const w=document.getElementById('game-wrap');if(w)new MutationObserver(hud).observe(w,{subtree:true,attributes:true,attributeFilter:['class','style']});hud()}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
-
 <!-- wh-v4-ready --></html>
