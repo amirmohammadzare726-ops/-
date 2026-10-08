@@ -8965,7 +8965,7 @@ function installEnemyData(){
 if(!ENEMIES)return;
 creatures.forEach(function(c){
 if(ENEMIES[c.id])return;
-ENEMIES[c.id]={name:c.name,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,xp:Math.round(c.level*16+(c.tier==="boss"?90:0)),gold:[Math.max(5,c.level*7),Math.max(12,c.level*13)],weakTo:c.weak,resistTo:c.resist,tier:c.tier,minLevel:c.level,core:c.tier==="boss"?"core_boss":"core_weak_beast",powerRank:c.tier==="boss"?"Boss":c.tier==="rare"?"Elite":"Normal",behavior:c.behavior,loot:[],whCreatureId:c.id});
+ENEMIES[c.id]={name:c.name,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,xp:Math.round(c.level*16+(c.tier==="boss"?90:0)),gold:[Math.max(5,c.level*7),Math.max(12,c.level*13)],weakTo:c.weak,resistTo:c.resist,tier:c.tier,minLevel:c.level,core:c.tier==="boss"?"core_boss":"core_weak_beast",powerRank:c.tier==="boss"?"Boss":c.tier==="rare"?"Elite":"Normal",behavior:c.behavior,loot:[],whCreatureId:c.id};
 });
 }
 function installScreen(){
