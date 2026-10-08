@@ -9047,4 +9047,157 @@ var tries=0;var timer=setInterval(function(){tries++;try{install()}catch(e){cons
 })();
 </script>
 
-</html>
+
+<!-- WH-LIVING-WORLD-V1 -->
+<script id="wh-living-world-v1">
+(function(){
+"use strict";
+if(window.__whLivingWorldV1)return; window.__whLivingWorldV1=true;
+const NPCS=[
+{id:"npc_arden",name:"آردن",role:"نگهبان پایتخت",region:0,mood:"محتاط",service:"راهنمای سفر",bio:"هر چیزی که از مرزهای پایتخت رد شود زیر نظر اوست"},
+{id:"npc_mira",name:"میرا",role:"ردیاب سایه",region:1,mood:"کنجکاو",service:"ردیابی موجودات",bio:"رد موجودات نادر را از روی نشانه‌های کوچک پیدا می‌کند"},
+{id:"npc_frost",name:"اِلیا",role:"پژوهشگر یخ",region:2,mood:"سرد",service:"تشخیص کریستال",bio:"برای هر کریستال یک داستان قدیمی دارد"},
+{id:"npc_kael",name:"کائل",role:"بازرگان سرخ",region:3,mood:"حسابگر",service:"خرید مواد",bio:"قیمت‌ها را بر اساس کمبود منطقه تغییر می‌دهد"},
+{id:"npc_vulcan",name:"وِرا",role:"آهنگر آتشفشان",region:4,mood:"جدی",service:"ساخت تجهیزات",bio:"هسته موجودات را برای ساخت تجهیزات خاص می‌خواهد"},
+{id:"npc_nox",name:"نوکس",role:"نگهبان مرداب",region:5,mood:"مشکوک",service:"پاکسازی نفرین",bio:"به هر مسافری اعتماد نمی‌کند"},
+{id:"npc_silva",name:"سیلوا",role:"ناخدای مه",region:6,mood:"شوخ",service:"مسیر جزایر",bio:"راه‌های امن بین مه را بهتر از هرکس می‌شناسد"},
+{id:"npc_veil",name:"وِیل",role:"راهنمای ارواح",region:7,mood:"آرام",service:"عبور روحی",bio:"فقط با کسانی کار می‌کند که توانایی لازم را ثابت کرده باشند"},
+{id:"npc_crys",name:"کریا",role:"کاوشگر کریستال",region:8,mood:"هیجان‌زده",service:"تحقیق کریستال",bio:"هر قطعه کریستال برایش یک سرنخ تازه است"},
+{id:"npc_chaos",name:"راوِن",role:"خبرچین آشوب",region:9,mood:"غیرقابل پیش‌بینی",service:"خبرهای ممنوع",bio:"هیچ خبری را رایگان نمی‌دهد"},
+{id:"npc_healer",name:"سِنا",role:"درمانگر",region:0,mood:"مهربان",service:"درمان",bio:"برای مسافران زخمی همیشه یک راه دارد"},
+{id:"npc_scribe",name:"رِین",role:"نقشه‌نگار",region:0,mood:"دقیق",service:"ثبت مسیرها",bio:"هر مسیر کشف‌شده را به نقشه جهان اضافه می‌کند"},
+{id:"npc_hunter",name:"دارک",role:"شکارچی",region:1,mood:"رقابتی",service:"قرارداد شکار",bio:"با شکارچی‌های دیگر رقابت می‌کند"},
+{id:"npc_ash",name:"اَش",role:"خبرنگار رویداد",region:4,mood:"هیجان‌زده",service:"اخبار جهان",bio:"قبل از همه از اتفاق‌های منطقه باخبر می‌شود"},
+{id:"npc_iris",name:"ایریس",role:"جادوگر آرشیو",region:8,mood:"مرموز",service:"خواندن آثار",bio:"قدرت و منبع آثار قدیمی را تشخیص می‌دهد"}
+];
+const MISSIONS=[
+{id:"m01",title:"ردپای اول",region:0,type:"daily",desc:"یک موجود را در سفر پیدا کن",need:{kind:"defeat",count:1},reward:{gold:35,xp:45}},
+{id:"m02",title:"پاکسازی جنگل",region:1,type:"hunt",desc:"دو موجود از جنگل سایه‌ها را شکست بده",need:{kind:"regionDefeat",region:1,count:2},reward:{gold:70,xp:90}},
+{id:"m03",title:"هسته یخ",region:2,type:"material",desc:"یک هسته از قله‌های یخ‌زده به دست بیاور",need:{kind:"regionDefeat",region:2,count:1},reward:{gold:80,xp:110,item:"wh_relic_crystal"}},
+{id:"m04",title:"شن‌های سرخ",region:3,type:"hunt",desc:"سه موجود بیابان سرخ را شکست بده",need:{kind:"regionDefeat",region:3,count:3},reward:{gold:110,xp:140}},
+{id:"m05",title:"آتش زیر خاکستر",region:4,type:"chain",desc:"با ورا صحبت کن و یک موجود آتشفشانی را شکست بده",need:{kind:"npcAndDefeat",npc:"npc_vulcan",region:4,count:1},reward:{gold:140,xp:180}},
+{id:"m06",title:"راز مرداب",region:5,type:"hidden",desc:"یک موجود نفرین‌شده را شکست بده",need:{kind:"typeDefeat",type:"cursed",count:1},reward:{gold:160,xp:220,item:"wh_relic_cleanse"}},
+{id:"m07",title:"راه میان مه",region:6,type:"journey",desc:"یک بار با ناخدای مه صحبت کن",need:{kind:"npc",npc:"npc_silva",count:1},reward:{gold:55,xp:75}},
+{id:"m08",title:"صدای ارواح",region:7,type:"hidden",desc:"با راهنمای ارواح صحبت کن و توانایی لازم را داشته باش",need:{kind:"npc",npc:"npc_veil",count:1},reward:{gold:120,xp:160,item:"wh_relic_soul"}},
+{id:"m09",title:"قطعه درخشان",region:8,type:"material",desc:"دو موجود قلمرو کریستال را شکست بده",need:{kind:"regionDefeat",region:8,count:2},reward:{gold:180,xp:240,item:"wh_relic_crystal"}},
+{id:"m10",title:"خبرچین آشوب",region:9,type:"chain",desc:"با راوِن صحبت کن",need:{kind:"npc",npc:"npc_chaos",count:1},reward:{gold:90,xp:130}},
+{id:"m11",title:"شکارچی تازه‌کار",region:1,type:"daily",desc:"یک قرارداد شکار را کامل کن",need:{kind:"regionDefeat",region:1,count:1},reward:{gold:50,xp:65}},
+{id:"m12",title:"سه هسته",region:4,type:"hunt",desc:"سه موجود هر منطقه‌ای را شکست بده",need:{kind:"defeat",count:3},reward:{gold:120,xp:150}},
+{id:"m13",title:"نقشه‌بردار",region:0,type:"world",desc:"با رِین صحبت کن",need:{kind:"npc",npc:"npc_scribe",count:1},reward:{gold:45,xp:60}},
+{id:"m14",title:"مسافر زخمی",region:0,type:"world",desc:"با سنا صحبت کن",need:{kind:"npc",npc:"npc_healer",count:1},reward:{gold:40,xp:55}},
+{id:"m15",title:"آرشیو کریستال",region:8,type:"hidden",desc:"با ایریس صحبت کن و یک موجود کریستالی را شکست بده",need:{kind:"npcAndDefeat",npc:"npc_iris",region:8,count:1},reward:{gold:220,xp:300,item:"wh_relic_eye"}}
+];
+const EVENTS=[
+{id:"ev_shadow",name:"هجوم سایه‌ها",region:1,desc:"موجودات جنگل برای مدت کوتاهی بیشتر دیده می‌شوند",bonus:"shadow"},
+{id:"ev_frost",name:"شکست یخ",region:2,desc:"هسته‌های قله‌های یخ‌زده ارزش بیشتری پیدا می‌کنند",bonus:"crystal"},
+{id:"ev_ash",name:"باران خاکستر",region:4,desc:"موجودات آتشفشانی خشن‌تر اما پاداششان بیشتر می‌شود",bonus:"fire"},
+{id:"ev_mist",name:"مه سنگین",region:6,desc:"مسیر جزایر مه‌آلود سخت‌تر می‌شود",bonus:"mist"},
+{id:"ev_spirit",name:"دروازه ارواح",region:7,desc:"یک مسیر ویژه برای دارندگان توانایی روحی باز می‌شود",bonus:"spirit"},
+{id:"ev_chaos",name:"شکاف آشوب",region:9,desc:"رویدادهای غیرقابل پیش‌بینی در قلمرو آشوب رخ می‌دهد",bonus:"chaos"}
+];
+const regName=i=>(window.whCreatureWorld&&window.whCreatureWorld.regions&&window.whCreatureWorld.regions[i]&&window.whCreatureWorld.regions[i].name)||(["پایتخت وارنهولد","جنگل سایه‌ها","قله‌های یخ‌زده","بیابان سرخ","سرزمین آتشفشان","مرداب نفرین‌شده","جزایر مه‌آلود","سرزمین ارواح","قلمرو کریستال","قلمرو آشوب"][i]||"منطقه");
+function ww(){return state.whLivingWorld||(state.whLivingWorld={missions:{},npcTalk:{},regionDefeats:{},totalDefeats:0,eventSeed:""});}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function activeEvent(){const seed=todayKey();let n=0;for(let i=0;i<seed.length;i++)n+=seed.charCodeAt(i)*(i+3);return EVENTS[n%EVENTS.length];}
+function npcById(id){return NPCS.find(x=>x.id===id);}
+function missionProgress(m){
+ const w=ww(),n=m.need;
+ if(n.kind==="defeat")return w.totalDefeats||0;
+ if(n.kind==="regionDefeat")return Number((w.regionDefeats||{})[n.region]||0);
+ if(n.kind==="typeDefeat")return Number((w.typeDefeats||{})[n.type]||0);
+ if(n.kind==="npc"||n.kind==="npcAndDefeat")return Number((w.npcTalk||{})[n.npc]||0);
+ return 0;
+}
+function missionDone(m){
+ const w=ww(),p=missionProgress(m),n=m.need;
+ if(n.kind==="npcAndDefeat")return p>=1 && Number((w.regionDefeats||{})[n.region]||0)>=n.count;
+ return p>=n.count;
+}
+function giveReward(r){
+ if(!r)return;
+ if(r.gold)state.gold=Math.max(0,(Number(state.gold)||0)+r.gold);
+ if(r.xp){state.xp=(Number(state.xp)||0)+r.xp;if(typeof grantLevelUpsAfterXp==="function")grantLevelUpsAfterXp();}
+ if(r.item){
+  if(typeof addLootToInventory==="function"){
+   const defs=(window.whCreatureWorld&&window.whCreatureWorld.relics)||[];
+   const d=defs.find(x=>x.id===r.item);
+   addLootToInventory({id:r.item,name:d?d.name:r.item,type:"Special",qty:1});
+  }
+ }
+ if(typeof saveState==="function")saveState();if(typeof renderHUD==="function")renderHUD();
+}
+function completeMission(id){
+ const m=MISSIONS.find(x=>x.id===id),w=ww();if(!m||w.missions[id])return;
+ if(!missionDone(m)){showToast("هنوز شرایط این مأموریت کامل نشده");return}
+ w.missions[id]={done:true,ts:Date.now()};giveReward(m.reward);showToast("✅ مأموریت کامل شد: "+m.title);
+ renderLivingWorld();
+}
+function talkNpc(id){
+ const n=npcById(id);if(!n)return;
+ const w=ww();w.npcTalk[id]=(Number(w.npcTalk[id])||0)+1;
+ let msg=n.name+" · "+n.role+"\n"+n.bio;
+ if(n.service==="درمان"){state.hp=Math.min(state.hpMax||state.hp,state.hpMax||state.hp);msg+="\nبرای درمان کامل HP به "+state.hpMax+" رسید."}
+ if(typeof saveState==="function")saveState();if(typeof renderHUD==="function")renderHUD();renderLivingWorld();
+ if(typeof aiNarrate==="function"){aiNarrate({event:"npc_dialogue",npc:n.name,role:n.role,mood:n.mood,region:regName(n.region)}).then(t=>{if(t)showToast(String(t).slice(0,180));}).catch(()=>{});}
+ else showToast(msg);
+}
+function renderLivingWorld(){
+ const root=document.getElementById("ww-root");if(!root)return;
+ const w=ww(),ev=activeEvent();
+ root.innerHTML='<div class="ww-hero"><div><b>جهان زنده وارنهولد</b><small>مأموریت · NPC · رویداد · مسیرهای پویا</small></div><div class="ww-event">🌍 '+ev.name+'<small>'+regName(ev.region)+'</small></div></div>'+
+ '<div class="ww-tabs"><button data-tab="missions" class="active">📜 مأموریت‌ها</button><button data-tab="npcs">👥 NPCها</button><button data-tab="events">🌍 رویداد جهان</button></div>'+
+ '<div id="ww-panel"></div>';
+ root.querySelectorAll(".ww-tabs button").forEach(b=>b.onclick=()=>{root.querySelectorAll(".ww-tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderPanel(b.dataset.tab)});
+ renderPanel("missions");
+ function renderPanel(tab){
+  const p=document.getElementById("ww-panel");
+  if(tab==="missions"){
+   p.innerHTML=MISSIONS.map(m=>{
+    const done=!!w.missions[m.id],prog=missionProgress(m),goal=m.need.count,ready=!done&&missionDone(m);
+    return '<div class="ww-card"><div class="ww-title"><b>'+m.title+'</b><span>'+m.type+'</span></div><div class="ww-desc">'+m.desc+'</div><div class="ww-meta">📍 '+regName(m.region)+' · '+Math.min(prog,goal)+'/'+goal+' · 🎁 '+(m.reward.gold||0)+'¥ + '+(m.reward.xp||0)+' XP</div><button class="'+(ready?"primary":"secondary")+'" '+((done||!ready)?"disabled":"")+' data-mission="'+m.id+'">'+(done?"✓ کامل شده":ready?"🎁 دریافت پاداش":"در حال پیشرفت")+'</button></div>';
+   }).join('');
+   p.querySelectorAll("[data-mission]").forEach(b=>b.onclick=()=>completeMission(b.dataset.mission));
+  }else if(tab==="npcs"){
+   p.innerHTML=NPCS.map(n=>'<div class="ww-card"><div class="ww-title"><b>👤 '+n.name+'</b><span>'+n.role+'</span></div><div class="ww-desc">'+n.bio+'</div><div class="ww-meta">📍 '+regName(n.region)+' · حال و هوا: '+n.mood+' · خدمت: '+n.service+'</div><button class="secondary" data-npc="'+n.id+'">💬 صحبت</button></div>').join('');
+   p.querySelectorAll("[data-npc]").forEach(b=>b.onclick=()=>talkNpc(b.dataset.npc));
+  }else{
+   p.innerHTML='<div class="ww-card ww-live"><div class="ww-title"><b>🌍 '+ev.name+'</b><span>امروز</span></div><div class="ww-desc">'+ev.desc+'</div><div class="ww-meta">📍 '+regName(ev.region)+' · اثر: '+ev.bonus+'</div><div class="ww-note">رویداد روزانه با تغییر روز عوض می‌شود و مأموریت‌ها و مسیرهای مرتبط می‌توانند از آن استفاده کنند.</div></div>'+
+   EVENTS.map(x=>'<div class="ww-card"><div class="ww-title"><b>'+x.name+'</b><span>'+regName(x.region)+'</span></div><div class="ww-desc">'+x.desc+'</div></div>').join('');
+  }
+ }
+}
+function installScreen(){
+ if(document.getElementById("screen-wh-world"))return;
+ const app=document.getElementById("app");if(!app)return;
+ const s=document.createElement("div");s.className="screen";s.id="screen-wh-world";
+ s.innerHTML='<button class="secondary" id="ww-back" style="width:100%;margin-bottom:8px">🔙 بازگشت به نقشه</button><div id="ww-root"></div>';
+ app.appendChild(s);
+ document.getElementById("ww-back").onclick=()=>{s.classList.remove("active");if(typeof switchScreen==="function")switchScreen("map");};
+ const map=document.getElementById("screen-map");
+ if(map&&!document.getElementById("ww-open")){
+  const b=document.createElement("button");b.id="ww-open";b.className="secondary";b.style.cssText="width:100%;margin:0 0 8px;border:1px solid #6f5a91;min-height:44px;font-weight:800";b.textContent="🌍 جهان زنده · مأموریت‌ها و NPCها";
+  b.onclick=()=>openWorld();const anchor=document.getElementById("whx-open");if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(b,anchor);else map.insertBefore(b,map.firstChild);
+ }
+}
+function openWorld(){installScreen();const s=document.getElementById("screen-wh-world");if(typeof switchScreen==="function")switchScreen("wh-world");else s.classList.add("active");renderLivingWorld();}
+function hookBattle(){
+ if(typeof window.endBattle!=="function"||window.endBattle.__wwWrapped)return;
+ const orig=window.endBattle;
+ const wrapped=async function(won){
+  const b=state&&state.battle,cid=b&&b.whCreatureId,c=window.whCreatureWorld&&window.whCreatureWorld.creatures&&window.whCreatureWorld.creatures.find(x=>x.id===cid);
+  if(c&&won){const w=ww();w.totalDefeats=(w.totalDefeats||0)+1;w.regionDefeats[c.region]=(Number(w.regionDefeats[c.region])||0)+1;for(const t of (c.types||[]))w.typeDefeats[t]=(Number(w.typeDefeats[t])||0)+1;if(typeof saveState==="function")saveState();}
+  return orig.apply(this,arguments);
+ };
+ wrapped.__wwWrapped=true;window.endBattle=wrapped;
+}
+function hookNavigation(){
+ if(window.__wwNavHook)return;window.__wwNavHook=true;
+ const orig=window.switchScreen;if(typeof orig==="function"){window.switchScreen=function(id){if(id==="wh-world"){installScreen();document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById("screen-wh-world").classList.add("active");renderLivingWorld();return;}return orig.apply(this,arguments);};}
+}
+const css=document.createElement("style");css.textContent=".ww-hero{display:flex;gap:8px;justify-content:space-between;align-items:stretch;margin-bottom:8px}.ww-hero b{font-size:16px;color:var(--gold)}.ww-hero small,.ww-event small{display:block;color:var(--dim);font-size:10px;margin-top:3px}.ww-event{font-size:11px;padding:8px;border:1px solid rgba(190,150,70,.35);border-radius:10px;text-align:center}.ww-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.ww-tabs button{padding:9px 5px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#171826;color:#aaa}.ww-tabs button.active{color:var(--gold);border-color:rgba(200,160,80,.5)}.ww-card{padding:10px;margin-bottom:7px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:linear-gradient(145deg,rgba(30,28,43,.94),rgba(13,14,23,.96));box-shadow:0 5px 18px rgba(0,0,0,.16)}.ww-title{display:flex;justify-content:space-between;gap:8px;align-items:center;color:#eee}.ww-title span{font-size:9px;color:var(--gold-dim)}.ww-desc{font-size:11px;color:#bbb;margin:6px 0;line-height:1.6}.ww-meta{font-size:9px;color:var(--dim);margin-bottom:7px}.ww-note{font-size:10px;color:#aaa;padding:7px;border-radius:8px;background:rgba(255,255,255,.035)}@media(max-width:430px){.ww-hero{flex-direction:column}.ww-tabs button{font-size:10px}}";document.head.appendChild(css);
+function init(){if(!window.state)return;const w=ww();if(w.eventSeed!==todayKey()){w.eventSeed=todayKey();if(typeof saveState==="function")saveState();}installScreen();hookNavigation();hookBattle();}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(init,1500));else setTimeout(init,1500);
+setInterval(()=>{try{if(window.state)init();}catch(e){console.debug("WW init",e)}},3000);
+window.whLivingWorld={npcs:NPCS,missions:MISSIONS,events:EVENTS,open:openWorld,render:renderLivingWorld,activeEvent:activeEvent};
+})();
+</script>\n</html>
