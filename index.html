@@ -7753,4 +7753,194 @@ body{overflow:hidden!important}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
+
+<style id="wh-game-ui-v8">
+/* ---------- Warnehold v8: clean game hierarchy ---------- */
+#wh-game-nav{height:64px!important}
+#wh-settings-screen{z-index:6500!important}
+.wh-v8-home{
+  background:linear-gradient(180deg,rgba(35,27,19,.96),rgba(28,22,16,.96));
+  border:1px solid rgba(201,162,75,.32);border-radius:12px;padding:12px;margin-bottom:12px;
+  box-shadow:0 8px 28px rgba(0,0,0,.22)
+}
+.wh-v8-home-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.wh-v8-home-title{font-family:'Cinzel';font-size:17px;color:var(--gold)}
+.wh-v8-home-sub{font-size:11px;color:var(--dim)}
+.wh-v8-quick{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.wh-v8-quick button{
+  min-height:48px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+  color:var(--parchment);font-family:'Cinzel';font-size:12px
+}
+.wh-v8-quick button:active{transform:translateY(1px)}
+.wh-v8-mini{
+  display:flex;gap:6px;overflow:auto;margin-top:8px;padding-bottom:2px
+}
+.wh-v8-mini span{
+  flex:none;border:1px solid var(--line);background:rgba(0,0,0,.12);border-radius:12px;
+  padding:5px 8px;color:var(--dim);font:10px 'JetBrains Mono'
+}
+.wh-v8-battle{
+  background:linear-gradient(180deg,rgba(138,31,43,.18),rgba(28,22,16,.95));
+  border:1px solid rgba(178,58,58,.35);border-radius:10px;padding:9px 10px;margin-bottom:10px
+}
+.wh-v8-battle .row{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+.wh-v8-battle .label{width:42px;color:var(--dim);font:10px 'JetBrains Mono'}
+.wh-v8-battle .track{flex:1;height:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.wh-v8-battle .fill{height:100%;transition:width .3s ease}
+.wh-v8-battle .fill.hp{background:var(--blood-bright)}
+.wh-v8-battle .fill.energy{background:var(--energy)}
+.wh-v8-battle .val{width:58px;text-align:left;color:var(--dim);font:9px 'JetBrains Mono'}
+.wh-v8-char-note{
+  border:1px solid rgba(201,162,75,.3);background:rgba(201,162,75,.05);
+  border-radius:8px;padding:9px 10px;margin-bottom:10px;color:var(--dim);font-size:11px
+}
+.wh-v8-settings-section{margin-top:10px}
+.wh-v8-settings-title{color:var(--gold);font-family:'Cinzel';font-size:14px;margin:5px 2px 8px}
+.wh-v8-settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.wh-v8-settings-grid button{
+  min-height:46px;background:var(--panel-2);border:1px solid var(--line);border-radius:7px;
+  color:var(--parchment);font:11px 'JetBrains Mono'
+}
+.wh-v8-owner-status{font:10px 'JetBrains Mono';color:var(--gold-dim);margin-top:5px}
+.wh-v8-admin-open{width:100%;margin-top:8px;background:linear-gradient(180deg,#8a1f2b,#5d141c);border:1px solid #b23a3a;color:#f4ece2;border-radius:7px;padding:11px;font-family:'Cinzel';font-size:13px}
+#hud-bars.wh-v8-force-hidden{display:none!important}
+#hud-currency.wh-v8-force-hidden{display:none!important}
+@media(max-width:380px){
+ .wh-v8-quick{grid-template-columns:1fr 1fr}
+ .wh-v8-quick button{font-size:11px}
+ .wh-v8-settings-grid{grid-template-columns:1fr}
+}
+</style>
+<script id="wh-game-ui-v8-js">
+(function(){
+  function bootV8(){
+    const wrap=document.getElementById('game-wrap');
+    if(!wrap)return;
+    const bars=document.getElementById('hud-bars')||document.querySelector('.bars');
+    const currency=document.getElementById('hud-currency')||document.querySelector('.gold-line');
+    if(bars)bars.id='hud-bars';
+    if(currency)currency.id='hud-currency';
+
+    const mainMap={home:'screen-map',map:'screen-worldmap',chat:'screen-chat',shop:'screen-shop',social:'screen-social',char:'screen-char'};
+    const owner=()=>String(localStorage.getItem('warnehold_account_username')||'').trim().toLowerCase()==='pain1'||localStorage.getItem('warnehold_account_role')==='owner';
+
+    function valFor(selector){
+      const el=document.querySelector(selector);
+      return el?.textContent?.trim()||'—';
+    }
+
+    function addHome(){
+      const home=document.getElementById('screen-map');
+      if(!home||home.querySelector('.wh-v8-home'))return;
+      const box=document.createElement('div');
+      box.className='wh-v8-home';
+      box.innerHTML=
+        '<div class="wh-v8-home-head"><div><div class="wh-v8-home-title">خانه وارنهولد</div><div class="wh-v8-home-sub">دسترسی سریع به مهم‌ترین بخش‌های بازی</div></div><div class="eyebrow">GAME HUB</div></div>'+
+        '<div class="wh-v8-quick">'+
+        '<button data-go="char">♙ شخصیت</button>'+
+        '<button data-go="battle">⚔️ نبرد</button>'+
+        '<button data-go="quest">✦ ماموریت‌ها</button>'+
+        '<button data-go="job">◈ فعالیت‌ها</button>'+
+        '<button data-go="inv">🎒 تجهیزات و موجودی</button>'+
+        '<button data-go="collection">✧ مجموعه</button>'+
+        '</div>'+
+        '<div class="wh-v8-mini"><span>وضعیت سریع</span><span>سطح '+valFor('#hud .lvl')+'</span><span>مکان '+valFor('#hud .ploc')+'</span></div>';
+      home.insertBefore(box,home.firstChild);
+      box.addEventListener('click',e=>{
+        const b=e.target.closest('button[data-go]');if(!b)return;
+        window.switchScreen?.(b.dataset.go);
+      });
+    }
+
+    function addBattleHud(){
+      const battle=document.getElementById('screen-battle');
+      if(!battle||battle.querySelector('.wh-v8-battle'))return;
+      const box=document.createElement('div');
+      box.className='wh-v8-battle';
+      box.innerHTML='<div class="row"><div class="label">جان</div><div class="track"><div class="fill hp" id="wh-v8-bhp"></div></div><div class="val" id="wh-v8-bhpv">—</div></div>'+
+                    '<div class="row"><div class="label">انرژی</div><div class="track"><div class="fill energy" id="wh-v8-ben"></div></div><div class="val" id="wh-v8-benv">—</div></div>';
+      battle.insertBefore(box,battle.firstChild);
+    }
+
+    function addCharacterNote(){
+      const ch=document.getElementById('screen-char');
+      if(!ch||ch.querySelector('.wh-v8-char-note'))return;
+      const n=document.createElement('div');
+      n.className='wh-v8-char-note';
+      n.textContent='صفحه شخصیت مرکز اطلاعات کامل توست: وضعیت، تجربه، پول و جم، تجهیزات و قدرت‌ها از اینجا قابل بررسی هستند';
+      ch.insertBefore(n,ch.firstChild);
+    }
+
+    function updateBattleHud(){
+      const hpTrack=document.querySelector('#hud-bars .bar-fill.hp');
+      const enTrack=document.querySelector('#hud-bars .bar-fill.energy');
+      const hpVal=document.querySelector('#hud-bars .bar-fill.hp')?.parentElement?.nextElementSibling;
+      const enVal=document.querySelector('#hud-bars .bar-fill.energy')?.parentElement?.nextElementSibling;
+      const bh=document.getElementById('wh-v8-bhp'),be=document.getElementById('wh-v8-ben');
+      if(hpTrack&&bh)bh.style.width=hpTrack.style.width||'0%';
+      if(enTrack&&be)be.style.width=enTrack.style.width||'0%';
+      const hv=document.getElementById('wh-v8-bhpv'),ev=document.getElementById('wh-v8-benv');
+      if(hv)hv.textContent=hpVal?.textContent?.trim()||'—';
+      if(ev)ev.textContent=enVal?.textContent?.trim()||'—';
+    }
+
+    function updateHierarchy(){
+      const id=wrap.querySelector('.screen.active')?.id||'';
+      const character=id==='screen-char';
+      const battle=id==='screen-battle';
+      const chat=id==='screen-chat';
+      const social=id==='screen-social';
+      const settings=id==='wh-settings-screen';
+
+      // Full status bar is character only.
+      bars?.classList.toggle('wh-v8-force-hidden',!character);
+      // Battle gets a dedicated compact HUD instead.
+      document.querySelector('.wh-v8-battle')?.classList.toggle('wh-v8-force-hidden',!battle);
+      // Currency is compact on normal game screens, hidden where it distracts.
+      const hideMoney=chat||social||battle||settings||id==='screen-auth'||id==='screen-start'||id==='screen-welcome'||id==='screen-blocked';
+      currency?.classList.toggle('wh-v8-force-hidden',hideMoney);
+      currency?.classList.toggle('wh-compact',!character&&!hideMoney);
+
+      if(battle)updateBattleHud();
+      document.querySelectorAll('#wh-game-nav button').forEach(b=>{
+        b.classList.toggle('active',mainMap[b.dataset.key]===id);
+      });
+    }
+
+    function enrichSettings(){
+      const s=document.getElementById('wh-settings-screen');
+      if(!s||s.querySelector('.wh-v8-settings-section'))return;
+      const section=document.createElement('div');
+      section.className='wh-v8-settings-section';
+      section.innerHTML='<div class="wh-v8-settings-title">تنظیمات بازی</div>'+
+        '<div class="wh-v8-settings-grid">'+
+        '<button id="wh-v8-account">👤 حساب</button>'+
+        '<button id="wh-v8-graphics">🎨 گرافیک</button>'+
+        '<button id="wh-v8-language">🌐 فارسی</button>'+
+        '<button id="wh-v8-resetfx">↺ بازنشانی جلوه‌ها</button>'+
+        '</div>'+
+        (owner()?'<div class="wh-v8-settings-title" style="margin-top:14px">مالکیت و مدیریت</div><div class="wh-v8-owner-status">حساب مالک شناسایی شد</div><button class="wh-v8-admin-open" id="wh-v8-admin">👑 ورود به پنل مدیریت</button>':'');
+      s.appendChild(section);
+      section.querySelector('#wh-v8-admin')?.addEventListener('click',()=>window.switchScreen?.('admin'));
+      section.querySelector('#wh-v8-graphics')?.addEventListener('click',()=>window.showToast?.('تنظیم جلوه‌ها از گزینه ✨ جلوه‌ها انجام می‌شود'));
+      section.querySelector('#wh-v8-account')?.addEventListener('click',()=>window.showToast?.('اطلاعات حساب از بخش شخصیت و ورود مدیریت می‌شود'));
+      section.querySelector('#wh-v8-language')?.addEventListener('click',()=>window.showToast?.('زبان فعلی فارسی است'));
+      section.querySelector('#wh-v8-resetfx')?.addEventListener('click',()=>{
+        localStorage.removeItem('warnehold_fx');localStorage.removeItem('warnehold_low');
+        document.documentElement.classList.remove('wh-reduced-fx');window.showToast?.('جلوه‌ها به حالت کامل برگشت');
+      });
+    }
+
+    addHome();addBattleHud();addCharacterNote();enrichSettings();updateHierarchy();
+
+    const observer=new MutationObserver(()=>{
+      addHome();addBattleHud();addCharacterNote();enrichSettings();updateHierarchy();
+    });
+    observer.observe(wrap,{subtree:true,attributes:true,attributeFilter:['class','style']});
+    setInterval(updateBattleHud,700);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV8);else bootV8();
+})();
+</script>
+
 <!-- wh-v4-ready --></html>
