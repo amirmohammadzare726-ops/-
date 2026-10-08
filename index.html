@@ -6833,7 +6833,10 @@ document.addEventListener('visibilitychange', ()=>{
   const canvas=document.createElement('canvas');
   canvas.id='wh-v9-bg';
   canvas.setAttribute('aria-hidden','true');
+  canvas.style.cssText='position:fixed;inset:0;width:100vw;height:100vh;display:block;pointer-events:none;z-index:0;';
   document.body.prepend(canvas);
+  const appEl=document.getElementById('app');
+  if(appEl) appEl.style.position='relative',appEl.style.zIndex='1';
   const ctx=canvas.getContext('2d',{alpha:true});
   if(!ctx)return;
 
