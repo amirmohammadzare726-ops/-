@@ -7133,7 +7133,7 @@ function onBack(){
   validateStep();
 }
 
-function enterGame(){
+function enterGame(){document.body.classList.add('wh-game-ready');
   $('#screen-start').classList.remove('active');
   $('#game-wrap').style.display='flex';
   $('#nav').style.display='flex';
@@ -7756,7 +7756,7 @@ body{overflow:hidden!important}
 
 <style id="wh-game-ui-v8">
 /* ---------- Warnehold v8: clean game hierarchy ---------- */
-#wh-game-nav{height:64px!important}
+#wh-game-nav{height:64px!important;display:none!important}body.wh-game-ready #wh-game-nav{display:flex!important}#wh-settings-btn{display:none!important}body.wh-game-ready #wh-settings-btn{display:block!important}
 #wh-settings-screen{z-index:6500!important}
 .wh-v8-home{
   background:linear-gradient(180deg,rgba(35,27,19,.96),rgba(28,22,16,.96));
