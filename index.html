@@ -8958,7 +8958,7 @@ var missing=missingTags(c);if(missing.length){showToast("قابلیت لازم �
 if(Number(s.level||1)<c.level){showToast("برای این موجود حداقل Level "+c.level+" لازم است");return}
 if(s.battle&&!s.battle.over){showToast("اول فایت فعلی را تمام کن");return}
 if(!ENEMIES[id]){showToast("داده دشمن آماده نیست");return}
-window.__whPendingCreature=id;openOriginalBattle(id);
+window.__whPendingCreature=id;window.startBattle(id);
 }
 var openOriginalBattle=window.startBattle||null;
 function installEnemyData(){
