@@ -1114,6 +1114,34 @@ async function accountRequest(payload){
   return data;
 }
 
+async function migrateLegacyDeviceSave(legacyScope, newAccountId){
+  if(!legacyScope || !newAccountId || legacyScope === 'acct_' + newAccountId || legacyScope.startsWith('acct_')) return;
+  try{
+    const oldRowsRes = await sbFetch(`${SUPABASE_TABLE}?scope=eq.${encodeURIComponent(legacyScope)}&select=key,value,updated_at`, {method:'GET'});
+    const oldRows = await oldRowsRes.json();
+    if(!oldRows || !oldRows.length) return;
+
+    const newRowsRes = await sbFetch(`${SUPABASE_TABLE}?scope=eq.${encodeURIComponent('acct_' + newAccountId)}&select=key`, {method:'GET'});
+    const newRows = await newRowsRes.json();
+    const existing = new Set((newRows||[]).map(x=>x.key));
+    const missing = oldRows.filter(x=>!existing.has(x.key)).map(x=>({
+      scope:'acct_' + newAccountId,
+      key:x.key,
+      value:x.value,
+      updated_at:x.updated_at || new Date().toISOString()
+    }));
+    if(missing.length){
+      await sbFetch(`${SUPABASE_TABLE}?on_conflict=scope,key`, {
+        method:'POST',
+        headers:{'Prefer':'resolution=ignore-duplicates'},
+        body:JSON.stringify(missing)
+      });
+    }
+  }catch(e){
+    console.error('legacy save migration failed', e);
+  }
+}
+
 function setAccountSession(data){
   accountSession = data.session || '';
   accountId = data.accountId || '';
@@ -1222,12 +1250,16 @@ function ensureAccountGate(){
       $('#auth-submit').disabled=true;
       $('#auth-submit').textContent=authMode==='register'?'در حال ساخت حساب...':'در حال ورود...';
       try{
+        // قبل از تغییر scope ذخیره، شناسه دستگاه قدیمی را نگه می‌داریم تا
+        // کاراکتر و Save قبلی بازیکن به حساب جدید منتقل شود.
+        const legacyScope = localStorage.getItem('warnhold_device_id') || '';
         const data=await accountRequest({
           action:authMode,
           username,
           password
         });
         setAccountSession(data);
+        await migrateLegacyDeviceSave(legacyScope, accountId);
         finishAuthGate();
         resolve(true);
       }catch(err){
