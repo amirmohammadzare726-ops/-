@@ -8781,4 +8781,269 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){ensureDailyBossActive().then(patchBanner)});else setTimeout(function(){ensureDailyBossActive().then(patchBanner)},900);
 })();
 </script>
+
+<style id="wh-creature-expansion-style">
+#screen-wh-creatures{position:fixed!important;inset:0!important;z-index:6100!important;overflow-y:auto!important;padding:calc(12px + env(safe-area-inset-top)) 12px calc(96px + env(safe-area-inset-bottom))!important;background:radial-gradient(ellipse at 50% -10%,rgba(132,72,185,.22),transparent 45%),radial-gradient(ellipse at 100% 55%,rgba(25,101,117,.15),transparent 40%),linear-gradient(180deg,#080912,#11101c 45%,#090910)!important}
+.whx-head{position:relative;overflow:hidden;border:1px solid rgba(204,166,83,.5);border-radius:20px;padding:17px 15px;background:linear-gradient(125deg,rgba(40,28,58,.96),rgba(12,18,34,.95) 60%,rgba(45,20,34,.9));box-shadow:0 12px 34px #0009,inset 0 1px #ffffff12;margin-bottom:12px}
+.whx-head:after{content:"";position:absolute;inset:auto -10% -68px;height:130px;background:radial-gradient(ellipse,rgba(189,135,255,.18),transparent 70%);pointer-events:none}
+.whx-kicker{font:700 10px Cinzel,serif;letter-spacing:2px;color:#d7b76a;text-align:center}
+.whx-title{font:900 25px Cinzel,serif;color:#f2d99a;text-align:center;margin:5px 0 7px;text-shadow:0 0 24px #b17ce855}
+.whx-sub{font-size:13px;line-height:1.8;text-align:center;color:#c9c6d7}
+.whx-statrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:13px}
+.whx-stat{border:1px solid #ffffff18;border-radius:12px;background:#05061088;padding:8px 4px;text-align:center}
+.whx-stat b{display:block;color:#f1d28b;font-size:16px}.whx-stat span{font-size:10px;color:#aaa9bd}
+.whx-region-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.whx-region{position:relative;min-height:118px;border:1px solid #ffffff20;border-radius:16px;padding:12px;text-align:right;overflow:hidden;background:linear-gradient(145deg,#22283b,#111521);color:#eee;box-shadow:0 7px 18px #0005;transition:transform .15s,border-color .15s}
+.whx-region:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,var(--glow,rgba(128,104,190,.3)),transparent 65%);pointer-events:none}
+.whx-region:active{transform:scale(.985)}.whx-region.active{border-color:#e1bd69;box-shadow:0 0 0 1px #e1bd6940,0 8px 24px #0008}
+.whx-region>*{position:relative}.whx-region .em{font-size:24px;float:left;filter:drop-shadow(0 0 8px var(--glow, #9a8bff))}.whx-region b{display:block;font-size:14px;color:#f4dfad;margin-bottom:5px}.whx-region small{display:block;font-size:10px;color:#c0bfd0;line-height:1.6}.whx-region .lvl{display:inline-block;margin-top:7px;border-radius:20px;padding:3px 7px;background:#0006;border:1px solid #ffffff1c;font-size:10px;color:#e3c779}
+.whx-section-title{font-size:15px;color:#f0d38d;margin:15px 2px 9px;font-weight:800;display:flex;align-items:center;gap:8px}.whx-section-title:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,#d7b15a55,transparent)}
+.whx-creature-list{display:flex;flex-direction:column;gap:9px}
+.whx-creature{position:relative;overflow:hidden;border-radius:16px;border:1px solid #ffffff1c;background:linear-gradient(120deg,#171a28f5,#10111bf5);padding:12px;box-shadow:0 7px 18px #0004}
+.whx-creature:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--rarity,#7c85a4)}
+.whx-creature-top{display:flex;align-items:flex-start;gap:10px}.whx-creature-icon{width:48px;height:48px;flex:0 0 48px;border-radius:13px;display:grid;place-items:center;font-size:26px;background:radial-gradient(circle at 40% 30%,var(--glow,#8a70bb77),#111321);border:1px solid #ffffff22;box-shadow:inset 0 0 16px #0007}
+.whx-creature-main{flex:1;min-width:0}.whx-creature-main b{font-size:15px;color:#f0d9a2;display:block}.whx-creature-main small{display:block;font-size:11px;line-height:1.65;color:#b8b8ca;margin-top:3px}
+.whx-tagrow{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0}.whx-tag{font-size:10px;padding:3px 7px;border-radius:20px;background:#ffffff0b;border:1px solid #ffffff19;color:#d3cee6}
+.whx-bars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}.whx-bar{font-size:10px;color:#b9b8cb}.whx-bar i{display:block;height:4px;background:#ffffff12;border-radius:5px;margin-top:4px;overflow:hidden}.whx-bar em{display:block;height:100%;background:linear-gradient(90deg,#6e66a9,#e0c078);border-radius:5px}
+.whx-warning{padding:9px 10px;border-radius:11px;border:1px solid #d69a4350;background:#8b4d171f;color:#e8c68a;font-size:11px;line-height:1.7;margin:8px 0}
+.whx-ok{border-color:#65c99a55;background:#1a7a4b20;color:#a7e8c6}
+.whx-actions{display:flex;gap:7px;margin-top:10px}.whx-actions button{flex:1;min-height:40px;border-radius:11px;border:1px solid #bca05c66;background:linear-gradient(180deg,#3a3044,#211b2b);color:#f2e3bc;font-weight:800;font-size:12px}.whx-actions button:disabled{opacity:.42;filter:grayscale(.7)}
+.whx-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.whx-toolbar button{flex:1;min-width:100px}
+.whx-filter{width:100%;padding:11px 12px;border:1px solid #ffffff22;border-radius:12px;background:#070812;color:#eee;font:inherit;margin:8px 0}
+.whx-relic{border:1px solid #ffffff1b;border-radius:13px;background:#111321;padding:10px;margin:6px 0;display:flex;align-items:center;gap:9px}.whx-relic .ico{font-size:22px}.whx-relic .desc{flex:1;font-size:11px;color:#bcbacd;line-height:1.6}.whx-relic b{color:#e7ce8f;display:block;font-size:12px}
+.whx-back{width:100%;margin-bottom:10px}
+@media(min-width:560px){.whx-region-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.whx-creature-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.whx-region{transition:none}}
+</style>
+<script id="wh-creature-expansion-v1">
+(function(){
+"use strict";
+if(window.__whCreatureExpansionV1)return;window.__whCreatureExpansionV1=true;
+var regions=[
+{id:"capital",name:"پایتخت وارنهولد",icon:"🏰",desc:"کوچه‌های سنگی و نگهبانان تاج؛ نقطه شروع ماجراجویی",danger:"کم",level:1,glow:"#d5b15c"},
+{id:"shadow_forest",name:"جنگل سایه‌ها",icon:"🌲",desc:"مه بنفش، ریشه‌های زنده و شکارچیانی که از تاریکی می‌آیند",danger:"متوسط",level:2,glow:"#67a77c"},
+{id:"frozen_peaks",name:"قله‌های یخ‌زده",icon:"❄️",desc:"کولاک‌های سنگین و موجوداتی که در سرمای جادویی زنده‌اند",danger:"بالا",level:4,glow:"#7dc9e8"},
+{id:"red_desert",name:"بیابان سرخ",icon:"🏜️",desc:"شن‌های سرخ، طوفان‌های تیز و شکارچیان زیر خاک",danger:"بالا",level:5,glow:"#e68a57"},
+{id:"volcano",name:"سرزمین آتشفشان",icon:"🌋",desc:"رودهای گدازه و هیولاهایی با هسته‌های داغ",danger:"خیلی بالا",level:7,glow:"#f06c47"},
+{id:"cursed_swamp",name:"مرداب نفرین‌شده",icon:"☠️",desc:"آب‌های سمی، مه سنگین و نفرین‌هایی که با هر قدم قوی‌تر می‌شوند",danger:"خیلی بالا",level:8,glow:"#9cba67"},
+{id:"mist_isles",name:"جزایر مه‌آلود",icon:"🌊",desc:"صخره‌های دریایی، کشتی‌های گمشده و موجودات اعماق",danger:"بالا",level:6,glow:"#5bafc8"},
+{id:"spiritlands",name:"سرزمین ارواح",icon:"👻",desc:"مرز میان جهان زنده‌ها و ارواح؛ ورود بدون آمادگی خطرناک است",danger:"مرگبار",level:10,glow:"#a58cf0"},
+{id:"crystal_realm",name:"قلمرو کریستال",icon:"💎",desc:"غارهای بلورین و انرژی‌هایی که ضربه‌ها را بازمی‌گردانند",danger:"خیلی بالا",level:9,glow:"#68d7dc"},
+{id:"chaos_realm",name:"قلمرو آشوب",icon:"🌀",desc:"قوانین ناپایدار، موجودات جهش‌یافته و دشمنان غیرقابل‌پیش‌بینی",danger:"مرگبار",level:12,glow:"#e06bcb"}
+];
+var creatures=[
+{id:"wh_cap_iron",region:"capital",name:"نگهبان آهنی",icon:"🛡️",types:["physical"],tier:"common",level:1,hp:72,atk:10,def:8,spd:5,weak:"جادو",resist:"فیزیکی",personality:"منظم و دفاعی",behavior:"اول دفاع می‌کند و بعد با ضربه‌های دقیق پاسخ می‌دهد",affinity:[],loot:"هسته سنگی"},
+{id:"wh_cap_wolf",region:"capital",name:"گرگ کوچه‌ها",icon:"🐺",types:["beast"],tier:"common",level:1,hp:58,atk:12,def:4,spd:12,weak:"آتش",resist:"تاریکی",personality:"گله‌ای و فرصت‌طلب",behavior:"وقتی هدف آسیب دیده باشد تهاجمی‌تر می‌شود",affinity:[],loot:"دندان گرگ"},
+{id:"wh_cap_thief",region:"capital",name:"دزد سایه",icon:"🥷",types:["dark"],tier:"uncommon",level:2,hp:66,atk:14,def:5,spd:16,weak:"نور",resist:"تاریکی",personality:"فرصت‌طلب",behavior:"دنبال باز کردن دفاع و حمله سریع است",affinity:["dark"],loot:"پارچه سایه"},
+{id:"wh_cap_knight",region:"capital",name:"شوالیه سرخ",icon:"⚔️",types:["physical","cursed"],tier:"rare",level:3,hp:142,atk:19,def:14,spd:8,weak:"آب",resist:"فیزیکی",personality:"مغرور و مستقیم",behavior:"در نیمه دوم فایت حمله سنگین می‌زند",affinity:[],loot:"نشان شوالیه"},
+{id:"wh_cap_crown",region:"capital",name:"نگهبان تاج",icon:"👑",types:["boss","physical"],tier:"boss",level:4,hp:330,atk:27,def:22,spd:11,weak:"جادو",resist:"فیزیکی",personality:"صبور و تاکتیکی",behavior:"با کم شدن HP فاز دوم را شروع می‌کند",affinity:[],loot:"قطعه تاج"},
+{id:"wh_forest_wolf",region:"shadow_forest",name:"گرگ مه‌آلود",icon:"🐺",types:["beast","phase"],tier:"common",level:2,hp:86,atk:14,def:6,spd:15,weak:"آتش",resist:"فیزیکی",personality:"کمین‌گر",behavior:"در مه جاخالی می‌دهد و از پهلو حمله می‌کند",affinity:[],loot:"پوست مه‌آلود"},
+{id:"wh_forest_spider",region:"shadow_forest",name:"عنکبوت شب‌رو",icon:"🕷️",types:["beast","cursed"],tier:"common",level:2,hp:78,atk:13,def:7,spd:13,weak:"آتش",resist:"زهر",personality:"صبور",behavior:"با تار سرعت هدف را کم می‌کند",affinity:[],loot:"تار شب‌رو"},
+{id:"wh_forest_eater",region:"shadow_forest",name:"درخت‌خوار",icon:"🌳",types:["nature"],tier:"uncommon",level:3,hp:128,atk:16,def:15,spd:4,weak:"آتش",resist:"فیزیکی",personality:"کند و مقاوم",behavior:"ریشه می‌دواند و حمله بعدی را تقویت می‌کند",affinity:[],loot:"پوست کهن"},
+{id:"wh_forest_hunter",region:"shadow_forest",name:"شکارچی سایه",icon:"🏹",types:["dark","phase"],tier:"rare",level:4,hp:154,atk:22,def:10,spd:18,weak:"نور",resist:"تاریکی",personality:"باهوش و کمین‌گر",behavior:"حرکت تکراری بازیکن را هدف می‌گیرد",affinity:["dark"],loot:"تیر سایه"},
+{id:"wh_forest_root",region:"shadow_forest",name:"نگهبان ریشه",icon:"🌿",types:["nature","boss"],tier:"boss",level:5,hp:390,atk:28,def:24,spd:6,weak:"آتش",resist:"فیزیکی",personality:"محافظ سرزمین",behavior:"ریشه‌ها را برای دفاع و بستن مسیر به کار می‌برد",affinity:[],loot:"هسته ریشه"},
+{id:"wh_ice_fox",region:"frozen_peaks",name:"روباه یخی",icon:"🦊",types:["ice","phase"],tier:"common",level:4,hp:110,atk:17,def:8,spd:19,weak:"آتش",resist:"یخ",personality:"چابک و گریزپا",behavior:"با سرعت حمله می‌کند و از ضربه سنگین دور می‌شود",affinity:[],loot:"دم یخی"},
+{id:"wh_ice_wolf",region:"frozen_peaks",name:"گرگ برفی",icon:"🐺",types:["beast","ice"],tier:"uncommon",level:4,hp:138,atk:19,def:11,spd:15,weak:"آتش",resist:"یخ",personality:"شکارچی گروهی",behavior:"حمله‌های پی‌درپی دارد",affinity:[],loot:"نیش برفی"},
+{id:"wh_ice_giant",region:"frozen_peaks",name:"غول یخی",icon:"🧊",types:["ice","physical"],tier:"rare",level:5,hp:220,atk:25,def:22,spd:5,weak:"آتش",resist:"یخ",personality:"سنگین و سرسخت",behavior:"ضربه‌های کند اما پرقدرت می‌زند",affinity:[],loot:"تکه یخ کهن"},
+{id:"wh_ice_hunter",region:"frozen_peaks",name:"شکارچی کولاک",icon:"🌨️",types:["ice","dark"],tier:"rare",level:6,hp:190,atk:27,def:13,spd:17,weak:"آتش",resist:"یخ",personality:"بی‌رحم و دقیق",behavior:"در کولاک دقت بازیکن را مختل می‌کند",affinity:["dark"],loot:"نشان کولاک"},
+{id:"wh_ice_titan",region:"frozen_peaks",name:"تایتان یخ",icon:"❄️",types:["ice","boss"],tier:"boss",level:7,hp:520,atk:34,def:28,spd:7,weak:"آتش",resist:"یخ",personality:"باستانی و سلطه‌گر",behavior:"با نصف شدن HP موج یخ ایجاد می‌کند",affinity:[],loot:"هسته تایتان یخ"},
+{id:"wh_desert_snake",region:"red_desert",name:"مار شنزار",icon:"🐍",types:["beast","phase"],tier:"common",level:5,hp:128,atk:19,def:8,spd:16,weak:"آب",resist:"شن",personality:"کمین‌گر",behavior:"از زیر شن حمله ناگهانی می‌کند",affinity:[],loot:"فلس شنزار"},
+{id:"wh_desert_scorpion",region:"red_desert",name:"عقرب سرخ",icon:"🦂",types:["beast","cursed"],tier:"uncommon",level:5,hp:156,atk:22,def:14,spd:10,weak:"آب",resist:"زهر",personality:"دفاعی",behavior:"نیش آن می‌تواند حمله بعدی را ضعیف کند",affinity:[],loot:"نیش سرخ"},
+{id:"wh_desert_hunter",region:"red_desert",name:"شکارچی شن",icon:"🏜️",types:["dark"],tier:"rare",level:6,hp:180,atk:26,def:12,spd:18,weak:"آب",resist:"شن",personality:"حسابگر",behavior:"با عقب‌نشینی ساختگی بازیکن را به دام می‌اندازد",affinity:["dark"],loot:"نقاب شن"},
+{id:"wh_desert_golem",region:"red_desert",name:"غول شنی",icon:"🗿",types:["earth","physical"],tier:"rare",level:7,hp:260,atk:29,def:25,spd:5,weak:"آب",resist:"شن",personality:"کند و مقاوم",behavior:"در برابر ضربه‌های پیاپی دفاعش را بالا می‌برد",affinity:[],loot:"هسته ماسه"},
+{id:"wh_desert_king",region:"red_desert",name:"پادشاه شن",icon:"👑",types:["earth","boss"],tier:"boss",level:8,hp:560,atk:38,def:28,spd:12,weak:"آب",resist:"شن",personality:"فرمانروای بیابان",behavior:"طوفان شن می‌سازد و دید را کم می‌کند",affinity:[],loot:"تاج شن"},
+{id:"wh_volc_serpent",region:"volcano",name:"مار گدازه‌ای",icon:"🐉",types:["fire"],tier:"common",level:7,hp:166,atk:26,def:12,spd:13,weak:"آب",resist:"آتش",personality:"تهاجمی",behavior:"حمله‌های آتشین کوتاه و سریع دارد",affinity:[],loot:"فلس گدازه"},
+{id:"wh_volc_bat",region:"volcano",name:"خفاش خاکستر",icon:"🦇",types:["fire","phase"],tier:"common",level:7,hp:145,atk:24,def:9,spd:20,weak:"آب",resist:"آتش",personality:"فرارکننده",behavior:"از ارتفاع حمله می‌کند و جاخالی می‌دهد",affinity:[],loot:"پر خاکستر"},
+{id:"wh_volc_wolf",region:"volcano",name:"گرگ آتشین",icon:"🐺",types:["beast","fire"],tier:"uncommon",level:8,hp:220,atk:30,def:15,spd:16,weak:"آب",resist:"آتش",personality:"خشمگین",behavior:"با کم شدن HP قدرت حمله‌اش بالا می‌رود",affinity:[],loot:"دندان آتشین"},
+{id:"wh_volc_magma",region:"volcano",name:"غول مذاب",icon:"🌋",types:["fire","physical"],tier:"rare",level:9,hp:330,atk:37,def:27,spd:6,weak:"آب",resist:"آتش",personality:"کند و ویرانگر",behavior:"با ضربه سنگین زمین را داغ می‌کند",affinity:[],loot:"سنگ مذاب"},
+{id:"wh_volc_titan",region:"volcano",name:"تایتان آتشفشان",icon:"🔥",types:["fire","boss"],tier:"boss",level:10,hp:690,atk:44,def:32,spd:9,weak:"آب",resist:"آتش",personality:"خشمگین و بی‌وقفه",behavior:"در فاز دوم فوران آتشین دارد",affinity:[],loot:"قلب آتشفشان"},
+{id:"wh_swamp_frog",region:"cursed_swamp",name:"قورباغه باتلاقی",icon:"🐸",types:["cursed"],tier:"common",level:8,hp:170,atk:25,def:14,spd:8,weak:"نور",resist:"زهر",personality:"سمی و کند",behavior:"لایه‌ای از سم روی زمین باقی می‌گذارد",affinity:[],loot:"کیسه سم"},
+{id:"wh_swamp_snake",region:"cursed_swamp",name:"مار مرداب",icon:"🐍",types:["beast","cursed"],tier:"uncommon",level:8,hp:188,atk:29,def:13,spd:15,weak:"آتش",resist:"زهر",personality:"کمین‌گر",behavior:"در آب تیره ناپدید می‌شود",affinity:[],loot:"فلس مرداب"},
+{id:"wh_swamp_hunter",region:"cursed_swamp",name:"شکارچی گل‌ولای",icon:"🪵",types:["cursed","dark"],tier:"rare",level:9,hp:245,atk:33,def:19,spd:11,weak:"نور",resist:"تاریکی",personality:"شکارچی خونسرد",behavior:"با گل‌ولای حرکت بازیکن را کند می‌کند",affinity:["dark"],loot:"نقاب گل"},
+{id:"wh_swamp_beast",region:"cursed_swamp",name:"هیولای مرداب",icon:"🐊",types:["cursed","physical"],tier:"rare",level:10,hp:360,atk:39,def:25,spd:7,weak:"آتش",resist:"زهر",personality:"خشن و مقاوم",behavior:"با کم شدن HP حمله‌های پی‌درپی می‌زند",affinity:[],loot:"هسته مرداب"},
+{id:"wh_swamp_lord",region:"cursed_swamp",name:"سلطان مرداب",icon:"☠️",types:["cursed","boss"],tier:"boss",level:11,hp:650,atk:43,def:30,spd:10,weak:"نور",resist:"زهر",personality:"نفرین‌گر",behavior:"در فاز دوم اثر نفرین را شدیدتر می‌کند",affinity:[],loot:"مهر سلطان مرداب"},
+{id:"wh_isles_gull",region:"mist_isles",name:"ماهی‌خوار دریایی",icon:"🦅",types:["water","beast"],tier:"common",level:6,hp:148,atk:23,def:11,spd:16,weak:"برق",resist:"آب",personality:"گروهی و سریع",behavior:"از فاصله حمله می‌کند",affinity:[],loot:"پر دریایی"},
+{id:"wh_isles_crab",region:"mist_isles",name:"خرچنگ سنگی",icon:"🦀",types:["water","physical"],tier:"uncommon",level:6,hp:210,atk:25,def:25,spd:5,weak:"برق",resist:"فیزیکی",personality:"دفاعی",behavior:"پوسته را می‌بندد و آسیب را کم می‌کند",affinity:[],loot:"پوسته سنگی"},
+{id:"wh_isles_serpent",region:"mist_isles",name:"مار دریایی",icon:"🐉",types:["water"],tier:"rare",level:7,hp:275,atk:34,def:19,spd:13,weak:"برق",resist:"آب",personality:"قلمروطلب",behavior:"موج بلند می‌سازد و ضربه‌های آب‌محور دارد",affinity:[],loot:"فلس دریایی"},
+{id:"wh_isles_ghostship",region:"mist_isles",name:"شبح کشتی",icon:"🚢",types:["spirit","phase"],tier:"rare",level:8,hp:290,atk:31,def:20,spd:12,weak:"نور",resist:"فیزیکی",personality:"خاموش و مرموز",behavior:"در فاز بودن از بعضی ضربه‌ها عبور می‌کند",affinity:["spirit"],loot:"تکه بادبان ارواح"},
+{id:"wh_isles_deep",region:"mist_isles",name:"هیولای اعماق",icon:"🐙",types:["water","boss"],tier:"boss",level:10,hp:720,atk:46,def:30,spd:9,weak:"برق",resist:"آب",personality:"باستانی و قلمروطلب",behavior:"با موج و کشش آب بازیکن را تحت فشار می‌گذارد",affinity:[],loot:"هسته اعماق"},
+{id:"wh_spirit_wanderer",region:"spiritlands",name:"روح سرگردان",icon:"👻",types:["spirit","phase"],tier:"common",level:10,hp:230,atk:32,def:16,spd:16,weak:"نور",resist:"فیزیکی",personality:"آشفته",behavior:"از ضربه‌های بدون تعامل روحی عبور می‌کند",affinity:["spirit"],loot:"غبار روح"},
+{id:"wh_spirit_shadow",region:"spiritlands",name:"سایه مرده",icon:"🌑",types:["spirit","dark"],tier:"uncommon",level:10,hp:280,atk:35,def:18,spd:18,weak:"نور",resist:"تاریکی",personality:"ساکت و شکارچی",behavior:"نقاط کور هدف را پیدا می‌کند",affinity:["spirit","dark"],loot:"تکه سایه"},
+{id:"wh_spirit_knight",region:"spiritlands",name:"شوالیه روح",icon:"🗡️",types:["spirit","physical"],tier:"rare",level:11,hp:390,atk:42,def:29,spd:12,weak:"نور",resist:"فیزیکی",personality:"منضبط",behavior:"حمله و دفاع را با نظم عوض می‌کند",affinity:["spirit"],loot:"زره اثیری"},
+{id:"wh_spirit_hunter",region:"spiritlands",name:"شکارچی ارواح",icon:"🏹",types:["spirit","dark"],tier:"rare",level:12,hp:420,atk:46,def:23,spd:20,weak:"نور",resist:"تاریکی",personality:"هوشمند و ضدجادو",behavior:"بعد از دیدن یک قدرت، برای دور بعد سبک دفاعی را تغییر می‌دهد",affinity:["spirit","dark"],loot:"چشم اثیری"},
+{id:"wh_spirit_lord",region:"spiritlands",name:"فرمانروای خاموش",icon:"👑",types:["spirit","boss"],tier:"boss",level:13,hp:900,atk:54,def:38,spd:14,weak:"نور",resist:"فیزیکی",personality:"سلطه‌گر و باستانی",behavior:"سه فاز دارد؛ در فاز آخر حمله روحی می‌کند",affinity:["spirit"],loot:"تاج ارواح"},
+{id:"wh_crystal_bat",region:"crystal_realm",name:"خفاش کریستالی",icon:"🦇",types:["crystal","phase"],tier:"common",level:9,hp:205,atk:31,def:19,spd:17,weak:"ضربه سنگین",resist:"جادو",personality:"چابک",behavior:"انرژی جادویی را بازتاب می‌دهد",affinity:[],loot:"خرده بلور"},
+{id:"wh_crystal_snake",region:"crystal_realm",name:"مار کریستالی",icon:"🐍",types:["crystal"],tier:"uncommon",level:9,hp:280,atk:35,def:24,spd:12,weak:"ضربه سنگین",resist:"جادو",personality:"محافظ",behavior:"سطح بلوری را برای منحرف کردن حمله می‌چرخاند",affinity:[],loot:"فلس بلور"},
+{id:"wh_crystal_wolf",region:"crystal_realm",name:"گرگ بلورین",icon:"🐺",types:["crystal","beast"],tier:"rare",level:10,hp:360,atk:40,def:27,spd:17,weak:"ضربه سنگین",resist:"جادو",personality:"شکارچی",behavior:"پس از دفاع بازیکن با جهش حمله می‌کند",affinity:[],loot:"نیش بلور"},
+{id:"wh_crystal_knight",region:"crystal_realm",name:"شوالیه کریستال",icon:"🛡️",types:["crystal","physical"],tier:"rare",level:11,hp:480,atk:45,def:36,spd:10,weak:"ضربه سنگین",resist:"جادو",personality:"منضبط",behavior:"سپر بلوری می‌سازد و ضدحمله می‌زند",affinity:[],loot:"زره بلوری"},
+{id:"wh_crystal_guardian",region:"crystal_realm",name:"نگهبان بلور",icon:"💎",types:["crystal","boss"],tier:"boss",level:13,hp:950,atk:56,def:42,spd:12,weak:"ضربه سنگین",resist:"جادو",personality:"محافظ هسته",behavior:"در فاز دوم بخشی از آسیب را بازمی‌گرداند",affinity:[],loot:"هسته بلور"},
+{id:"wh_chaos_beast",region:"chaos_realm",name:"هیولای آشوب",icon:"🌀",types:["chaos"],tier:"common",level:12,hp:330,atk:42,def:24,spd:16,weak:"پایدارسازی",resist:"آشوب",personality:"غریزی",behavior:"هر چند نوبت سبک حمله‌اش تغییر می‌کند",affinity:[],loot:"تکه آشوب"},
+{id:"wh_chaos_hunter",region:"chaos_realm",name:"شکارچی بی‌ثبات",icon:"🗡️",types:["chaos","phase"],tier:"uncommon",level:12,hp:390,atk:46,def:25,spd:21,weak:"پایدارسازی",resist:"آشوب",personality:"غیرقابل‌پیش‌بینی",behavior:"به حرکات تکراری واکنش متفاوت نشان می‌دهد",affinity:[],loot:"نشان بی‌ثباتی"},
+{id:"wh_chaos_mutant",region:"chaos_realm",name:"موجود جهش‌یافته",icon:"🧬",types:["chaos","cursed"],tier:"rare",level:13,hp:520,atk:52,def:32,spd:14,weak:"پایدارسازی",resist:"آشوب",personality:"تغییرپذیر",behavior:"در میانه فایت یکی از مقاومت‌هایش را عوض می‌کند",affinity:[],loot:"هسته جهش"},
+{id:"wh_chaos_commander",region:"chaos_realm",name:"فرمانده آشوب",icon:"👹",types:["chaos","dark"],tier:"rare",level:14,hp:650,atk:58,def:37,spd:16,weak:"پایدارسازی",resist:"آشوب",personality:"فرمانده تاکتیکی",behavior:"از ضعف بازیکن در حرکت بعدی استفاده می‌کند",affinity:["dark"],loot:"نشان فرمانده"},
+{id:"wh_chaos_avatar",region:"chaos_realm",name:"آواتار آشوب",icon:"🌀",types:["chaos","boss"],tier:"boss",level:15,hp:1250,atk:64,def:46,spd:18,weak:"پایدارسازی",resist:"آشوب",personality:"باهوش و سلطه‌گر",behavior:"سه فاز دارد و با هر فاز سبک مبارزه را عوض می‌کند",affinity:[],loot:"هسته آواتار"}
+];
+var byId=Object.create(null);creatures.forEach(function(c){byId[c.id]=c});
+var relics=[
+{id:"wh_relic_soul",name:"سنگ پیوند روح",icon:"🔮",cost:220,effect:"برای یک فایت، محدودیت موجودات روحی را برمی‌دارد",tags:["spirit"]},
+{id:"wh_relic_lamp",name:"چراغ ارواح",icon:"🏮",cost:180,effect:"برای یک فایت، موجودات روحی و فازی قابل هدف‌گیری می‌شوند",tags:["spirit","phase"]},
+{id:"wh_relic_dark",name:"مهر تاریکی",icon:"🌑",cost:200,effect:"برای یک فایت، تعامل با موجودات تاریکی را باز می‌کند",tags:["dark"]},
+{id:"wh_relic_cleanse",name:"طلسم پاک‌کننده",icon:"📿",cost:160,effect:"برای یک فایت، اثر محدودیت نفرین را خنثی می‌کند",tags:["cursed"]},
+{id:"wh_relic_eye",name:"چشم اثیری",icon:"👁️",cost:260,effect:"برای یک فایت، موجودات فازی را قابل هدف‌گیری می‌کند",tags:["phase"]},
+{id:"wh_relic_crystal",name:"کریستال سازگاری",icon:"💠",cost:240,effect:"برای یک فایت، یک محدودیت عنصری/کریستالی را دور می‌زند",tags:["crystal","elemental"]}
+];
+var activeRegion=regions[0].id,filterText="",filterType="all";
+var requiredByType={spirit:{label:"روحی",ability:"تعامل روحی",icon:"👻"},dark:{label:"تاریکی",ability:"تعامل با تاریکی",icon:"🌑"},phase:{label:"فازی",ability:"تعامل با موجودات فازی",icon:"🌀"},cursed:{label:"نفرین‌شده",ability:"مقاومت در برابر نفرین",icon:"📿"},crystal:{label:"کریستالی",ability:"تعامل با کریستال",icon:"💎"},chaos:{label:"آشوبی",ability:"پایدارسازی آشوب",icon:"🌀"}};
+function playerTags(){
+var s=window.state||{},tags=[];
+var race=String(s.race||"").toLowerCase(),style=String(s.style||s.class||s.combatStyle||"").toLowerCase(),bg=String(s.background||"").toLowerCase();
+if(/undead|مرده|نامرده|مرده.?متحرک/.test(race))tags.push("spirit","dark","cursed");
+if(/dark_elf|الف تاریک|الف تاریکی/.test(race))tags.push("spirit","dark");
+if(/demon|شیطان|اهریمن/.test(race))tags.push("spirit","dark");
+if(/vampire|خون.?آشام/.test(race))tags.push("dark");
+if(/paladin|پالادین/.test(style))tags.push("spirit","cursed");
+if(/mage|جادوگر|مگ/.test(style))tags.push("dark");
+if(/spirit|روح|اثیری/.test(bg))tags.push("spirit","phase");
+var powers=Array.isArray(s.powers)?s.powers:[];
+powers.forEach(function(p){var d=window.PDEF?window.PDEF(p.id):null;var n=String((d&&d.name)||p.name||"").toLowerCase();if(/روح|ارواح|soul|spirit|اثیری/.test(n))tags.push("spirit");if(/تاریکی|سایه|dark|shadow/.test(n))tags.push("dark");if(/فاز|نامرئی|phase|void/.test(n))tags.push("phase");if(/پاک.?کن|نور مقدس|holy|cleanse/.test(n))tags.push("cursed");if(/کریستال|بلور|crystal/.test(n))tags.push("crystal");if(/آشوب|chaos|پایدار/.test(n))tags.push("chaos")});
+return Array.from(new Set(tags));
+}
+function relicCounts(){var s=window.state||{};s.whRelics=s.whRelics&&typeof s.whRelics==="object"?s.whRelics:{};return s.whRelics}
+function ownsRelic(id){return (Number(relicCounts()[id])||0)>0}
+function missingTags(c){
+var tags=playerTags(),inv=relicCounts(),missing=[];
+(c.types||[]).forEach(function(t){if(!requiredByType[t])return;if(tags.includes(t))return;
+var relic=relics.find(function(r){return r.tags.includes(t)&&Number(inv[r.id]||0)>0});
+if(!relic)missing.push(t);
+});
+return Array.from(new Set(missing));
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function regionCreatures(){return creatures.filter(function(c){return c.region===activeRegion&&(!filterText||c.name.toLowerCase().includes(filterText.toLowerCase())||c.behavior.toLowerCase().includes(filterText.toLowerCase()))&&(filterType==="all"||c.types.includes(filterType))})}
+function renderExpansion(){
+var root=document.getElementById("whx-root");if(!root)return;
+var reg=regions.find(function(r){return r.id===activeRegion})||regions[0];
+var s=window.state||{},discovered=creatures.filter(function(c){return (s.defeatedMonsterIds||[]).includes(c.id)}).length;
+var head='<div class="whx-head"><div class="whx-kicker">WARNEHOLD · BESTIARY / BATTLE ENGINE</div><div class="whx-title">جهان موجودات</div><div class="whx-sub">ده قلمرو اختصاصی · پنج موجود در هر قلمرو · قوانین ورود واقعی و فایت متصل به موتور اصلی بازی</div><div class="whx-statrow"><div class="whx-stat"><b>۱۰</b><span>قلمرو</span></div><div class="whx-stat"><b>۵۰</b><span>موجود ثبت‌شده</span></div><div class="whx-stat"><b>'+discovered+'/۵۰</b><span>موجود شکست‌داده‌شده</span></div></div></div>';
+var rg='<div class="whx-section-title">انتخاب قلمرو</div><div class="whx-region-grid">';
+regions.forEach(function(r){rg+='<button class="whx-region '+(r.id===activeRegion?"active":"")+'" data-whx-region="'+r.id+'" style="--glow:'+r.glow+'"><span class="em">'+r.icon+'</span><b>'+r.name+'</b><small>'+r.desc+'</small><span class="lvl">خطر '+r.danger+' · Level '+r.level+'+</span></button>'});rg+='</div>';
+var inv=relicCounts(),relicHtml='<div class="whx-section-title">آیتم‌های دورزننده محدودیت</div>';
+relics.forEach(function(r){relicHtml+='<div class="whx-relic"><span class="ico">'+r.icon+'</span><div class="desc"><b>'+r.name+' · ×'+(Number(inv[r.id])||0)+'</b>'+r.effect+'</div><button class="mini-btn" data-whx-buy="'+r.id+'" '+((Number(s.gold)||0)<r.cost?"disabled":"")+'>'+r.cost+' ین</button></div>'});
+var list=regionCreatures(),cl='<div class="whx-section-title">'+reg.icon+' موجودات '+reg.name+'</div><input class="whx-filter" id="whx-filter" placeholder="جست‌وجوی موجود یا سبک رفتارش..." value="'+esc(filterText)+'"><div class="whx-toolbar"><button class="secondary" data-whx-filter="all">همه نوع‌ها</button><button class="secondary" data-whx-filter="spirit">روحی</button><button class="secondary" data-whx-filter="dark">تاریکی</button><button class="secondary" data-whx-filter="phase">فازی</button><button class="secondary" data-whx-filter="cursed">نفرین‌شده</button></div><div class="whx-creature-list">';
+list.forEach(function(c){
+var missing=missingTags(c),tierLabel={common:"عادی",uncommon:"غیرمعمول",rare:"کمیاب",boss:"باس"}[c.tier]||c.tier;
+var warning=missing.length?'<div class="whx-warning">🔒 شرط مبارزه: '+missing.map(function(t){return requiredByType[t].ability}).join("، ")+'<br>برای ورود، نژاد/قدرت مناسب یا آیتم کمکی لازم است.</div>':'<div class="whx-warning whx-ok">✓ شرایط تعامل بررسی شد؛ می‌توانی وارد فایت شوی.</div>';
+var defeated=(s.defeatedMonsterIds||[]).includes(c.id);
+cl+='<article class="whx-creature" style="--rarity:'+(c.tier==="boss"?"#e2b95f":c.tier==="rare"?"#b58ae8":c.tier==="uncommon"?"#65b8cf":"#8392a8")+';--glow:'+reg.glow+'"><div class="whx-creature-top"><div class="whx-creature-icon">'+c.icon+'</div><div class="whx-creature-main"><b>'+c.name+(defeated?' ✓':'')+'</b><small>'+c.personality+' · '+c.behavior+'</small></div></div><div class="whx-tagrow"><span class="whx-tag">'+tierLabel+'</span><span class="whx-tag">Level '+c.level+'</span><span class="whx-tag">ضعف: '+c.weak+'</span><span class="whx-tag">مقاومت: '+c.resist+'</span></div><div class="whx-bars"><div class="whx-bar">HP '+c.hp+'<i><em style="width:'+Math.min(100,c.hp/13)+'%"></em></i></div><div class="whx-bar">حمله '+c.atk+'<i><em style="width:'+Math.min(100,c.atk/0.65)+'%"></em></i></div><div class="whx-bar">دفاع '+c.def+'<i><em style="width:'+Math.min(100,c.def/0.46)+'%"></em></i></div></div><div class="whx-tagrow">'+c.types.map(function(t){return '<span class="whx-tag">'+(requiredByType[t]?requiredByType[t].label:({beast:"جانوری",physical:"فیزیکی",nature:"طبیعت",ice:"یخی",fire:"آتشین",earth:"زمینی",water:"آبی",boss:"باس"}[t]||t))+'</span>'}).join("")+'</div>'+warning+'<div class="whx-actions"><button data-whx-fight="'+c.id+'" '+(missing.length?"disabled":"")+'>'+(c.tier==="boss"?"👑 شروع فایت باس":"⚔️ شروع فایت")+'</button><button data-whx-info="'+c.id+'">جزئیات</button></div></article>'
+});cl+='</div>';
+root.innerHTML=head+rg+cl+relicHtml+'<button class="secondary whx-back" id="whx-back">🔙 بازگشت به نقشه اصلی</button>';
+root.querySelectorAll("[data-whx-region]").forEach(function(b){b.addEventListener("click",function(){activeRegion=b.dataset.whxRegion;filterText="";filterType="all";renderExpansion();root.scrollTop=0})});
+root.querySelectorAll("[data-whx-filter]").forEach(function(b){b.addEventListener("click",function(){filterType=b.dataset.whxFilter;renderExpansion()})});
+var fi=document.getElementById("whx-filter");if(fi)fi.addEventListener("input",function(){var p=fi.selectionStart;filterText=fi.value;renderExpansion();var nf=document.getElementById("whx-filter");if(nf){nf.focus();nf.setSelectionRange(p,p)}});
+root.querySelectorAll("[data-whx-buy]").forEach(function(b){b.addEventListener("click",function(){buyRelic(b.dataset.whxBuy)})});
+root.querySelectorAll("[data-whx-fight]").forEach(function(b){b.addEventListener("click",function(){startCreatureFight(b.dataset.whxFight)})});
+root.querySelectorAll("[data-whx-info]").forEach(function(b){b.addEventListener("click",function(){var c=byId[b.dataset.whxInfo];if(c)showToast(c.name+" | "+c.personality+" | "+c.behavior)})});
+var back=document.getElementById("whx-back");if(back)back.addEventListener("click",function(){document.getElementById("screen-wh-creatures").classList.remove("active");if(typeof switchScreen==="function")switchScreen("map")});
+}
+function openExpansion(){document.querySelectorAll(".screen").forEach(function(x){x.classList.remove("active")});var s=document.getElementById("screen-wh-creatures");if(s)s.classList.add("active");renderExpansion();if(window.stopChatPolling)stopChatPolling()}
+function buyRelic(id){
+var r=relics.find(function(x){return x.id===id}),s=window.state;if(!r||!s)return;
+if((Number(s.gold)||0)<r.cost){showToast("ین کافی نداری");return}
+s.gold-=r.cost;var inv=relicCounts();inv[id]=(Number(inv[id])||0)+1;
+if(typeof saveState==="function")saveState();if(typeof renderHUD==="function")renderHUD();renderExpansion();showToast(r.name+" خریداری شد");
+}
+function startCreatureFight(id){
+var c=byId[id],s=window.state;if(!c||!s)return;
+var missing=missingTags(c);if(missing.length){showToast("قابلیت لازم را نداری: "+missing.map(function(t){return requiredByType[t].ability}).join("، "));return}
+if(Number(s.level||1)<c.level){showToast("برای این موجود حداقل Level "+c.level+" لازم است");return}
+if(s.battle&&!s.battle.over){showToast("اول فایت فعلی را تمام کن");return}
+if(!window.ENEMIES[id]){showToast("داده دشمن آماده نیست");return}
+window.__whPendingCreature=id;openOriginalBattle(id);
+}
+var openOriginalBattle=window.startBattle||null;
+function installEnemyData(){
+if(!window.ENEMIES)return;
+creatures.forEach(function(c){
+if(window.ENEMIES[c.id])return;
+window.ENEMIES[c.id]={name:c.name,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,xp:Math.round(c.level*16+(c.tier==="boss"?90:0)),gold:[Math.max(5,c.level*7),Math.max(12,c.level*13)],weakTo:c.weak,resistTo:c.resist,tier:c.tier,minLevel:c.level,core:c.tier==="boss"?"core_boss":"core_weak_beast",powerRank:c.tier==="boss"?"Boss":c.tier==="rare"?"Elite":"Normal",behavior:c.behavior,loot:[],whCreatureId:c.id});
+});
+}
+function installScreen(){
+if(document.getElementById("screen-wh-creatures"))return;
+var app=document.getElementById("app");if(!app)return;
+var screen=document.createElement("div");screen.className="screen";screen.id="screen-wh-creatures";
+screen.innerHTML='<button class="secondary whx-back" id="whx-top-back">🔙 بازگشت به نقشه</button><div id="whx-root"></div>';
+app.appendChild(screen);
+document.getElementById("whx-top-back").addEventListener("click",function(){screen.classList.remove("active");if(typeof switchScreen==="function")switchScreen("map")});
+var map=document.getElementById("screen-map");
+if(map&&!document.getElementById("whx-open")){
+var btn=document.createElement("button");btn.className="secondary";btn.id="whx-open";btn.style.cssText="width:100%;margin:0 0 10px;border:1px solid #b89a5a;background:linear-gradient(100deg,#29213a,#151725);color:#f0d99b;min-height:44px;font-weight:800";
+btn.textContent="🧭 جهان موجودات · ۱۰ قلمرو / ۵۰ موجود";btn.addEventListener("click",openExpansion);
+var anchor=document.getElementById("open-worldmap-btn");if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(btn,anchor.nextSibling);else map.insertBefore(btn,map.firstChild);
+}
+}
+function installBattleGuard(){
+if(typeof window.startBattle!=="function"||window.startBattle.__whxWrapped)return;
+var original=window.startBattle;
+var wrapped=function(id){
+var c=byId[id];
+if(c){
+var missing=missingTags(c);
+if(missing.length){showToast("این موجود قابل هدف‌گیری نیست؛ نیاز داری: "+missing.map(function(t){return requiredByType[t].ability}).join("، "));return}
+if(Number((window.state||{}).level||1)<c.level){showToast("برای این فایت حداقل Level "+c.level+" لازم است");return}
+}
+var out=original.apply(this,arguments);
+if(c&&window.state&&window.state.battle){window.state.battle.whCreatureId=c.id;window.state.battle.whCreatureTypes=c.types.slice();window.state.battle.whPhase=1;window.state.battle.whHistory=[];if(typeof pushLog==="function")pushLog("sys","⚔️ "+c.name+" وارد فایت شد | سبک: "+c.personality);if(typeof renderBattleUI==="function")renderBattleUI();if(typeof saveState==="function")saveState()}
+return out;
+};
+wrapped.__whxWrapped=true;window.startBattle=wrapped;
+}
+function installVictoryHook(){
+if(typeof window.endBattle!=="function"||window.endBattle.__whxWrapped)return;
+var original=window.endBattle;
+var wrapped=async function(won){
+var b=window.state&&window.state.battle,c=b&&byId[b.whCreatureId];
+if(c&&won){
+window.state.whCreatureDefeats=window.state.whCreatureDefeats||{};
+window.state.whCreatureDefeats[c.id]=(Number(window.state.whCreatureDefeats[c.id])||0)+1;
+if(c.tier==="boss"&&Math.random()<0.12){var reward=relics[Math.floor(Math.random()*relics.length)],inv=relicCounts();inv[reward.id]=(Number(inv[reward.id])||0)+1;pushLog("sys","✨ غنیمت ویژه: "+reward.name+" ×1")}
+}
+return original.apply(this,arguments);
+};
+wrapped.__whxWrapped=true;window.endBattle=wrapped;
+}
+function installAiNarration(){
+if(typeof window.playerAction!=="function"||window.playerAction.__whxWrapped)return;
+var original=window.playerAction,aiBusy=false;
+var wrapped=async function(kind,powerId){
+var b=window.state&&window.state.battle,c=b&&byId[b.whCreatureId];
+var before=b?b.log.length:0,prevHp=b?b.enemyHp:0;
+var out=await original.apply(this,arguments);
+if(c&&window.state&&window.state.battle&&window.state.battle.log){
+var now=window.state.battle,entry={turn:now.log.length,action:String(kind||"attack"),hpBefore:prevHp,hpAfter:now.enemyHp,enemyHp:now.enemyHp,phase:now.enemyHp<=now.enemyHpMax*.3?3:now.enemyHp<=now.enemyHpMax*.65?2:1};
+now.whPhase=entry.phase;now.whHistory=Array.isArray(now.whHistory)?now.whHistory:[];now.whHistory.push(entry);if(now.whHistory.length>5)now.whHistory.shift();
+if(!aiBusy&&window.warneholdAIHooks&&window.warneholdAIHooks.battle&&!now.over){
+aiBusy=true;
+try{
+var text=await window.warneholdAIHooks.battle("برای موجود زیر یک جمله روایی کوتاه و متفاوت برای اتفاق واقعی این نوبت بنویس. هیچ عدد یا نتیجه‌ای نساز. موجود: "+c.name+"؛ شخصیت: "+c.personality+"؛ رفتار: "+c.behavior+"؛ نوع‌ها: "+c.types.join("، ")+"؛ فاز: "+entry.phase+"؛ اقدام بازیکن: "+kind+"؛ HP دشمن قبل و بعد: "+prevHp+" و "+now.enemyHp+"؛ تاریخچه اخیر: "+JSON.stringify(now.whHistory.slice(-3)),{enemy:c.name,enemyTypes:c.types,personality:c.personality,behavior:c.behavior,phase:entry.phase,turnHistory:now.whHistory.slice(-3),screen:"screen-battle"});
+if(text&&window.state&&window.state.battle===now&&!now.over){pushLog("narr",String(text).slice(0,260));renderBattleUI();saveState()}
+}catch(e){console.debug("Creature AI narration skipped",e)}finally{aiBusy=false}
+}
+}
+return out;
+};
+wrapped.__whxWrapped=true;window.playerAction=wrapped;
+}
+function install(){
+if(!window.state||!window.ENEMIES)return;
+installEnemyData();installScreen();installBattleGuard();installVictoryHook();installAiNarration();
+var s=window.state;if(!s.whRelics)s.whRelics={};if(!s.whCreatureDefeats)s.whCreatureDefeats={};
+if(!window.__whxHooksInstalled){window.__whxHooksInstalled=true;var orig=window.enterGame;if(typeof orig==="function"){window.enterGame=function(){var r=orig.apply(this,arguments);setTimeout(function(){installEnemyData();installScreen();installBattleGuard();installVictoryHook();installAiNarration()},50);return r}}}
+}
+window.whCreatureWorld={regions:regions,creatures:creatures,relics:relics,open:openExpansion,render:renderExpansion,playerTags:playerTags,missingTags:missingTags};
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(install,1200)});else setTimeout(install,1200);
+var tries=0;var timer=setInterval(function(){tries++;try{install()}catch(e){console.error("Creature expansion init",e)}if(window.state&&window.ENEMIES&&document.getElementById("screen-wh-creatures")||tries>30)clearInterval(timer)},700);
+})();
+</script>
+
 </html>
