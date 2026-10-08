@@ -1161,12 +1161,24 @@ function clearAccountSession(){
 async function restoreAccountSession(){
   if(!accountSession) return false;
   try{
-    const data=await accountRequest({action:'session',session:accountSession});
+    // نسخه فعلی Edge Function قبل از بررسی action، username/password را validate می‌کند.
+    // برای action=session این دو مقدار اصلاً استفاده نمی‌شوند، اما باید از validation عبور کنند.
+    const data=await accountRequest({
+      action:'session',
+      session:accountSession,
+      username:'session',
+      password:'000000'
+    });
     accountId=data.accountId; accountUsername=data.username;
     localStorage.setItem('warnehold_account_id',accountId);
     localStorage.setItem('warnehold_account_username',accountUsername);
+
+    // اگر Save قدیمی هنوز روی scope دستگاه مانده باشد، یک‌بار به scope حساب منتقلش می‌کنیم.
+    const legacyScope = localStorage.getItem('warnhold_device_id') || '';
+    await migrateLegacyDeviceSave(legacyScope, accountId);
     return true;
   }catch(e){
+    console.error('account session restore failed',e);
     clearAccountSession();
     return false;
   }
