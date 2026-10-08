@@ -1400,7 +1400,7 @@ async function restoreAccountSession(){
     if(!accountId||!accountUsername)throw new Error('اطلاعات حساب از سرور کامل نیست');
     writeRememberedAccount();
     const legacyScope=localStorage.getItem('warnhold_device_id')||'';
-    await migrateLegacyDeviceSave(legacyScope,accountId);
+    migrateLegacyDeviceSave(legacyScope,accountId).catch(e=>console.warn('legacy save migration deferred',e));
     return true;
   }catch(e){
     console.error('account session restore failed',e);
@@ -7546,9 +7546,9 @@ document.addEventListener('visibilitychange', ()=>{
 });
 
 (async function init(){
+  try{ initCreation(); }catch(e){ console.error('creation UI init failed',e); }
   const accountReady = await ensureAccountGate();
   if(!accountReady) return;
-  initCreation();
   const seasonCfg = await loadSeasonConfig();
   const currentSeasonId = seasonCfg.currentSeasonId;
   const currentSeason = getSeasonById(seasonCfg, currentSeasonId);
