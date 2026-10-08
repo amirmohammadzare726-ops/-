@@ -499,6 +499,84 @@
   .auth-explosion{display:none!important}
   @media (prefers-reduced-motion:reduce){#wh-cinematic.play{animation:none;display:none}.auth-explosion{display:none!important}}
 
+
+/* WARNEHOLD VISUAL UPGRADE — backgrounds + lightweight glass UI */
+#app{overflow:hidden}
+.screen{
+  position:relative;
+  isolation:isolate;
+  background-color:#100d0d;
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:center;
+  background-attachment:scroll;
+  overflow-y:auto;
+}
+.screen::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,.04), rgba(0,0,0,.20));
+}
+#screen-auth,#screen-start{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/44059d6d-ae2f-4a38-807e-d23b59fd3efc.jpg');
+  background-position:center center;
+}
+#screen-map,#screen-welcome{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg');
+}
+#screen-worldmap{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f171f5f3-ab32-418d-b2cb-0cdbf636a751.jpg');
+}
+#screen-village-map{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg');
+}
+#screen-battle,#screen-pvp{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/4c513103-7b0c-477e-ac43-0c4248d9e3ec.jpg');
+}
+#screen-shop,#screen-animeshop,#screen-auction,#screen-blacksmith{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg');
+}
+#screen-quest,#screen-job,#screen-social,#screen-transfer,#screen-journey,#screen-chat,#screen-char,#screen-inv,#screen-notifcenter,#screen-admin,#screen-blocked{
+  background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg');
+}
+#screen-start>.seal,
+#screen-start>h1,
+#screen-start>.tagline,
+#screen-start>.step-track,
+#screen-start>.cstep{position:relative;z-index:1}
+.region,.enemy-card,.combat-log,.item-row,.stat-box,.identity-card,.npc-card,.quest-card,
+.admin-report,.registry-row,.notif-row,.equip-slot-row,.social-row,.req-row,.shop-item,
+.chat-sub,.chat-messages,.auth-panel,.auth-shell,.auth-step,.power-row,.build-list .power-row,
+#power-panel,#battle-item-panel,.village-map-wrap{
+  background:rgba(18,14,11,.84);
+  border-color:rgba(201,162,75,.24);
+}
+button.secondary,.action-btn,.buy-btn,.mini-btn,.shop-tab,.chat-tab{
+  background:rgba(20,15,12,.88);
+}
+button.primary{
+  box-shadow:0 0 18px rgba(138,31,43,.22);
+}
+.screen .section-title{
+  text-shadow:0 2px 12px rgba(0,0,0,.75);
+}
+.screen.active{
+  animation:wh-screen-in .22s ease-out;
+}
+@keyframes wh-screen-in{
+  from{opacity:.82;background-position:center 3px}
+  to{opacity:1;background-position:center center}
+}
+@media (max-width:600px){
+  .screen{background-size:cover}
+}
+@media (prefers-reduced-motion:reduce){
+  .screen.active{animation:none}
+}
+
 </style>
 </head>
 <body>
@@ -7346,6 +7424,52 @@ document.addEventListener('visibilitychange', ()=>{
   new MutationObserver(detectScene).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
   if(!reduced)start(); else { frame(0); }
 })();
+
+/* WARNEHOLD MOBILE POLISH — no game-state changes */
+(function(){
+  let audioCtx=null;
+  let audioReady=false;
+  function ensureAudio(){
+    if(audioReady) return true;
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC) return false;
+      audioCtx=audioCtx||new AC();
+      if(audioCtx.state==='suspended') audioCtx.resume();
+      audioReady=true;
+      return true;
+    }catch(e){return false;}
+  }
+  function tone(freq,duration,type,volume){
+    if(!ensureAudio()||!audioCtx) return;
+    try{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=type||'sine'; o.frequency.value=freq;
+      g.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(volume||0.018,audioCtx.currentTime+.008);
+      g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+duration);
+      o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+duration+.02);
+    }catch(e){}
+  }
+  document.addEventListener('pointerdown',ensureAudio,{passive:true,once:true});
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('button');
+    if(!b||b.disabled) return;
+    if(b.classList.contains('primary')) tone(220,.09,'triangle',.022);
+    else if(b.classList.contains('danger')||b.id.includes('attack')) tone(120,.11,'sawtooth',.014);
+    else tone(330,.055,'sine',.012);
+  },{passive:true});
+
+  const observer=new MutationObserver(()=>{
+    document.querySelectorAll('.screen.active .region,.screen.active .shop-item,.screen.active .quest-card,.screen.active .npc-card').forEach((el,i)=>{
+      if(el.dataset.whAnimated) return;
+      el.dataset.whAnimated='1';
+      el.style.animation='wh-card-in .22s ease-out '+Math.min(i*18,180)+'ms both';
+    });
+  });
+  observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style']});
+})();
+
 </script>
 </body>
 </html>
