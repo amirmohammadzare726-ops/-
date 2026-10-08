@@ -7696,4 +7696,89 @@ body{overflow:hidden!important}
 })();
 </script>
 </body>
+
+<style id="wh-ui-v8">
+#wh-settings-btn{
+ position:fixed!important;top:calc(10px + env(safe-area-inset-top));left:10px!important;right:auto!important;
+ width:42px;height:42px;border-radius:13px;border:1px solid rgba(201,162,75,.45);
+ background:rgba(8,7,16,.9);color:#e8dfca;font-size:20px;z-index:7000;
+ box-shadow:0 8px 24px rgba(0,0,0,.35);backdrop-filter:blur(12px)
+}
+#wh-settings-screen{position:fixed!important;inset:0!important;z-index:6500!important;width:100%!important;max-width:520px!important;margin:0 auto!important;background:var(--bg)!important;padding-top:62px!important;overflow-y:auto!important}
+#wh-settings-close{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;width:auto;padding:9px 13px}
+.wh-setting-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
+.wh-setting-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--line)}
+.wh-setting-row:last-child{border-bottom:0}
+.wh-setting-name{font-family:'Cinzel';font-size:14px;color:var(--gold)}
+.wh-setting-desc{font-size:11px;color:var(--dim);margin-top:3px}
+.wh-setting-btn{background:var(--panel-2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:6px;padding:7px 12px;font-family:'JetBrains Mono';font-size:10px}
+.wh-owner-card{border-color:rgba(201,162,75,.5)}
+.wh-owner-badge{font-family:'JetBrains Mono';font-size:9px;color:var(--gold-dim);margin-top:3px}
+.wh-owner-btn{width:100%;margin-top:8px;background:linear-gradient(180deg,#8a1f2b,#5d141c);border:1px solid #b23a3a;color:#f4ece2;border-radius:7px;padding:11px;font-family:'Cinzel';font-size:13px}
+#hud-bars.wh-hidden,#hud-currency.wh-hidden{display:none!important}
+#hud-currency.wh-compact{padding-top:5px;padding-bottom:7px}
+#hud-currency.wh-compact .wh-full-stat{display:none!important}
+.wh-reduced-fx *, .wh-reduced-fx *:before, .wh-reduced-fx *:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+@media(max-width:430px){#wh-settings-btn{left:8px!important;top:calc(8px + env(safe-area-inset-top));width:40px;height:40px}}
+</style>
+<script id="wh-game-ui-v8">
+(function(){
+ function boot(){
+   const wrap=document.getElementById('game-wrap');
+   const settings=document.getElementById('wh-settings-screen');
+   if(!wrap||!settings)return;
+   const isOwner=()=>localStorage.getItem('warnehold_account_role')==='owner' ||
+     String(localStorage.getItem('warnehold_account_username')||'').trim().toLowerCase()==='pain1';
+   function addOwnerPanel(){
+     if(document.getElementById('wh-owner-card'))return;
+     const card=document.createElement('div');
+     card.id='wh-owner-card'; card.className='wh-setting-card wh-owner-card';
+     card.innerHTML='<div class="wh-setting-row"><div><div class="wh-setting-name">👑 مدیریت و مالکیت</div><div class="wh-owner-badge">فقط حساب مالک</div></div><span style="color:var(--gold)">OWNER</span></div><div style="font-size:11px;color:var(--dim);line-height:1.6">مدیریت بازیکنان اقتصاد آیتم‌ها رویدادها فصل اعلان‌ها چت و گزارش‌های مدیریتی از اینجا در دسترس است</div><button id="wh-owner-open" class="wh-owner-btn" type="button">ورود به پنل مدیریت</button>';
+     settings.appendChild(card);
+     document.getElementById('wh-owner-open').onclick=function(){
+       if(!isOwner()){window.showToast?.('این بخش فقط برای مالک است');return}
+       settings.classList.remove('active');document.body.classList.remove('wh-settings-open');
+       if(typeof window.switchScreen==='function')window.switchScreen('admin');
+     };
+   }
+   addOwnerPanel();
+   const oldOpen=window.openSettings;
+   window.openSettings=function(){
+     if(isOwner())addOwnerPanel();
+     settings.classList.add('active');document.body.classList.add('wh-settings-open');
+     document.getElementById('wh-settings-btn').style.display='none';
+   };
+   const oldClose=window.closeSettings;
+   window.closeSettings=function(){
+     settings.classList.remove('active');document.body.classList.remove('wh-settings-open');
+     const b=document.getElementById('wh-settings-btn');if(b)b.style.display='block';
+   };
+   const oldSwitch=window.switchScreen;
+   window.switchScreen=function(name){
+     const r=oldSwitch?.apply(this,arguments);
+     setTimeout(function(){
+       const id=document.querySelector('#game-wrap .screen.active')?.id||'';
+       const full=id==='screen-char'||id==='screen-battle';
+       const hideCurrency=['screen-chat','screen-social','screen-battle'].includes(id);
+       const bars=document.getElementById('hud-bars'), cur=document.getElementById('hud-currency');
+       if(bars)bars.classList.toggle('wh-hidden',!full);
+       if(cur)cur.classList.toggle('wh-hidden',hideCurrency);
+       if(cur)cur.classList.toggle('wh-compact',!full&&!hideCurrency);
+     },0);
+     return r;
+   };
+   const observer=new MutationObserver(function(){
+     const id=document.querySelector('#game-wrap .screen.active')?.id||'';
+     const full=id==='screen-char'||id==='screen-battle';
+     const hideCurrency=['screen-chat','screen-social','screen-battle'].includes(id);
+     document.getElementById('hud-bars')?.classList.toggle('wh-hidden',!full);
+     document.getElementById('hud-currency')?.classList.toggle('wh-hidden',hideCurrency);
+     document.getElementById('hud-currency')?.classList.toggle('wh-compact',!full&&!hideCurrency);
+   });
+   observer.observe(wrap,{subtree:true,attributes:true,attributeFilter:['class','style']});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+
 <!-- wh-v4-ready --></html>
