@@ -1146,7 +1146,8 @@ async function restoreAccountSession(){
 
 function showAuthStep(id){
   $('.auth-step').forEach(x=>x.classList.remove('active'));
-  $('#'+id).classList.add('active');
+  const step=$('#'+id);
+  if(step) step.classList.add('active');
 }
 
 function showAuthError(msg){
