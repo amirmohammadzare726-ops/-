@@ -1171,12 +1171,16 @@ function finishAuthGate(){
 
 function ensureAccountGate(){
   return new Promise(async resolve=>{
-    setTimeout(()=>playCinematicTransition(()=>{}),40);
+    // فقط اولین ورود بدون Session صفحه خوش‌آمدگویی و افکت ورود را نشان می‌دهد.
+    // اگر Session معتبر باشد، پلیر مستقیم از گیت حساب عبور می‌کند.
     if(await restoreAccountSession()){
       finishAuthGate();
       resolve(true);
       return;
     }
+
+    // این افکت فقط برای صفحه خوش‌آمدگوییِ اولین ورود اجرا می‌شود.
+    setTimeout(()=>playCinematicTransition(()=>{}),40);
 
     const story = 'سال‌هاست وارنهولد بین روستاهای دورافتاده و شهرهای تاریک تقسیم شده. قدرت‌های عجیب در گوشه‌های این سرزمین بیدار شده‌اند و گروه‌های مختلف برای به‌دست آوردنشان با هم درگیرند. تو وارد جهانی می‌شوی که هنوز سرنوشتش نوشته نشده. می‌توانی مسیر خودت را بسازی، قدرت پیدا کنی، همراه پیدا کنی، وارد درگیری‌های بزرگ شوی و جایگاه خودت را در وارنهولد به دست بیاوری.';
     let storyDone=false;
