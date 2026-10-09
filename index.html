@@ -8273,7 +8273,7 @@ body{overflow:hidden!important}
  let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null,activeVendor='capital',lastCatalogVendor=null,extraView='catalog',tradeQty=1,rarityFilter='all',currencyFilter='all',stockFilter='all',shopMeta={reputation:{},favorites:[],quests:[],upgrades:{}};
  window.warneholdShopLockedItems=Array.isArray(window.warneholdShopLockedItems)?window.warneholdShopLockedItems:[];
  window.warneholdShopAction=async function(action,itemId,collectionId){const payload={itemId:itemId||''};if(collectionId)payload.collectionId=collectionId;const r=await api({action,payload});if(r.lockedItems)window.warneholdShopLockedItems=r.lockedItems;return r};
- const oldBuy=window.buyItem,oldSell=window.sellItem,oldGemBuy=window.buyItemWithGems,oldSwitch=window.switchScreenCore;
+ const oldBuy=window.buyItem,oldSell=window.sellItem,oldGemBuy=window.buyItemWithGems,oldSwitch=window.switchScreenCore,oldDeleteItem=window.deleteItem;
  const $=s=>document.querySelector(s),esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function session(){try{return accountSession||localStorage.getItem('warnehold_account_session')||readRememberedAccount()||''}catch(_){return accountSession||''}}
  async function api(payload){
@@ -8481,6 +8481,7 @@ body{overflow:hidden!important}
  window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
  window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
  window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
+ window.deleteItem=function(id){if(Array.isArray(window.warneholdShopLockedItems)&&window.warneholdShopLockedItems.includes(id)){showToast('این آیتم قفل شده و قابل حذف نیست');return}if(oldDeleteItem)return oldDeleteItem(id)};
  if(oldSwitch){window.switchScreenCore=function(name){const r=oldSwitch.apply(this,arguments);if(name==='shop')setTimeout(()=>renderShop(),0);return r}}
  ensureChrome();
  api({action:'lock_status',payload:{}}).then(r=>{window.warneholdShopLockedItems=r.locked||[];try{renderInventory()}catch(_){}}).catch(()=>{});
