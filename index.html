@@ -8308,7 +8308,7 @@ body{overflow:hidden!important}
   const aiClose=$('#wh-shop-ai-close');if(aiClose&&!aiClose.dataset.bound){aiClose.dataset.bound='1';aiClose.onclick=()=>$('#wh-shop-ai').hidden=true}
   const searchInput=$('#wh-shop-search');if(searchInput&&!searchInput.dataset.bound){searchInput.dataset.bound='1';searchInput.addEventListener('input',()=>{search=searchInput.value.trim().toLocaleLowerCase();drawList()})}
   const sortInput=$('#wh-shop-sort');if(sortInput&&!sortInput.dataset.bound){sortInput.dataset.bound='1';sortInput.addEventListener('change',()=>{sort=sortInput.value;drawList()})}
-  if(!tabs.dataset.whBound){tabs.dataset.whBound='1';tabs.addEventListener('click',e=>{const b=e.target.closest('[data-shop-mode],[data-shop-cat]');if(!b)return;if(b.dataset.shopMode){mode=b.dataset.shopMode}else if(b.dataset.shopCat){activeCat=b.dataset.shopCat}renderShop()})}
+  if(!tabs.dataset.whBound){tabs.dataset.whBound='1';tabs.addEventListener('click',e=>{const b=e.target.closest('[data-shop-mode],[data-shop-cat]');if(!b)return;if(b.dataset.shopMode){mode=b.dataset.shopMode}else if(b.dataset.shopCat){activeCat=b.dataset.shopCat}drawTabs();drawList()})}
   if(!list.dataset.whBound){list.dataset.whBound='1';list.addEventListener('click',e=>{const b=e.target.closest('[data-shop-action]');if(!b)return;const act=b.dataset.shopAction,id=b.dataset.itemId,currency=b.dataset.currency||null;if(act==='details')showDetail(id);else if(act==='buy')shopAction('buy',id,1,currency,b);else if(act==='sell')shopAction('sell',id,1,null,b);else if(act==='salvage')shopAction('salvage',id,1,null,b)})}
   const detail=$('#wh-shop-detail');if(detail&&!detail.dataset.bound){detail.dataset.bound='1';detail.addEventListener('click',e=>{if(e.target===detail||e.target.closest('[data-close-detail]')){detail.hidden=true;detailId=null;return}const b=e.target.closest('[data-shop-action="buy"]');if(b)shopAction('buy',b.dataset.itemId,1,b.dataset.currency||null,b)})}
   const form=$('#wh-shop-ai-form');if(form&&!form.dataset.bound){form.dataset.bound='1';form.addEventListener('submit',e=>{e.preventDefault();sendMerchantMessage()})}
@@ -8329,7 +8329,7 @@ body{overflow:hidden!important}
   if(sort==='priceUp')a.sort((x,y)=>x.price-y.price);else if(sort==='priceDown')a.sort((x,y)=>y.price-x.price);else if(sort==='rarity')a.sort((x,y)=>(rv[y.rarity]||0)-(rv[x.rarity]||0));else if(sort==='stock')a.sort((x,y)=>(y.stock||0)-(x.stock||0));else a.sort((x,y)=>(rv[x.rarity]||0)-(rv[y.rarity]||0)||x.price-y.price);
   return a;
  }
- function canAfford(it,currency){const key=currency||it.currency||'gold';const price=key==='gems'&&currency==='gems'?(Number(it.gemPrice)||0):(Number(it.price)||0);return balance(key)>=price}
+ function canAfford(it,currency){const main=it.currency||'gold';const key=currency||main;const price=(currency==='gems'&&main!=='gems')?(Number(it.gemPrice)||0):(Number(it.price)||0);return balance(key)>=price}
  function drawList(){
   const list=$('#shop-list');if(!list)return;
   if(!catalog.length){list.innerHTML='<div class="wh-shop-empty">کاتالوگ فروشگاه هنوز بارگذاری نشده. فروشگاه را دوباره باز کن.</div>';return}
@@ -8408,9 +8408,9 @@ body{overflow:hidden!important}
   finally{chatBusy=false;if(btn)btn.disabled=false;input.focus()}
  }
  window.renderShop=renderShop;
- window.buyItem=async function(id){if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
- window.buyItemWithGems=async function(id){const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
- window.sellItem=async function(id){if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
+ window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
+ window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
+ window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
  if(oldSwitch){window.switchScreenCore=function(name){const r=oldSwitch.apply(this,arguments);if(name==='shop')setTimeout(()=>renderShop(),0);return r}}
  ensureChrome();
 })();
