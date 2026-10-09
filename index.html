@@ -8166,6 +8166,256 @@ body{overflow:hidden!important}
  window.whMapTravelAssistant={open,close,places:allPlaces,render,refresh:refreshStatus,selectTarget(id){if(regions()[id])target=id;}};
 })();
 </script>
+
+<style id="wh-shop-expansion-css">
+:root{--wh-shop-gold:#e4bd68;--wh-shop-ink:#0c0a10;--wh-shop-panel:rgba(21,17,24,.94);--wh-shop-line:rgba(226,187,103,.22)}
+#screen-shop.wh-shop-v2.active{display:flex!important;flex-direction:column!important;min-height:0!important;height:calc(100dvh - 105px)!important;max-height:calc(100dvh - 105px)!important;overflow:hidden!important;gap:7px;padding-bottom:8px}
+#screen-shop.wh-shop-v2>.section-title{flex:none;margin:0 0 2px;text-shadow:0 0 18px #bd823b55}
+#screen-shop.wh-shop-v2>div[style*="display:flex"][style*="margin-bottom:8px"]{flex:none}
+#screen-shop.wh-shop-v2 .wh-shop-hero{flex:none;position:relative;overflow:hidden;min-height:112px;border:1px solid rgba(226,187,103,.34);border-radius:15px;background:#141018 url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg') center 46%/cover no-repeat;box-shadow:0 10px 32px #0008,inset 0 0 40px #09060b}
+#screen-shop.wh-shop-v2 .wh-shop-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,7,12,.92),rgba(10,7,12,.56) 58%,rgba(10,7,12,.28)),linear-gradient(0deg,rgba(8,5,9,.62),transparent 75%)}
+#screen-shop.wh-shop-v2 .wh-shop-hero:after{content:"";position:absolute;inset:-50%;background:linear-gradient(112deg,transparent 43%,#ffe8a014 50%,transparent 57%);animation:whShopSweep 8s ease-in-out infinite;pointer-events:none}
+#screen-shop.wh-shop-v2 .wh-shop-hero-inner{position:relative;z-index:1;padding:13px 14px;display:flex;flex-direction:column;gap:8px}
+#screen-shop.wh-shop-v2 .wh-shop-kicker{font:10px 'JetBrains Mono',monospace;letter-spacing:2px;color:#f3dba1;opacity:.9}
+#screen-shop.wh-shop-v2 .wh-shop-title{font-family:'Cinzel',serif;font-size:20px;font-weight:900;line-height:1.2;color:#fff0c8;text-shadow:0 2px 14px #000;max-width:80%}
+#screen-shop.wh-shop-v2 .wh-shop-subtitle{font-size:12px;color:#e5d5b4;max-width:88%;line-height:1.5}
+#screen-shop.wh-shop-v2 .wh-shop-currencies{display:flex;flex-wrap:wrap;gap:5px;margin-top:1px}
+#screen-shop.wh-shop-v2 .wh-currency-pill{border:1px solid #f0cf8050;background:#09070bd9;border-radius:99px;padding:4px 8px;color:#ffe9b3;font:10px 'JetBrains Mono',monospace;white-space:nowrap}
+#screen-shop.wh-shop-v2 .wh-shop-ai-launch{position:absolute;left:10px;bottom:10px;z-index:2;border:1px solid #f2d28b88;background:linear-gradient(135deg,#4a2431,#211721);color:#ffe9b3;border-radius:99px;padding:8px 11px;font-size:11px;box-shadow:0 0 22px #d6a64c22}
+#screen-shop.wh-shop-v2 #shop-tabs{flex:none;display:flex;flex-direction:column;gap:7px;overflow:visible;padding:0;margin:0}
+#screen-shop.wh-shop-v2 .wh-shop-mode-row,#screen-shop.wh-shop-v2 .wh-shop-cat-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 0 3px}
+#screen-shop.wh-shop-v2 .wh-shop-mode-row::-webkit-scrollbar,#screen-shop.wh-shop-v2 .wh-shop-cat-row::-webkit-scrollbar{display:none}
+#screen-shop.wh-shop-v2 .wh-shop-mode-row .shop-tab{background:#211a24;border-color:#57432c;color:#d6c8ae}
+#screen-shop.wh-shop-v2 .wh-shop-mode-row .shop-tab.active{background:linear-gradient(135deg,#e8c66e,#a87832);color:#21150a;border-color:#f5d78a;box-shadow:0 0 16px #d4a34a25}
+#screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab{border-radius:9px;background:#19151d;border-color:#42313b;color:#c8bba9;padding:8px 10px;font-family:inherit;font-size:12px}
+#screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab.active{background:linear-gradient(135deg,#3c2733,#6e3436);border-color:#c49a51;color:#ffe7b2;box-shadow:inset 0 0 0 1px #f5d99422}
+#screen-shop.wh-shop-v2 .wh-shop-toolbar{flex:none;display:flex;gap:7px;align-items:center}
+#screen-shop.wh-shop-v2 .wh-shop-search{flex:1;min-width:0;border:1px solid #6e5639;background:#100d14;color:#f8e8c9;border-radius:10px;padding:10px 11px;font-size:13px;outline:none}
+#screen-shop.wh-shop-v2 .wh-shop-search:focus{border-color:#e4bd68;box-shadow:0 0 0 2px #e4bd6822}
+#screen-shop.wh-shop-v2 .wh-shop-sort{max-width:118px;border:1px solid #6e5639;background:#19141c;color:#f4dfb6;border-radius:10px;padding:9px 6px;font-size:11px}
+#screen-shop.wh-shop-v2 #shop-list{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 2px 22px;scrollbar-width:thin;scrollbar-color:#77572e transparent}
+#screen-shop.wh-shop-v2 .wh-shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;align-content:start}
+#screen-shop.wh-shop-v2 .wh-item-card{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px;min-width:0;padding:10px;border:1px solid var(--wh-shop-line);border-radius:13px;background:linear-gradient(155deg,rgba(42,32,39,.96),rgba(15,12,18,.98) 68%);box-shadow:0 5px 14px #0003;transition:transform .18s,border-color .18s,box-shadow .18s;animation:whShopCardIn .24s ease both}
+#screen-shop.wh-shop-v2 .wh-item-card:before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,#f2d28c8c,transparent)}
+#screen-shop.wh-shop-v2 .wh-item-card:active{transform:scale(.985)}
+#screen-shop.wh-shop-v2 .wh-item-card.rarity-legendary{border-color:#c49a516b;box-shadow:0 0 16px #d8a94b0c}
+#screen-shop.wh-shop-v2 .wh-item-card.rarity-mythic{border-color:#b06ad17a;box-shadow:0 0 18px #9b51c81b}
+#screen-shop.wh-shop-v2 .wh-item-card.rarity-unique{border-color:#e35d658c;box-shadow:0 0 22px #b5213b24}
+#screen-shop.wh-shop-v2 .wh-item-top{display:flex;align-items:flex-start;gap:8px}
+#screen-shop.wh-shop-v2 .wh-item-icon{flex:none;display:grid;place-items:center;width:46px;height:48px;border-radius:11px;border:1px solid #d5b36c42;background:radial-gradient(circle at 35% 25%,#77533975,#1a141e 70%);font-size:25px;text-shadow:0 0 15px #f2c66c66}
+#screen-shop.wh-shop-v2 .rarity-mythic .wh-item-icon{background:radial-gradient(circle at 35% 25%,#794c957c,#1a141e 70%);border-color:#c087e17a}
+#screen-shop.wh-shop-v2 .rarity-unique .wh-item-icon{background:radial-gradient(circle at 35% 25%,#9c33467c,#1a141e 70%);border-color:#e35d657a}
+#screen-shop.wh-shop-v2 .wh-item-heading{flex:1;min-width:0}
+#screen-shop.wh-shop-v2 .wh-item-name{font-size:13px;line-height:1.4;font-weight:800;color:#f7e8c8;overflow-wrap:anywhere}
+#screen-shop.wh-shop-v2 .wh-item-rarity{display:inline-flex;margin-top:4px;padding:2px 6px;border-radius:99px;font-size:9px;background:#fff1;border:1px solid #fff2;color:#cfc1ac}
+#screen-shop.wh-shop-v2 .wh-item-rarity.r-uncommon{color:#9cdaa9;border-color:#4c9b6155}
+#screen-shop.wh-shop-v2 .wh-item-rarity.r-rare{color:#8dc7ff;border-color:#4e8dcc66}
+#screen-shop.wh-shop-v2 .wh-item-rarity.r-epic{color:#d0a0ff;border-color:#a56bce77}
+#screen-shop.wh-shop-v2 .wh-item-rarity.r-legendary{color:#ffdb86;border-color:#c79b4e88}
+#screen-shop.wh-shop-v2 .wh-item-rarity.r-mythic{color:#e5b4ff;border-color:#b26cdb88}
+#screen-shop.wh-shop-v2 .wh-item-rarity.r-unique{color:#ffabb5;border-color:#d7536888}
+#screen-shop.wh-shop-v2 .wh-item-desc{font-size:11px;line-height:1.45;color:#bcb0a0;min-height:32px}
+#screen-shop.wh-shop-v2 .wh-item-meta{display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap;font:10px 'JetBrains Mono',monospace;color:#a99b83}
+#screen-shop.wh-shop-v2 .wh-stock{color:#d2bd91}
+#screen-shop.wh-shop-v2 .wh-stock.empty{color:#ff8b8b}
+#screen-shop.wh-shop-v2 .wh-item-price{color:#ffe1a1;font:11px 'JetBrains Mono',monospace;font-weight:700}
+#screen-shop.wh-shop-v2 .wh-item-actions{display:flex;flex-direction:column;gap:5px;margin-top:auto}
+#screen-shop.wh-shop-v2 .wh-shop-buy{border:1px solid #b78d43;background:linear-gradient(135deg,#483020,#2b1b22);color:#ffe8b1;border-radius:8px;padding:8px 6px;font-size:11px;font-weight:800;min-height:34px}
+#screen-shop.wh-shop-v2 .wh-shop-buy.alt{border-color:#5d70b4;background:linear-gradient(135deg,#202641,#1b1726);color:#c9d6ff}
+#screen-shop.wh-shop-v2 .wh-shop-buy:disabled{opacity:.35;filter:grayscale(.7)}
+#screen-shop.wh-shop-v2 .wh-shop-detail-btn{border:1px solid #594a3b;background:#151119;color:#cbbda7;border-radius:7px;padding:6px;font-size:10px}
+#screen-shop.wh-shop-v2 .wh-shop-empty{grid-column:1/-1;text-align:center;padding:24px 12px;color:#bca98b;border:1px dashed #765c3b;border-radius:12px;background:#17121a}
+#screen-shop.wh-shop-v2 .wh-shop-ai{flex:none;border:1px solid #8e6d45;border-radius:13px;background:linear-gradient(145deg,#211922,#110e15);padding:10px;box-shadow:0 10px 24px #0004}
+#screen-shop.wh-shop-v2 .wh-shop-ai-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#f3d89b;font-weight:800}
+#screen-shop.wh-shop-v2 .wh-shop-ai-log{display:flex;flex-direction:column;gap:7px;max-height:130px;overflow:auto;margin:8px 0}
+#screen-shop.wh-shop-v2 .wh-shop-ai-msg{padding:8px 10px;border:1px solid #554052;border-radius:10px;background:#100d15;color:#e6d7c1;font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+#screen-shop.wh-shop-v2 .wh-shop-ai-msg.player{border-color:#7b633e;background:#251d18}
+#screen-shop.wh-shop-v2 .wh-shop-ai-form{display:flex;gap:6px}
+#screen-shop.wh-shop-v2 .wh-shop-ai-input{flex:1;min-width:0;background:#0d0a10;color:#fff0d2;border:1px solid #6b523b;border-radius:9px;padding:10px;font-size:13px}
+#screen-shop.wh-shop-v2 .wh-shop-ai-send{border:1px solid #b9914c;background:#4b3025;color:#ffe7b0;border-radius:9px;padding:0 12px;font-weight:800}
+#screen-shop.wh-shop-v2 .wh-shop-detail{position:fixed;inset:0;z-index:10050;background:#05040aeb;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(9px)}
+#screen-shop.wh-shop-v2 .wh-shop-detail-card{width:min(440px,100%);max-height:85dvh;overflow:auto;border:1px solid #c39a50;border-radius:17px;padding:17px;background:radial-gradient(ellipse at top,#38242b,#151018 60%);box-shadow:0 0 55px #000b,0 0 25px #d0a14b19}
+#screen-shop.wh-shop-v2 .wh-shop-detail-art{font-size:52px;text-align:center;padding:15px;background:radial-gradient(circle,#88623d55,transparent 70%);border-radius:12px}
+#screen-shop.wh-shop-v2 .wh-shop-detail-card h3{color:#ffe6ae;margin:8px 0}
+#screen-shop.wh-shop-v2 .wh-shop-detail-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}
+#screen-shop.wh-shop-v2 .wh-shop-stat{padding:8px;border:1px solid #554032;border-radius:8px;background:#100c13;color:#e4d2b3;font-size:11px}
+@keyframes whShopCardIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes whShopSweep{0%,70%,100%{transform:translateX(-20%)}35%{transform:translateX(20%)}}
+@media(min-width:520px){#screen-shop.wh-shop-v2 .wh-shop-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#screen-shop.wh-shop-v2 .wh-shop-hero{min-height:132px}}
+@media(max-width:360px){#screen-shop.wh-shop-v2 .wh-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}#screen-shop.wh-shop-v2 .wh-item-card{padding:8px}#screen-shop.wh-shop-v2 .wh-item-icon{width:38px;height:40px;font-size:21px}#screen-shop.wh-shop-v2 .wh-item-name{font-size:12px}}
+@media(prefers-reduced-motion:reduce){#screen-shop.wh-shop-v2 .wh-shop-hero:after{animation:none}#screen-shop.wh-shop-v2 .wh-item-card{animation:none;transition:none}}
+</style>
+
+<script id="WH-SHOP-EXPANSION-V1">
+(function(){
+ if(window.__WH_SHOP_EXPANSION_V1)return;window.__WH_SHOP_EXPANSION_V1=true;
+ const API=SUPABASE_URL+'/functions/v1/warnehold-shop';
+ const CATEGORY_ORDER=['Weapons','Armor','Potions','Accessories','Tools','Scrolls','Materials','Survival','Crafting','Relics','Hunting','BlackMarket'];
+ const CATEGORY_LABELS={Weapons:'⚔️ سلاح‌ها',Armor:'🛡️ زره و دفاع',Potions:'🧪 پوشن‌ها',Accessories:'🔮 اکسسوری',Tools:'🧰 ابزار و تله',Scrolls:'📜 کتاب و طومار',Materials:'💎 مواد اولیه',Survival:'🏕️ سفر و بقا',Crafting:'🔨 آهنگری و ساخت',Relics:'🗝️ آثار باستانی',Hunting:'🏹 شکارچی',BlackMarket:'☠️ بازار سیاه'};
+ const CURRENCY={gold:{icon:'🪙',label:'سکه'},gems:{icon:'💎',label:'جم'},bloodTokens:{icon:'🩸',label:'مهره خون'},ancientDust:{icon:'✨',label:'غبار باستانی'},hunterMarks:{icon:'🏹',label:'نشان شکارچی'}};
+ const RARITY_LABEL={common:'معمولی',uncommon:'غیرمعمول',rare:'کمیاب',epic:'حماسی',legendary:'افسانه‌ای',mythic:'اساطیری',unique:'یگانه'};
+ let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null;
+ const oldBuy=window.buyItem,oldSell=window.sellItem,oldGemBuy=window.buyItemWithGems,oldSwitch=window.switchScreenCore;
+ const $=s=>document.querySelector(s),esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function session(){try{return accountSession||localStorage.getItem('warnehold_account_session')||readRememberedAccount()||''}catch(_){return accountSession||''}}
+ async function api(payload){
+  const token=session();if(!token)throw new Error('ابتدا وارد حساب وارنهولد شو');
+  const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'x-warnehold-session':token},body:JSON.stringify(payload)});
+  const data=await res.json().catch(()=>({ok:false,error:'پاسخ نامعتبر فروشگاه'}));
+  if(!res.ok||!data.ok)throw new Error(data.error||'درخواست فروشگاه انجام نشد');return data;
+ }
+ function balance(key){return Math.max(0,Number(state&&state[key])||0)}
+ function currencyText(key,value){const c=CURRENCY[key]||CURRENCY.gold;return c.icon+' '+Number(value||0).toLocaleString('fa-IR')+' '+c.label}
+ function itemFor(id){return catalog.find(x=>x.id===id)||null}
+ function mergeDefinitions(){
+  if(!Array.isArray(window.SHOP_ITEMS)&&typeof SHOP_ITEMS==='undefined')return;
+  for(const it of catalog){
+   const old=SHOP_ITEMS.find(x=>x.id===it.id);
+   if(old)Object.assign(old,it);else SHOP_ITEMS.push(it);
+   if(it.consumable&&it.effect&&typeof CONSUMABLE_EFFECTS!=='undefined')CONSUMABLE_EFFECTS[it.id]=it.effect;
+  }
+  if(typeof RARITY_MULT!=='undefined')Object.assign(RARITY_MULT,{mythic:2.7,unique:3.2});
+  if(typeof RARITY_LEVEL_REQ!=='undefined')Object.assign(RARITY_LEVEL_REQ,{mythic:26,unique:35});
+  if(typeof SHOP_CATEGORIES!=='undefined')CATEGORY_ORDER.forEach(c=>{if(!SHOP_CATEGORIES.includes(c))SHOP_CATEGORIES.push(c)});
+ }
+ async function loadCatalog(){
+  if(loading)return;loading=true;
+  try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions()}
+  finally{loading=false}
+ }
+ function ensureChrome(){
+  const screen=$('#screen-shop');if(!screen)return;screen.classList.add('wh-shop-v2');
+  const tabs=$('#shop-tabs'),list=$('#shop-list');if(!tabs||!list)return;
+  if(!$('#wh-shop-hero')){
+   const hero=document.createElement('div');hero.id='wh-shop-hero';hero.className='wh-shop-hero';
+   hero.innerHTML='<div class="wh-shop-hero-inner"><div class="wh-shop-kicker">WARNEHOLD · MERCHANTS GUILD</div><div class="wh-shop-title">بازار بزرگ وارنهولد</div><div class="wh-shop-subtitle">کالاهای محدود · تجهیزات واقعی · معامله امن · فروشنده‌های هوشمند</div><div class="wh-shop-currencies" id="wh-shop-currencies"></div></div><button type="button" class="wh-shop-ai-launch" id="wh-shop-ai-launch">✦ گفت‌وگو با فروشنده</button>';
+   tabs.parentNode.insertBefore(hero,tabs);
+  }
+  if(!$('#wh-shop-toolbar')){
+   const toolbar=document.createElement('div');toolbar.id='wh-shop-toolbar';toolbar.className='wh-shop-toolbar';
+   toolbar.innerHTML='<input class="wh-shop-search" id="wh-shop-search" type="search" maxlength="70" placeholder="🔎 جست‌وجوی کالا..." aria-label="جست‌وجوی کالا"><select class="wh-shop-sort" id="wh-shop-sort" aria-label="مرتب‌سازی"><option value="recommended">پیشنهادی</option><option value="priceUp">ارزان‌تر</option><option value="priceDown">گران‌تر</option><option value="rarity">کمیاب‌تر</option><option value="stock">موجودی بیشتر</option></select>';
+   list.parentNode.insertBefore(toolbar,list);
+  }
+  if(!$('#wh-shop-ai')){
+   const ai=document.createElement('section');ai.id='wh-shop-ai';ai.className='wh-shop-ai';ai.hidden=true;
+   ai.innerHTML='<div class="wh-shop-ai-head"><span>✦ فروشنده هوشمند</span><button type="button" class="wh-shop-detail-btn" id="wh-shop-ai-close">بستن</button></div><div class="wh-shop-ai-log" id="wh-shop-ai-log"><div class="wh-shop-ai-msg">سلام مسافر وارنهولد؛ دنبال چه وسیله‌ای می‌گردی؟</div></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px"><button class="wh-shop-detail-btn wh-shop-quick" data-q="با بودجه فعلی من بهترین خرید چیه؟">بهترین خرید</button><button class="wh-shop-detail-btn wh-shop-quick" data-q="برای منطقه بعدی چه تجهیزاتی پیشنهاد می‌کنی؟">تجهیزات سفر</button><button class="wh-shop-detail-btn wh-shop-quick" data-q="چطور غبار باستانی و نشان شکارچی به دست بیارم؟">راهنمای ارزها</button></div><form class="wh-shop-ai-form" id="wh-shop-ai-form"><input class="wh-shop-ai-input" id="wh-shop-ai-input" maxlength="500" autocomplete="off" placeholder="با فروشنده صحبت کن..."><button class="wh-shop-ai-send" id="wh-shop-ai-send" type="submit">ارسال</button></form>';
+   toolbar.parentNode.insertBefore(ai,list);
+  }
+  if(!$('#wh-shop-detail')){
+   const modal=document.createElement('div');modal.id='wh-shop-detail';modal.className='wh-shop-detail';modal.hidden=true;modal.innerHTML='<div class="wh-shop-detail-card" id="wh-shop-detail-content"></div>';screen.appendChild(modal);
+  }
+  const heroBtn=$('#wh-shop-ai-launch');if(heroBtn&&!heroBtn.dataset.bound){heroBtn.dataset.bound='1';heroBtn.onclick=()=>{const p=$('#wh-shop-ai');p.hidden=!p.hidden;if(!p.hidden)$('#wh-shop-ai-input')?.focus()}}
+  const aiClose=$('#wh-shop-ai-close');if(aiClose&&!aiClose.dataset.bound){aiClose.dataset.bound='1';aiClose.onclick=()=>$('#wh-shop-ai').hidden=true}
+  const searchInput=$('#wh-shop-search');if(searchInput&&!searchInput.dataset.bound){searchInput.dataset.bound='1';searchInput.addEventListener('input',()=>{search=searchInput.value.trim().toLocaleLowerCase();drawList()})}
+  const sortInput=$('#wh-shop-sort');if(sortInput&&!sortInput.dataset.bound){sortInput.dataset.bound='1';sortInput.addEventListener('change',()=>{sort=sortInput.value;drawList()})}
+  if(!tabs.dataset.whBound){tabs.dataset.whBound='1';tabs.addEventListener('click',e=>{const b=e.target.closest('[data-shop-mode],[data-shop-cat]');if(!b)return;if(b.dataset.shopMode){mode=b.dataset.shopMode}else if(b.dataset.shopCat){activeCat=b.dataset.shopCat}renderShop()})}
+  if(!list.dataset.whBound){list.dataset.whBound='1';list.addEventListener('click',e=>{const b=e.target.closest('[data-shop-action]');if(!b)return;const act=b.dataset.shopAction,id=b.dataset.itemId,currency=b.dataset.currency||null;if(act==='details')showDetail(id);else if(act==='buy')shopAction('buy',id,1,currency,b);else if(act==='sell')shopAction('sell',id,1,null,b);else if(act==='salvage')shopAction('salvage',id,1,null,b)})}
+  const detail=$('#wh-shop-detail');if(detail&&!detail.dataset.bound){detail.dataset.bound='1';detail.addEventListener('click',e=>{if(e.target===detail||e.target.closest('[data-close-detail]')){detail.hidden=true;detailId=null;return}const b=e.target.closest('[data-shop-action="buy"]');if(b)shopAction('buy',b.dataset.itemId,1,b.dataset.currency||null,b)})}
+  const form=$('#wh-shop-ai-form');if(form&&!form.dataset.bound){form.dataset.bound='1';form.addEventListener('submit',e=>{e.preventDefault();sendMerchantMessage()})}
+  const ai=$('#wh-shop-ai');if(ai&&!ai.dataset.quickBound){ai.dataset.quickBound='1';ai.addEventListener('click',e=>{const b=e.target.closest('.wh-shop-quick');if(b){$('#wh-shop-ai-input').value=b.dataset.q;sendMerchantMessage()}})}
+ }
+ function renderCurrencyPills(){
+  const el=$('#wh-shop-currencies');if(!el)return;
+  el.innerHTML=Object.keys(CURRENCY).map(k=>'<span class="wh-currency-pill">'+esc(CURRENCY[k].icon)+' '+esc(CURRENCY[k].label)+' '+balance(k).toLocaleString('fa-IR')+'</span>').join('');
+ }
+ function drawTabs(){
+  const tabs=$('#shop-tabs');if(!tabs)return;
+  const modeRow='<div class="wh-shop-mode-row">'+[['buy','🛒 خرید'],['sell','💰 فروش'],['salvage','♻️ بازیافت']].map(([m,l])=>'<button type="button" class="shop-tab '+(mode===m?'active':'')+'" data-shop-mode="'+m+'">'+l+'</button>').join('')+'</div>';
+  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+CATEGORY_ORDER.filter(c=>catalog.some(i=>i.cat===c)).map(c=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+c+'">'+esc(CATEGORY_LABELS[c]||c)+'</button>').join('')+'</div>':'';
+  tabs.innerHTML=modeRow+cats;
+ }
+ function sortedItems(items){
+  const a=items.slice();const rv={common:1,uncommon:2,rare:3,epic:4,legendary:5,mythic:6,unique:7};
+  if(sort==='priceUp')a.sort((x,y)=>x.price-y.price);else if(sort==='priceDown')a.sort((x,y)=>y.price-x.price);else if(sort==='rarity')a.sort((x,y)=>(rv[y.rarity]||0)-(rv[x.rarity]||0));else if(sort==='stock')a.sort((x,y)=>(y.stock||0)-(x.stock||0));else a.sort((x,y)=>(rv[x.rarity]||0)-(rv[y.rarity]||0)||x.price-y.price);
+  return a;
+ }
+ function canAfford(it,currency){const key=currency||it.currency||'gold';const price=key==='gems'&&currency==='gems'?(Number(it.gemPrice)||0):(Number(it.price)||0);return balance(key)>=price}
+ function drawList(){
+  const list=$('#shop-list');if(!list)return;
+  if(!catalog.length){list.innerHTML='<div class="wh-shop-empty">کاتالوگ فروشگاه هنوز بارگذاری نشده. فروشگاه را دوباره باز کن.</div>';return}
+  if(mode==='buy'){
+   let items=catalog.filter(i=>i.cat===activeCat);
+   if(search)items=items.filter(i=>(i.name+' '+i.desc+' '+i.rarity+' '+(CATEGORY_LABELS[i.cat]||i.cat)).toLocaleLowerCase().includes(search));
+   items=sortedItems(items);
+   if(!items.length){list.innerHTML='<div class="wh-shop-empty">کالایی با این مشخصات پیدا نشد.</div>';return}
+   list.innerHTML='<div class="wh-shop-grid">'+items.map(it=>{
+    const c=CURRENCY[it.currency]||CURRENCY.gold,stock=Number(it.stock)||0,disabled=stock<=0||!canAfford(it,it.currency);
+    const stockText=stock<=0?'ناموجود':('موجودی '+stock.toLocaleString('fa-IR'));
+    const alt=Number(it.gemPrice)>0?'<button type="button" class="wh-shop-buy alt" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="gems" '+((stock<=0||balance('gems')<Number(it.gemPrice))?'disabled':'')+'>💎 '+Number(it.gemPrice).toLocaleString('fa-IR')+' جم</button>':'';
+    const mod=it.mod&&Object.keys(it.mod).length?Object.entries(it.mod).map(([k,v])=>({atk:'حمله',def:'دفاع',magic:'جادو',spd:'سرعت',crit:'ضربه بحرانی',luck:'شانس',hp:'جان',energy:'انرژی'}[k]||k)+' '+(v>0?'+':'')+v).join(' · '):'';
+    return '<article class="wh-item-card rarity-'+esc(it.rarity||'common')+'"><div class="wh-item-top"><div class="wh-item-icon">'+esc(it.icon||'📦')+'</div><div class="wh-item-heading"><div class="wh-item-name">'+esc(it.name)+'</div><span class="wh-item-rarity r-'+esc(it.rarity||'common')+'">'+esc(RARITY_LABEL[it.rarity]||it.rarity||'معمولی')+'</span></div></div><div class="wh-item-desc">'+esc(it.desc||'کالای وارنهولد')+(mod?'<br><span style="color:#d8bd83">'+esc(mod)+'</span>':'')+'</div><div class="wh-item-meta"><span class="wh-stock '+(stock<=0?'empty':'')+'">'+stockText+'</span><span>Lv '+Number(it.levelReq||1)+'</span></div><div class="wh-item-price">'+esc(c.icon)+' '+Number(it.price||0).toLocaleString('fa-IR')+' '+esc(c.label)+'</div><div class="wh-item-actions"><button type="button" class="wh-shop-buy" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="'+esc(it.currency||'gold')+'" '+(disabled?'disabled':'')+'>'+(stock<=0?'ناموجود':(!canAfford(it,it.currency)?'ارز کافی نیست':'خرید'))+'</button>'+alt+'<button type="button" class="wh-shop-detail-btn" data-shop-action="details" data-item-id="'+esc(it.id)+'">جزئیات آیتم</button></div></article>';
+   }).join('')+'</div>';
+  }else{
+   const inv=Array.isArray(state?.inventory)?state.inventory:[];
+   const items=inv.map(x=>({owned:x,def:itemFor(x.id)})).filter(x=>mode==='sell'||(x.def&&x.def.salvageCurrency&&Number(x.def.salvageValue)>0));
+   const filtered=items.filter(x=>!search||(x.owned.name+' '+(x.def?.desc||'')).toLocaleLowerCase().includes(search));
+   if(!filtered.length){list.innerHTML='<div class="wh-shop-empty">'+(mode==='sell'?'آیتمی برای فروش در انبار نیست.':'آیتم قابل بازیافتی در انبار نیست.')+'</div>';return}
+   list.innerHTML='<div class="wh-shop-grid">'+filtered.map(({owned,def})=>{
+    const equipped=Object.values(state.equipment||{}).filter(x=>x===owned.id).length,available=Math.max(0,(Number(owned.qty)||0)-equipped);
+    const sellPrice=Number(def?.sellPrice)||Math.max(1,Math.round((Number(def?.price)||5)*.45));
+    const salvage=def&&def.salvageCurrency&&Number(def.salvageValue)>0;
+    const currency=CURRENCY[def?.salvageCurrency]||CURRENCY.gold;
+    const action=mode==='sell'?'sell':'salvage';
+    return '<article class="wh-item-card rarity-'+esc(def?.rarity||'common')+'"><div class="wh-item-top"><div class="wh-item-icon">'+esc(def?.icon||'📦')+'</div><div class="wh-item-heading"><div class="wh-item-name">'+esc(owned.name||def?.name||owned.id)+'</div><span class="wh-item-rarity">'+(def?esc(RARITY_LABEL[def.rarity]||def.rarity):'آیتم انبار')+'</span></div></div><div class="wh-item-desc">'+esc(def?.desc||'آیتم ذخیره‌شده در انبار')+'</div><div class="wh-item-meta"><span>تعداد '+Number(owned.qty||0).toLocaleString('fa-IR')+'</span><span>'+ (equipped?'مجهز':'آزاد')+'</span></div><div class="wh-item-price">'+(mode==='sell'?'🪙 '+sellPrice.toLocaleString('fa-IR')+' سکه':'♻️ '+currency.icon+' '+Number(def?.salvageValue||0).toLocaleString('fa-IR')+' '+currency.label)+'</div><div class="wh-item-actions"><button type="button" class="wh-shop-buy" data-shop-action="'+action+'" data-item-id="'+esc(owned.id)+'" '+(available<=0||(!def&&mode==='salvage')||(mode==='salvage'&&!salvage)?'disabled':'')+'>'+(available<=0?'قابل استفاده نیست':(mode==='sell'?'فروش یک عدد':'بازیافت یک عدد'))+'</button></div></article>';
+   }).join('')+'</div>';
+  }
+ }
+ async function renderShop(){
+  ensureChrome();const list=$('#shop-list');if(list)list.innerHTML='<div class="wh-shop-empty">در حال بازکردن بازار و بررسی موجودی سرور...</div>';
+  try{await loadCatalog();ensureChrome();if(!catalog.some(i=>i.cat===activeCat))activeCat=(catalog.find(i=>i.cat)?.cat)||'Weapons';drawTabs();renderCurrencyPills();drawList()}
+  catch(e){console.error('Warnehold shop catalog error',e);if(list)list.innerHTML='<div class="wh-shop-empty">اتصال فروشگاه برقرار نشد: '+esc(e.message)+'<br><button type="button" class="wh-shop-detail-btn" id="wh-shop-retry" style="margin-top:10px">تلاش دوباره</button></div>';$('#wh-shop-retry')?.addEventListener('click',renderShop)}
+ }
+ async function shopAction(action,id,qty,currency,button){
+  if(busy)return;const it=itemFor(id);if(!it){showToast('این آیتم در کاتالوگ معتبر نیست');return}
+  if(action==='buy'&&Number(it.stock)<=0){showToast('این کالا فعلاً ناموجود است');return}
+  busy=true;if(button)button.disabled=true;
+  try{
+   const result=await api({action,itemId:id,qty:qty||1,currency:currency||null});
+   if(result.character&&state)Object.assign(state,result.character);
+   if(state){state.bloodTokens=Number(state.bloodTokens)||0;state.ancientDust=Number(state.ancientDust)||0;state.hunterMarks=Number(state.hunterMarks)||0;await saveState()}
+   try{renderHUD();renderInventory();renderChar()}catch(_){}
+   try{playPurchaseFX(action==='buy'&&currency==='gems'?'gem':'coin')}catch(_){}
+   if(action==='buy')showToast('خرید ثبت شد: '+it.name);
+   else if(action==='sell')showToast('فروش ثبت شد؛ سکه دریافت شد');
+   else showToast('بازیافت ثبت شد: '+it.name);
+   try{pushPersonalNotif('trade',(action==='buy'?'🛒 خرید: ':action==='sell'?'💰 فروش: ':'♻️ بازیافت: ')+it.name)}catch(_){}
+   await renderShop();
+  }catch(e){showToast(e.message||'معامله انجام نشد');if(button)button.disabled=false}
+  finally{busy=false}
+ }
+ function showDetail(id){
+  const it=itemFor(id),modal=$('#wh-shop-detail'),content=$('#wh-shop-detail-content');if(!it||!modal||!content)return;detailId=id;
+  const c=CURRENCY[it.currency]||CURRENCY.gold;
+  const stats=it.mod&&Object.keys(it.mod).length?Object.entries(it.mod).map(([k,v])=>'<div class="wh-shop-stat">'+esc(({atk:'حمله',def:'دفاع',magic:'جادو',spd:'سرعت',crit:'ضربه بحرانی',luck:'شانس',hp:'جان',energy:'انرژی'}[k]||k))+' <b style="color:'+(v>=0?'#e8c46e':'#ff9292')+'">'+(v>0?'+':'')+esc(v)+'</b></div>').join(''):'<div class="wh-shop-stat">ویژگی اختصاصی: '+esc(it.desc||'کاربرد ویژه')+'</div>';
+  content.innerHTML='<button type="button" class="wh-shop-detail-btn" data-close-detail style="float:left">بستن ✕</button><div class="wh-shop-detail-art">'+esc(it.icon||'📦')+'</div><h3>'+esc(it.name)+'</h3><div style="color:#c9b99e;font-size:12px;line-height:1.6">'+esc(it.desc||'کالای وارنهولد')+'</div><div class="wh-item-rarity r-'+esc(it.rarity)+'">'+esc(RARITY_LABEL[it.rarity]||it.rarity)+'</div><div class="wh-shop-detail-stats">'+stats+'<div class="wh-shop-stat">نیاز به سطح <b>'+Number(it.levelReq||1)+'</b></div><div class="wh-shop-stat">موجودی <b>'+Number(it.stock||0)+'</b></div><div class="wh-shop-stat">قیمت <b>'+esc(c.icon)+' '+Number(it.price||0).toLocaleString('fa-IR')+' '+esc(c.label)+'</b></div><div class="wh-shop-stat">قیمت فروش <b>🪙 '+Number(it.sellPrice||0).toLocaleString('fa-IR')+'</b></div></div><button type="button" class="wh-shop-buy" style="width:100%" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="'+esc(it.currency||'gold')+'" '+((Number(it.stock)<=0||!canAfford(it,it.currency))?'disabled':'')+'>خرید آیتم</button>';
+  modal.hidden=false;
+ }
+ function logAI(who,text){
+  const log=$('#wh-shop-ai-log');if(!log)return;const row=document.createElement('div');row.className='wh-shop-ai-msg'+(who==='player'?' player':'');row.textContent=text;log.appendChild(row);while(log.children.length>8)log.removeChild(log.firstChild);log.scrollTop=log.scrollHeight;
+ }
+ async function sendMerchantMessage(){
+  const input=$('#wh-shop-ai-input'),btn=$('#wh-shop-ai-send');if(chatBusy||!input)return;
+  const q=input.value.trim();if(!q)return;if(q.length>500){showToast('پیام خیلی طولانی است');return}
+  input.value='';chatBusy=true;if(btn)btn.disabled=true;logAI('player',q);const loading=document.createElement('div');loading.className='wh-shop-ai-msg';loading.textContent='فروشنده در حال بررسی اجناس...';loading.id='wh-shop-ai-loading';$('#wh-shop-ai-log')?.appendChild(loading);
+  try{
+   const hooks=window.warneholdAIHooks;if(!hooks||typeof hooks.npc!=='function')throw new Error('هوش مصنوعی فروشنده در دسترس نیست');
+   const available=catalog.filter(x=>Number(x.stock)>0).slice(0,45).map(x=>({id:x.id,name:x.name,category:x.categoryLabel||CATEGORY_LABELS[x.cat],price:x.price,currency:(CURRENCY[x.currency]||CURRENCY.gold).label,rarity:RARITY_LABEL[x.rarity],levelReq:x.levelReq,stock:x.stock}));
+   const history=chatHistory.slice(-4).map(x=>(x.role==='player'?'بازیکن: ':'فروشنده: ')+x.text).join('\n');
+   const prompt='تو فروشنده هوشمند بازار بزرگ وارنهولد هستی. فارسی طبیعی و کوتاه جواب بده و مثل یک NPC داخل بازی حرف بزن. فقط از کالاهای موجود در فهرست واقعی زیر پیشنهاد بده. نام یا قیمت یا موجودی جدید نساز. هرگز ادعا نکن معامله انجام شده؛ خرید فقط با دکمه فروشگاه ثبت می‌شود. ارزها: سکه، جم، مهره خون، غبار باستانی، نشان شکارچی. اطلاعات موجودی، سطح و تجهیزات فقط از context استفاده کن.\nفهرست واقعی کالاها: '+JSON.stringify(available)+'\nگفت‌وگوی اخیر:\n'+history+'\nپیام فعلی بازیکن: '+q;
+   const answer=await hooks.npc(prompt,{screen:'merchant-shop',questionType:'merchant-advice',activeCategory:CATEGORY_LABELS[activeCat]||activeCat,level:Number(state?.level)||1,currencies:Object.fromEntries(Object.keys(CURRENCY).map(k=>[k,balance(k)])),equipment:state?.equipment||{},inventory:(state?.inventory||[]).slice(0,20).map(x=>({name:x.name,qty:x.qty})),region:state?.region||'capital'});
+   $('#wh-shop-ai-loading')?.remove();const text=String(answer||'الان جوابی ندارم؛ دوباره بپرس.').slice(0,1200);logAI('merchant',text);chatHistory.push({role:'player',text:q},{role:'merchant',text});if(chatHistory.length>10)chatHistory=chatHistory.slice(-10);
+  }catch(e){$('#wh-shop-ai-loading')?.remove();logAI('merchant','فعلاً نمی‌تونم جواب بدم: '+(e.message||'اتصال ناموفق'))}
+  finally{chatBusy=false;if(btn)btn.disabled=false;input.focus()}
+ }
+ window.renderShop=renderShop;
+ window.buyItem=async function(id){if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
+ window.buyItemWithGems=async function(id){const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
+ window.sellItem=async function(id){if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
+ if(oldSwitch){window.switchScreenCore=function(name){const r=oldSwitch.apply(this,arguments);if(name==='shop')setTimeout(()=>renderShop(),0);return r}}
+ ensureChrome();
+})();
+</script>
+
 </body>
 
 <style id="wh-game-ui-final">
