@@ -8410,7 +8410,7 @@ body{overflow:hidden!important}
  }
  async function shopAction(action,id,qty,currency,button){
   if(busy)return;const it=itemFor(id);if(!it){showToast('این آیتم در کاتالوگ معتبر نیست');return}
-  if(action!=='buy'&&window.warneholdShopLockedItems.includes(id)){showToast('این آیتم قفل است؛ قبل از فروش یا بازیافت قفلش را باز کن');return}const n=Math.max(1,Math.min(20,Number(qty)||1));const c=CURRENCY[currency||it.currency]||CURRENCY.gold;const unit=(currency==='gems'&&Number(it.gemPrice)>0)?Number(it.gemPrice):Number(it.price||0);
+  if(action!=='buy'&&window.warneholdShopLockedItems.includes(id)){showToast('این آیتم قفل است؛ قبل از فروش یا بازیافت قفلش را باز کن');return}const equippedSlot=Object.entries(state?.equipment||{}).find(([slot,itemId])=>itemId===id)?.[0];if(action==='sell'&&equippedSlot){showToast('این آیتم در جایگاه «'+equippedSlot+'» مجهز است؛ اول از بخش شخصیت آن را باز کن');return}const n=Math.max(1,Math.min(20,Number(qty)||1));const c=CURRENCY[currency||it.currency]||CURRENCY.gold;const unit=(currency==='gems'&&Number(it.gemPrice)>0)?Number(it.gemPrice):Number(it.price||0);
   const verb=action==='buy'?'خرید':action==='sell'?'فروش':'بازیافت';
   if(!confirm(verb+' '+n+' عدد «'+it.name+'»؟'+(action==='buy'?'\nهزینه تقریبی: '+(unit*n)+' '+c.label:'')))return;qty=n;
   if(action==='buy'&&Number(it.stock)<=0){showToast('این کالا فعلاً ناموجود است');return}
