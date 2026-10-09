@@ -8280,10 +8280,12 @@ body{overflow:hidden!important}
   if(typeof RARITY_LEVEL_REQ!=='undefined')Object.assign(RARITY_LEVEL_REQ,{mythic:26,unique:35});
   if(typeof SHOP_CATEGORIES!=='undefined')CATEGORY_ORDER.forEach(c=>{if(!SHOP_CATEGORIES.includes(c))SHOP_CATEGORIES.push(c)});
  }
+ let catalogPromise=null;
  async function loadCatalog(){
-  if(loading)return;loading=true;
-  try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions()}
-  finally{loading=false}
+  if(catalogPromise)return catalogPromise;
+  loading=true;
+  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions();return catalog}finally{loading=false}})();
+  try{return await catalogPromise}finally{catalogPromise=null}
  }
  function ensureChrome(){
   const screen=$('#screen-shop');if(!screen)return;screen.classList.add('wh-shop-v2');
