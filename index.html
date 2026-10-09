@@ -8284,7 +8284,7 @@ body{overflow:hidden!important}
  async function loadCatalog(){
   if(catalogPromise)return catalogPromise;
   loading=true;
-  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items.filter(it=>it&&typeof it==='object').map(it=>({...it,id:String(it.id||it.item_id||''),cat:String(it.cat||it.category||'').trim(),name:String(it.name||'کالای ناشناس'),desc:String(it.desc||''),price:Math.max(0,Number(it.price)||0),gemPrice:Math.max(0,Number(it.gemPrice)||0),stock:Math.max(0,Number(it.stock)||0),levelReq:Math.max(1,Number(it.levelReq)||1),sellPrice:Math.max(0,Number(it.sellPrice)||0),rarity:String(it.rarity||'common'),currency:CURRENCY[it.currency]?it.currency:'gold'})).filter(it=>it.id&&it.cat&&it.price>0):[];if(!catalog.length)throw new Error('فهرست معتبر فروشگاه خالی است؛ کاتالوگ سرور را بررسی کن');mergeDefinitions();return catalog}finally{loading=false}})();
+  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});if(data.currencies&&state){for(const key of Object.keys(CURRENCY)){const value=Number(data.currencies[key]);if(Number.isFinite(value)&&value>=0)state[key]=value}try{renderHUD()}catch(_){}}catalog=Array.isArray(data.items)?data.items.filter(it=>it&&typeof it==='object').map(it=>({...it,id:String(it.id||it.item_id||''),cat:String(it.cat||it.category||'').trim(),name:String(it.name||'کالای ناشناس'),desc:String(it.desc||''),price:Math.max(0,Number(it.price)||0),gemPrice:Math.max(0,Number(it.gemPrice)||0),stock:Math.max(0,Number(it.stock)||0),levelReq:Math.max(1,Number(it.levelReq)||1),sellPrice:Math.max(0,Number(it.sellPrice)||0),rarity:String(it.rarity||'common'),currency:CURRENCY[it.currency]?it.currency:'gold'})).filter(it=>it.id&&it.cat&&it.price>0):[];if(!catalog.length)throw new Error('فهرست معتبر فروشگاه خالی است؛ کاتالوگ سرور را بررسی کن');mergeDefinitions();return catalog}finally{loading=false}})();
   try{return await catalogPromise}finally{catalogPromise=null}
  }
  function ensureChrome(){
@@ -8382,9 +8382,9 @@ body{overflow:hidden!important}
    if(state){state.bloodTokens=Number(state.bloodTokens)||0;state.ancientDust=Number(state.ancientDust)||0;state.hunterMarks=Number(state.hunterMarks)||0;try{await saveState()}catch(saveError){console.error('Warnehold shop: server transaction succeeded but local state save failed',saveError)}}
    try{renderHUD();renderInventory();renderChar()}catch(_){}
    try{playPurchaseFX(action==='buy'&&currency==='gems'?'gem':'coin')}catch(_){}
-   if(action==='buy')showToast('خرید ثبت شد: '+it.name);
-   else if(action==='sell')showToast('فروش ثبت شد؛ سکه دریافت شد');
-   else showToast('بازیافت ثبت شد: '+it.name);
+   if(action==='buy')showToast('خرید ثبت شد: '+it.name+' · '+currencyText(result.currency||currency||it.currency,result.amount));
+   else if(action==='sell')showToast('فروش ثبت شد: '+currencyText('gold',result.amount)+' دریافت شد');
+   else showToast('بازیافت ثبت شد: '+currencyText(result.currency||it.salvageCurrency,result.amount));
    try{pushPersonalNotif('trade',(action==='buy'?'🛒 خرید: ':action==='sell'?'💰 فروش: ':'♻️ بازیافت: ')+it.name)}catch(_){}
    await renderShop();
   }catch(e){showToast(e.message||'معامله انجام نشد');if(button)button.disabled=false}
