@@ -6297,6 +6297,7 @@ async function sellItem(itemId){
 async function openListItemDialog(itemId){
   const item = (state.inventory||[]).find(i=>i.id===itemId);
   if(!item) return;
+  if(Array.isArray(window.warneholdShopLockedItems)&&window.warneholdShopLockedItems.includes(itemId)){showToast('این آیتم قفل شده و نمی‌توانی آن را در بازارچه بفروشی');return;}
   const equippedCount = Object.values(state.equipment||{}).filter(x=>x===itemId).length;
   const sellableQty = item.qty - equippedCount;
   if(sellableQty<=0){ showToast('این آیتم تجهیز شده و قابل فروش در بازارچه نیست'); return; }
@@ -8464,6 +8465,8 @@ body{overflow:hidden!important}
   try{const r=await api({action:'unequip',payload:{slot:slotId}});if(r.character)Object.assign(state,r.character);await saveState();renderChar();renderInventory();renderHUD();showToast('تجهیزات باز شد')}
   catch(e){showToast(e.message||'بازکردن تجهیزات انجام نشد')}
  };
+ window.upgradeEquipment=async function(slotId){const itemId=state?.equipment?.[slotId];if(!itemId)return;try{const r=await api({action:'upgrade',payload:{itemId}});if(r.character)Object.assign(state,r.character);if(r.upgrades){shopMeta.upgrades=r.upgrades;state.equipUpgrades=r.upgrades}await saveState();renderChar();renderInventory();renderHUD();showToast('ارتقای تجهیزات ثبت شد')}catch(e){showToast(e.message||'ارتقا انجام نشد')}};
+ window.repairEquipment=async function(slotId){const itemId=state?.equipment?.[slotId];if(!itemId)return;try{const r=await api({action:'repair',payload:{itemId}});if(r.character)Object.assign(state,r.character);if(r.upgrades){shopMeta.upgrades=r.upgrades;state.equipUpgrades=r.upgrades}await saveState();renderChar();renderInventory();renderHUD();showToast('تعمیر تجهیزات ثبت شد')}catch(e){showToast(e.message||'تعمیر انجام نشد')}};
  window.warneholdShopDurabilityTick=async function(){
   try{const r=await api({action:'durability',payload:{}});if(r.upgrades&&state){state.equipUpgrades=r.upgrades;shopMeta.upgrades=r.upgrades;await saveState();renderChar();renderHUD()}}
   catch(e){console.warn('server durability tick failed',e)}
