@@ -4230,6 +4230,10 @@ function itemLevelReq(def){ return def.levelReq || RARITY_LEVEL_REQ[def.rarity] 
 
 /* ---------- Update 10: Item Information System ---------- */
 const CONSUMABLE_EFFECTS = {
+  food_bread: {kind:'heal', amount:10, battleOnly:false, label:'بازیابی ۱۰ HP'},
+  food_stew: {kind:'heal', amount:25, battleOnly:false, label:'بازیابی ۲۵ HP'},
+  food_tea: {kind:'energy', amount:12, battleOnly:false, label:'بازیابی ۱۲ انرژی'},
+  food_ration: {kind:'heal', amount:15, battleOnly:false, label:'بازیابی ۱۵ HP'},
   itm_potion: {kind:'heal', amount:30, battleOnly:false, label:'بازیابی ۳۰ HP'},
   pt_greater: {kind:'heal', amount:80, battleOnly:false, label:'بازیابی ۸۰ HP'},
   pt_energy:  {kind:'energy', amount:25, battleOnly:false, label:'بازیابی ۲۵ انرژی'},
@@ -4796,8 +4800,10 @@ SHOP_ITEMS.push(...ANIME_WEAPONS, ...ANIME_ITEMS);
 CONSUMABLE_EFFECTS.ai_senzu_bean = {kind:'heal', amount:70, battleOnly:true, label:'بازیابی ۷۰ HP (فقط در Battle)'};
 
 const EQUIP_SLOTS = [
-  {id:'weapon', label:'⚔️ سلاح'}, {id:'armor', label:'🛡️ زره'}, {id:'helmet', label:'⛑️ کلاه‌خود'},
-  {id:'boots', label:'👢 چکمه'}, {id:'accessory', label:'💍 زیورآلات'},
+  {id:'weapon',label:'⚔️ سلاح'}, {id:'armor',label:'🛡️ زره'}, {id:'helmet',label:'⛑️ کلاه‌خود'}, {id:'gloves',label:'🧤 دستکش'},
+  {id:'boots',label:'👢 چکمه'}, {id:'cloak',label:'🧥 شنل'}, {id:'shield',label:'🛡️ سپر'}, {id:'accessory',label:'💍 زیورآلات'},
+  {id:'ring1',label:'💍 انگشتر ۱'}, {id:'ring2',label:'💍 انگشتر ۲'}, {id:'necklace',label:'📿 گردنبند'}, {id:'talisman',label:'🔮 طلسم'},
+  {id:'companion',label:'🐾 همراه'}, {id:'mount',label:'🐎 سواری'},
 ];
 const EQUIP_STAT_CAP = 25; // سقف مجموع باف تجهیزات روی هر Stat — از قدرت بی‌نهایت جلوگیری می‌کند
 
@@ -5237,7 +5243,8 @@ async function loadState(){
     const r = await window.storage.get('character', false);
     if(!r) return null;
     const s = JSON.parse(r.value);
-    if(!s.equipment || Array.isArray(s.equipment)) s.equipment = {weapon:null, armor:null, helmet:null, boots:null, accessory:null};
+    if(!s.equipment || Array.isArray(s.equipment)) s.equipment = {weapon:null,armor:null,helmet:null,gloves:null,boots:null,cloak:null,shield:null,accessory:null,ring1:null,ring2:null,necklace:null,talisman:null,companion:null,mount:null};
+    ['weapon','armor','helmet','gloves','boots','cloak','shield','accessory','ring1','ring2','necklace','talisman','companion','mount'].forEach(slot=>{if(!(slot in s.equipment))s.equipment[slot]=null});
     if(!s.equipUpgrades) s.equipUpgrades = {};
     if(!s.discoveredRegions) s.discoveredRegions = Object.keys(REGIONS).filter(id=> (REGIONS[id].minLevel<=s.level && !REGIONS[id].requiresCapital) || id==='village' || id==='forest'); // بازیکنان قدیمی مناطقی که قبلاً به آن‌ها دسترسی داشتند را از دست نمی‌دهند
     if(!s.discoveredLocations) s.discoveredLocations = [];
@@ -8258,8 +8265,8 @@ body{overflow:hidden!important}
 (function(){
  if(window.__WH_SHOP_EXPANSION_V1)return;window.__WH_SHOP_EXPANSION_V1=true;
  const API=SUPABASE_URL+'/functions/v1/warnehold-shop';
- const CATEGORY_ORDER=['Weapons','Armor','Potions','Accessories','Tools','Scrolls','Materials','Survival','Crafting','Relics','Hunting','BlackMarket'];
- const CATEGORY_LABELS={Weapons:'⚔️ سلاح‌ها',Armor:'🛡️ زره و دفاع',Potions:'🧪 پوشن‌ها',Accessories:'🔮 اکسسوری',Tools:'🧰 ابزار و تله',Scrolls:'📜 کتاب و طومار',Materials:'💎 مواد اولیه',Survival:'🏕️ سفر و بقا',Crafting:'🔨 آهنگری و ساخت',Relics:'🗝️ آثار باستانی',Hunting:'🏹 شکارچی',BlackMarket:'☠️ بازار سیاه'};
+ const CATEGORY_ORDER=['Weapons','Armor','Accessories','Jewelry','Potions','Food','Tools','Scrolls','Materials','Mining','Fishing','Survival','Travel','Crafting','Relics','Hunting','Pets','Mounts','EventGoods','BossRewards','BlackMarket'];
+ const CATEGORY_LABELS={Weapons:'⚔️ سلاح‌ها',Armor:'🛡️ زره و دفاع',Potions:'🧪 معجون‌ها',Accessories:'🔮 اکسسوری',Jewelry:'💍 جواهرات',Food:'🍲 خوراک و غذا',Tools:'🧰 ابزار و تله',Scrolls:'📜 کتاب و طومار',Materials:'💎 مواد اولیه',Mining:'⛏️ معدن',Fishing:'🎣 ماهیگیری',Survival:'🏕️ سفر و بقا',Travel:'🧭 سفر و بقا',Crafting:'🔨 آهنگری و ساخت',Relics:'🗝️ آثار باستانی',Hunting:'🏹 شکارچی',Pets:'🐾 همراهان',Mounts:'🐎 سواری‌ها',EventGoods:'🎪 کالاهای رویداد',BossRewards:'👑 پاداش باس',BlackMarket:'☠️ بازار سیاه'};
  const CURRENCY={gold:{icon:'🪙',label:'سکه'},gems:{icon:'💎',label:'جم'},bloodTokens:{icon:'🩸',label:'مهره خون'},ancientDust:{icon:'✨',label:'غبار باستانی'},hunterMarks:{icon:'🏹',label:'نشان شکارچی'}};
  const RARITY_LABEL={common:'معمولی',uncommon:'غیرمعمول',rare:'کمیاب',epic:'حماسی',legendary:'افسانه‌ای',mythic:'اساطیری',unique:'یگانه'};
  let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null,activeVendor='capital',lastCatalogVendor=null,extraView='catalog',tradeQty=1,rarityFilter='all',currencyFilter='all',stockFilter='all',shopMeta={reputation:{},favorites:[],quests:[],upgrades:{}};
