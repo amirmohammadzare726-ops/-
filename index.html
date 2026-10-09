@@ -8257,7 +8257,7 @@ body{overflow:hidden!important}
  const CATEGORY_LABELS={Weapons:'⚔️ سلاح‌ها',Armor:'🛡️ زره و دفاع',Potions:'🧪 پوشن‌ها',Accessories:'🔮 اکسسوری',Tools:'🧰 ابزار و تله',Scrolls:'📜 کتاب و طومار',Materials:'💎 مواد اولیه',Survival:'🏕️ سفر و بقا',Crafting:'🔨 آهنگری و ساخت',Relics:'🗝️ آثار باستانی',Hunting:'🏹 شکارچی',BlackMarket:'☠️ بازار سیاه'};
  const CURRENCY={gold:{icon:'🪙',label:'سکه'},gems:{icon:'💎',label:'جم'},bloodTokens:{icon:'🩸',label:'مهره خون'},ancientDust:{icon:'✨',label:'غبار باستانی'},hunterMarks:{icon:'🏹',label:'نشان شکارچی'}};
  const RARITY_LABEL={common:'معمولی',uncommon:'غیرمعمول',rare:'کمیاب',epic:'حماسی',legendary:'افسانه‌ای',mythic:'اساطیری',unique:'یگانه'};
- let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null,activeVendor='capital',extraView='catalog',tradeQty=1,shopMeta={reputation:{},favorites:[],quests:[],upgrades:{}};
+ let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null,activeVendor='capital',extraView='catalog',tradeQty=1,rarityFilter='all',currencyFilter='all',stockFilter='all',shopMeta={reputation:{},favorites:[],quests:[],upgrades:{}};
  const oldBuy=window.buyItem,oldSell=window.sellItem,oldGemBuy=window.buyItemWithGems,oldSwitch=window.switchScreenCore;
  const $=s=>document.querySelector(s),esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function session(){try{return accountSession||localStorage.getItem('warnehold_account_session')||readRememberedAccount()||''}catch(_){return accountSession||''}}
@@ -8283,7 +8283,7 @@ body{overflow:hidden!important}
  }
  async function loadCatalog(){
   if(loading)return;loading=true;
-  try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions();try{shopMeta=await api({action:'status',payload:{}})}catch(metaError){console.warn('shop meta unavailable',metaError)}}
+  try{const previous=Object.fromEntries(catalog.map(i=>[i.id,Number(i.stock)||0]));const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions();try{shopMeta=await api({action:'status',payload:{}})}catch(metaError){console.warn('shop meta unavailable',metaError)}if(previous&&Object.keys(previous).length){const favs=Array.isArray(shopMeta.favorites)?shopMeta.favorites:[];const restocked=catalog.find(i=>favs.includes(i.id)&&previous[i.id]===0&&Number(i.stock)>0);if(restocked&&typeof showToast==='function')showToast('★ کالای موردعلاقه دوباره موجود شد: '+restocked.name)}}
   finally{loading=false}
  }
  function ensureChrome(){
@@ -8299,6 +8299,10 @@ body{overflow:hidden!important}
    toolbar.innerHTML='<input class="wh-shop-search" id="wh-shop-search" type="search" maxlength="70" placeholder="🔎 جست‌وجوی کالا..." aria-label="جست‌وجوی کالا"><select class="wh-shop-sort" id="wh-shop-sort" aria-label="مرتب‌سازی"><option value="recommended">پیشنهادی</option><option value="priceUp">ارزان‌تر</option><option value="priceDown">گران‌تر</option><option value="rarity">کمیاب‌تر</option><option value="stock">موجودی بیشتر</option></select>';
    list.parentNode.insertBefore(toolbar,list);
    const qty=document.createElement('select');qty.id='wh-shop-qty';qty.className='wh-shop-sort';qty.setAttribute('aria-label','تعداد معامله');qty.style.marginTop='6px';qty.innerHTML='<option value="1">تعداد ۱</option><option value="2">تعداد ۲</option><option value="5">تعداد ۵</option><option value="10">تعداد ۱۰</option><option value="20">تعداد ۲۰</option>';qty.value=String(tradeQty);qty.onchange=()=>{tradeQty=Math.max(1,Math.min(20,Number(qty.value)||1))};toolbar.appendChild(qty);
+   const filters=document.createElement('div');filters.className='wh-shop-extra';filters.style.width='100%';filters.innerHTML='<select id="wh-shop-rarity-filter" class="wh-shop-sort" aria-label="فیلتر کمیابی"><option value="all">همه کمیابی‌ها</option><option value="common">معمولی</option><option value="uncommon">غیرمعمول</option><option value="rare">کمیاب</option><option value="epic">حماسی</option><option value="legendary">افسانه‌ای</option><option value="mythic">اساطیری</option><option value="unique">یگانه</option></select><select id="wh-shop-currency-filter" class="wh-shop-sort" aria-label="فیلتر ارز"><option value="all">همه ارزها</option><option value="gold">سکه</option><option value="gems">جم</option><option value="bloodTokens">مهره خون</option><option value="ancientDust">غبار باستانی</option><option value="hunterMarks">نشان شکارچی</option></select><select id="wh-shop-stock-filter" class="wh-shop-sort" aria-label="فیلتر موجودی"><option value="all">همه موجودی‌ها</option><option value="available">فقط موجود</option><option value="low">موجودی کم</option></select>';
+   toolbar.appendChild(filters);
+   filters.querySelector('#wh-shop-rarity-filter').value=rarityFilter;filters.querySelector('#wh-shop-currency-filter').value=currencyFilter;filters.querySelector('#wh-shop-stock-filter').value=stockFilter;
+   filters.querySelector('#wh-shop-rarity-filter').onchange=e=>{rarityFilter=e.target.value;drawList()};filters.querySelector('#wh-shop-currency-filter').onchange=e=>{currencyFilter=e.target.value;drawList()};filters.querySelector('#wh-shop-stock-filter').onchange=e=>{stockFilter=e.target.value;drawList()};
   }
   if(!$('#wh-shop-extra-nav')){
    const nav=document.createElement('div');nav.id='wh-shop-extra-nav';nav.className='wh-shop-extra';
@@ -8355,12 +8359,12 @@ body{overflow:hidden!important}
   if(!catalog.length){list.innerHTML='<div class="wh-shop-empty">کاتالوگ فروشگاه هنوز بارگذاری نشده. فروشگاه را دوباره باز کن.</div>';return}
   if(mode==='buy'){
    let items=vendorItems(catalog).filter(i=>i.cat===activeCat);
-   if(search)items=items.filter(i=>(i.name+' '+i.desc+' '+i.rarity+' '+(CATEGORY_LABELS[i.cat]||i.cat)).toLocaleLowerCase().includes(search));
+   if(search)items=items.filter(i=>(i.name+' '+i.desc+' '+i.rarity+' '+(CATEGORY_LABELS[i.cat]||i.cat)).toLocaleLowerCase().includes(search));if(rarityFilter!=='all')items=items.filter(i=>i.rarity===rarityFilter);if(currencyFilter!=='all')items=items.filter(i=>(i.currency||'gold')===currencyFilter);if(stockFilter==='available')items=items.filter(i=>Number(i.stock)>0);else if(stockFilter==='low')items=items.filter(i=>Number(i.stock)>0&&Number(i.stock)<=3);
    items=sortedItems(items);
    if(!items.length){list.innerHTML='<div class="wh-shop-empty">کالایی با این مشخصات پیدا نشد.</div>';return}
    list.innerHTML='<div class="wh-shop-grid">'+items.map(it=>{
     const c=CURRENCY[it.currency]||CURRENCY.gold,stock=Number(it.stock)||0,disabled=stock<=0||!canAfford(it,it.currency);
-    const stockText=stock<=0?'ناموجود':('موجودی '+stock.toLocaleString('fa-IR'));
+    const stockText=stock<=0?'ناموجود':(stock<=3?'⚠️ موجودی کم: '+stock.toLocaleString('fa-IR'):('موجودی '+stock.toLocaleString('fa-IR')));
     const alt=Number(it.gemPrice)>0?'<button type="button" class="wh-shop-buy alt" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="gems" '+((stock<=0||balance('gems')<Number(it.gemPrice))?'disabled':'')+'>💎 '+Number(it.gemPrice).toLocaleString('fa-IR')+' جم</button>':'';
     const mod=it.mod&&Object.keys(it.mod).length?Object.entries(it.mod).map(([k,v])=>({atk:'حمله',def:'دفاع',magic:'جادو',spd:'سرعت',crit:'ضربه بحرانی',luck:'شانس',hp:'جان',energy:'انرژی'}[k]||k)+' '+(v>0?'+':'')+v).join(' · '):'';
     return '<article class="wh-item-card rarity-'+esc(it.rarity||'common')+'"><div class="wh-item-top"><div class="wh-item-icon">'+esc(it.icon||'📦')+'</div><div class="wh-item-heading"><div class="wh-item-name">'+esc(it.name)+'</div><span class="wh-item-rarity r-'+esc(it.rarity||'common')+'">'+esc(RARITY_LABEL[it.rarity]||it.rarity||'معمولی')+'</span></div></div><div class="wh-item-desc">'+esc(it.desc||'کالای وارنهولد')+(mod?'<br><span style="color:#d8bd83">'+esc(mod)+'</span>':'')+'</div><div class="wh-item-meta"><span class="wh-stock '+(stock<=0?'empty':'')+'">'+stockText+'</span><span>Lv '+Number(it.levelReq||1)+'</span></div><div class="wh-item-price">'+esc(c.icon)+' '+Number(it.price||0).toLocaleString('fa-IR')+' '+esc(c.label)+'</div><div class="wh-item-actions"><button type="button" class="wh-shop-buy" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="'+esc(it.currency||'gold')+'" '+(disabled?'disabled':'')+'>'+(stock<=0?'ناموجود':(!canAfford(it,it.currency)?'ارز کافی نیست':'خرید'))+'</button>'+alt+'<button type="button" class="wh-shop-detail-btn" data-shop-action="details" data-item-id="'+esc(it.id)+'">جزئیات آیتم</button></div></article>';
