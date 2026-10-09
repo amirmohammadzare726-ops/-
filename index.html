@@ -8284,7 +8284,7 @@ body{overflow:hidden!important}
  }
  async function loadCatalog(){
   if(loading)return;loading=true;
-  try{const previous=Object.fromEntries(catalog.map(i=>[i.id,Number(i.stock)||0]));const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions();try{shopMeta=await api({action:'status',payload:{}})}catch(metaError){console.warn('shop meta unavailable',metaError)}if(previous&&Object.keys(previous).length){const favs=Array.isArray(shopMeta.favorites)?shopMeta.favorites:[];const restocked=catalog.find(i=>favs.includes(i.id)&&previous[i.id]===0&&Number(i.stock)>0);if(restocked&&typeof showToast==='function')showToast('★ کالای موردعلاقه دوباره موجود شد: '+restocked.name)}}
+  try{const previous=Object.fromEntries(catalog.map(i=>[i.id,Number(i.stock)||0]));const data=await api({action:'catalog',vendorId:activeVendor});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions();try{shopMeta=await api({action:'status',payload:{}})}catch(metaError){console.warn('shop meta unavailable',metaError)}if(previous&&Object.keys(previous).length){const favs=Array.isArray(shopMeta.favorites)?shopMeta.favorites:[];const restocked=catalog.find(i=>favs.includes(i.id)&&previous[i.id]===0&&Number(i.stock)>0);if(restocked&&typeof showToast==='function')showToast('★ کالای موردعلاقه دوباره موجود شد: '+restocked.name)}}
   finally{loading=false}
  }
  function ensureChrome(){
@@ -8398,7 +8398,7 @@ body{overflow:hidden!important}
   if(action==='buy'&&Number(it.stock)<=0){showToast('این کالا فعلاً ناموجود است');return}
   busy=true;if(button)button.disabled=true;
   try{
-   const result=await api({action,itemId:id,qty:qty||1,currency:currency||null});
+   const result=await api({action,itemId:id,qty:qty||1,currency:currency||null,vendorId:action==='buy'?activeVendor:undefined});
    if(result.character&&state)Object.assign(state,result.character);
    if(state){state.bloodTokens=Number(state.bloodTokens)||0;state.ancientDust=Number(state.ancientDust)||0;state.hunterMarks=Number(state.hunterMarks)||0;await saveState()}
    try{renderHUD();renderInventory();renderChar()}catch(_){}
