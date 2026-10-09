@@ -8351,9 +8351,9 @@ body{overflow:hidden!important}
    }).join('')+'</div>';
   }else{
    const inv=Array.isArray(state?.inventory)?state.inventory:[];
-   const items=inv.map(x=>({owned:x,def:itemFor(x.id)})).filter(x=>mode==='sell'||(x.def&&x.def.salvageCurrency&&Number(x.def.salvageValue)>0));
+   const items=inv.map(x=>({owned:x,def:itemFor(x.id)})).filter(x=>mode==='sell'?Boolean(x.def):(x.def&&x.def.salvageCurrency&&Number(x.def.salvageValue)>0));
    const filtered=items.filter(x=>!search||(x.owned.name+' '+(x.def?.desc||'')).toLocaleLowerCase().includes(search));
-   if(!filtered.length){list.innerHTML='<div class="wh-shop-empty">'+(mode==='sell'?'آیتمی برای فروش در انبار نیست.':'آیتم قابل بازیافتی در انبار نیست.')+'</div>';return}
+   if(!filtered.length){list.innerHTML='<div class="wh-shop-empty">'+(mode==='sell'?'کالای قابل فروش این بازار در انبار نیست.':'آیتم قابل بازیافتی در انبار نیست.')+'</div>';return}
    list.innerHTML='<div class="wh-shop-grid">'+filtered.map(({owned,def})=>{
     const equipped=Object.values(state.equipment||{}).filter(x=>x===owned.id).length,available=Math.max(0,(Number(owned.qty)||0)-equipped);
     const sellPrice=Number(def?.sellPrice)||Math.max(1,Math.round((Number(def?.price)||5)*.45));
