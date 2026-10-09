@@ -8442,7 +8442,7 @@ var vendors=[{id:'capital',name:'بازار پایتخت',emoji:'🏰',desc:'ک�
 var recipes=[{id:'heal',name:'معجون درمان ساده',out:'pt_heal',needs:[['mat_herb',2],['mat_bottle',1]]},{id:'energy',name:'معجون انرژی',out:'pt_energy',needs:[['mat_herb',1],['mat_crystal',1],['mat_bottle',1]]},{id:'sharp',name:'سنگ تیزکن',out:'tool_sharpstone',needs:[['mat_iron',2],['mat_stone',1]]}];
 var cat='all',mode='buy',vendor='capital',query='',rarity='all',sort='recommended',view='catalog',favs=new Set();
 try{favs=new Set(JSON.parse(localStorage.getItem('wh_shop22_favs')||'[]'))}catch(e){}
-function items(){return Array.isArray(window.SHOP_ITEMS)?window.SHOP_ITEMS:[]}
+function items(){if(Array.isArray(window.SHOP_ITEMS))return window.SHOP_ITEMS;try{if(typeof SHOP_ITEMS!=='undefined'&&Array.isArray(SHOP_ITEMS))return SHOP_ITEMS}catch(e){}return []}
 function st(){return window.state||(typeof state!=='undefined'?state:null)}
 function def(id){return items().find(function(x){return String(x.id)===String(id)})}
 function owned(id){var s=st();return (s&&s.inventory||[]).find(function(x){return String(x.id)===String(id)})}
