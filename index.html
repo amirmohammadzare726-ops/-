@@ -8467,6 +8467,7 @@ body{overflow:hidden!important}
  };
  window.upgradeEquipment=async function(slotId){const itemId=state?.equipment?.[slotId];if(!itemId)return;try{const r=await api({action:'upgrade',payload:{itemId}});if(r.character)Object.assign(state,r.character);if(r.upgrades){shopMeta.upgrades=r.upgrades;state.equipUpgrades=r.upgrades}await saveState();renderChar();renderInventory();renderHUD();showToast('ارتقای تجهیزات ثبت شد')}catch(e){showToast(e.message||'ارتقا انجام نشد')}};
  window.repairEquipment=async function(slotId){const itemId=state?.equipment?.[slotId];if(!itemId)return;try{const r=await api({action:'repair',payload:{itemId}});if(r.character)Object.assign(state,r.character);if(r.upgrades){shopMeta.upgrades=r.upgrades;state.equipUpgrades=r.upgrades}await saveState();renderChar();renderInventory();renderHUD();showToast('تعمیر تجهیزات ثبت شد')}catch(e){showToast(e.message||'تعمیر انجام نشد')}};
+ window.degradeEquipmentOnDefeat=function(){if(window.warneholdShopDurabilityTick)return window.warneholdShopDurabilityTick()};
  window.warneholdShopDurabilityTick=async function(){
   try{const r=await api({action:'durability',payload:{}});if(r.upgrades&&state){state.equipUpgrades=r.upgrades;shopMeta.upgrades=r.upgrades;await saveState();renderChar();renderHUD()}}
   catch(e){console.warn('server durability tick failed',e)}
