@@ -8376,7 +8376,7 @@ body{overflow:hidden!important}
   try{
    const result=await api({action,itemId:id,qty:qty||1,currency:currency||null});
    if(result.character&&state)Object.assign(state,result.character);
-   if(state){state.bloodTokens=Number(state.bloodTokens)||0;state.ancientDust=Number(state.ancientDust)||0;state.hunterMarks=Number(state.hunterMarks)||0;await saveState()}
+   if(state){state.bloodTokens=Number(state.bloodTokens)||0;state.ancientDust=Number(state.ancientDust)||0;state.hunterMarks=Number(state.hunterMarks)||0;try{await saveState()}catch(saveError){console.error('Warnehold shop: server transaction succeeded but local state save failed',saveError)}}
    try{renderHUD();renderInventory();renderChar()}catch(_){}
    try{playPurchaseFX(action==='buy'&&currency==='gems'?'gem':'coin')}catch(_){}
    if(action==='buy')showToast('خرید ثبت شد: '+it.name);
