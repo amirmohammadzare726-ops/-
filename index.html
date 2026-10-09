@@ -4724,8 +4724,9 @@ function updateVillageInteraction(){
   box.innerHTML = `<button class="primary" style="width:100%;" id="village-interact-btn">${near.actionLabel}</button>`;
   $('#village-interact-btn').onclick = async ()=>{
     if(near.action==='forest'){
+      if(window.whMapTravelAssistant){ window.whMapTravelAssistant.selectTarget('forest'); window.whMapTravelAssistant.open('travel'); return; }
       await travelTo('forest');
-      if(!pendingEncounter) switchScreen('map'); // اگر Encounter نبود (یا در حال Recovery بودیم)، به نقشه جهان برمی‌گردیم؛ در غیر این‌صورت travelTo خودش صفحه Battle را باز کرده
+      if(!pendingEncounter) switchScreen('map');
     }
     else switchScreen(near.action);
   };
@@ -5830,6 +5831,11 @@ async function finishJourney(){
   const toId = j.toId;
   state.journey = null;
   await saveState();
+  if(window.whMapTravelAssistant){
+    window.whMapTravelAssistant.selectTarget(toId);
+    window.whMapTravelAssistant.open('travel');
+    return;
+  }
   await travelTo(toId);
   if(toId==='village') switchScreen('villagemap'); else switchScreen('map');
 }
