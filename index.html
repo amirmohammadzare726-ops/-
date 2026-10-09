@@ -6080,6 +6080,8 @@ function renderInventory(){
     list.innerHTML = '<div class="empty-note">کوله‌پشتی شما خالی است.</div>';
     return;
   }
+  const capacityNote = document.createElement('div'); capacityNote.className='empty-note'; capacityNote.textContent=`ظرفیت کوله‌پشتی: ${state.inventory.length}/100 دسته آیتم`;
+  list.appendChild(capacityNote);
   state.inventory.forEach(item=>{
     const row = document.createElement('div');
     row.className='item-row';
