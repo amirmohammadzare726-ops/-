@@ -5571,7 +5571,7 @@ function renderMap(){
         <div class="rdesc">${r.desc}${locked?` · ${regionLockReason(id)}`:''}${!locked && r.travelFee && !homeClusterRegions().includes(id) ? ` · هزینه سفر: ${r.travelFee} ین`:''}${!r.hub?` · Exploration: ${explorePct}%`:''}</div>
       </div>
       <div class="rdanger">${r.danger}</div>`;
-    if(!locked){ div.onclick = () => { if(r.hub && id!==state.region){ startJourney(id); } else if(id==='village'){ travelTo(id).then(()=> switchScreen('villagemap')); } else { travelTo(id); } }; }
+    if(!locked){ div.onclick = () => { if(window.whMapTravelAssistant){ window.whMapTravelAssistant.selectTarget(id); window.whMapTravelAssistant.open('travel'); } else if(r.hub && id!==state.region){ startJourney(id); } else if(id==='village'){ travelTo(id).then(()=> switchScreen('villagemap')); } else { travelTo(id); } }; }
     list.appendChild(div);
   });
   const exploreCard = document.createElement('div');
@@ -5867,7 +5867,8 @@ function renderWorldMap(){
     node.innerHTML = `<div class="wm-dot"></div><div class="wm-label">${label}${(discovered&&locked)?' 🔒':''}</div>`;
     if(discovered && !locked){
       node.onclick = ()=>{
-        if(r.hub && id!==state.region){ startJourney(id); }
+        if(window.whMapTravelAssistant){ window.whMapTravelAssistant.selectTarget(id); window.whMapTravelAssistant.open('travel'); }
+        else if(r.hub && id!==state.region){ startJourney(id); }
         else if(id==='village'){ travelTo(id).then(()=> switchScreen('villagemap')); }
         else { travelTo(id).then(()=> switchScreen('map')); }
       };
@@ -8156,7 +8157,7 @@ body{overflow:hidden!important}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{install();setTimeout(install,1200)});else{install();setTimeout(install,1200)}
  const installRetry=setInterval(()=>{install();if($('#whm-assistant-launch')&&$('#whm-open-map'))clearInterval(installRetry)},2500);
- window.whMapTravelAssistant={open,close,places:allPlaces,render,refresh:refreshStatus};
+ window.whMapTravelAssistant={open,close,places:allPlaces,render,refresh:refreshStatus,selectTarget(id){if(regions()[id])target=id;}};
 })();
 </script>
 </body>
