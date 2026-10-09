@@ -5067,7 +5067,7 @@ function effectiveStats(){
     if(!def || !def.mod) return;
     const info = getUpgradeInfo(itemId);
     const levelMult = 1 + info.level*0.12;
-    const duraMult = info.durability < 30 ? 0.8 : 1;
+    const duraMult = info.durability <= 0 ? 0 : (info.durability < 30 ? 0.8 : 1);
     Object.entries(def.mod).forEach(([k,v])=>{ added[k] = (added[k]||0) + Math.round(v*levelMult*duraMult); });
   });
   Object.entries(added).forEach(([k,v])=>{
@@ -7005,6 +7005,7 @@ function applyDamageToEnemy(b, rawDmg){
 async function playerAction(kind, powerId){
   const b = state.battle;
   if(!b || b.over) return;
+  if(window.warneholdShopDurabilityTick) window.warneholdShopDurabilityTick();
   ['act-attack','act-powers','act-items','act-defend','act-run'].forEach(id=> $('#'+id).disabled = true);
   $('#power-panel').style.display='none';
   $('#battle-item-panel').style.display='none';
@@ -7194,7 +7195,6 @@ async function reactToEnemyAttack(reaction){
   if(b.enemyWeaken>0){ dmg = Math.round(dmg*(1-b.enemyWeaken)); b.enemyWeaken=0; }
   if(b.playerShield>0){ dmg = Math.round(dmg*(1-b.playerShield)); b.playerShield=0; }
   state.hp = Math.max(0, state.hp - dmg);
-  if(window.warneholdShopDurabilityTick) window.warneholdShopDurabilityTick();
   pushLog('sys', `[Engine] ${b.enemyName} ${action==='special'?'با یک حمله ویژه':''}حمله کرد: ${dmg} آسیب`);
 
   if(reaction==='dodge_counter' && state.hp>0){
