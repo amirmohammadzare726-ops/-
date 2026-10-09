@@ -8268,7 +8268,7 @@ body{overflow:hidden!important}
  }
  function balance(key){return Math.max(0,Number(state&&state[key])||0)}
  function currencyText(key,value){const c=CURRENCY[key]||CURRENCY.gold;return c.icon+' '+Number(value||0).toLocaleString('fa-IR')+' '+c.label}
- function itemFor(id){return catalog.find(x=>x.id===id)||null}
+ function itemFor(id){const key=String(id??'');return catalog.find(x=>x.id===key)||null}
  function mergeDefinitions(){
   if(!Array.isArray(window.SHOP_ITEMS)&&typeof SHOP_ITEMS==='undefined')return;
   for(const it of catalog){
@@ -8374,7 +8374,7 @@ body{overflow:hidden!important}
   if(action==='buy'&&Number(it.stock)<=0){showToast('این کالا فعلاً ناموجود است');return}
   if(action==='buy'&&(Number(state?.level)||1)<(Number(it.levelReq)||1)){showToast('برای خرید این کالا به سطح '+Number(it.levelReq||1)+' نیاز داری');return}
   if(action==='buy'&&!canAfford(it,currency||it.currency)){showToast('موجودی ارز برای این خرید کافی نیست');return}
-  if(action==='sell'){const owned=(state?.inventory||[]).find(x=>x.id===id);const equipped=Object.values(state?.equipment||{}).filter(x=>x===id).length;if(!owned||Number(owned.qty||0)-equipped<1){showToast('این آیتم در دسترس فروش نیست یا مجهز شده');return}}
+  if(action==='sell'){const owned=(state?.inventory||[]).find(x=>String(x.id)===String(id));const equipped=Object.values(state?.equipment||{}).filter(x=>String(x)===String(id)).length;if(!owned||Number(owned.qty||0)-equipped<1){showToast('این آیتم در دسترس فروش نیست یا مجهز شده');return}}
   busy=true;if(button)button.disabled=true;
   try{
    const result=await api({action,itemId:id,qty:qty||1,currency:currency||null});
@@ -8415,9 +8415,9 @@ body{overflow:hidden!important}
   finally{chatBusy=false;if(btn)btn.disabled=false;input.focus()}
  }
  window.renderShop=renderShop;
- window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
- window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
- window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
+ window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}const it=itemFor(id);if(it)return shopAction('buy',it.id,1,it.currency,null);showToast('این کالا در فهرست معتبر فروشگاه نیست');};
+ window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',it.id,1,'gems',null);showToast('این کالا یا قیمت جم آن در فهرست معتبر فروشگاه نیست');};
+ window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}const it=itemFor(id);if(it)return shopAction('sell',it.id,1,null,null);showToast('این کالا در فهرست معتبر فروشگاه نیست');};
  if(oldSwitch){window.switchScreenCore=function(name){const r=oldSwitch.apply(this,arguments);if(name==='shop')setTimeout(()=>renderShop(),0);return r}}
  ensureChrome();
 })();
