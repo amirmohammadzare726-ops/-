@@ -8284,7 +8284,7 @@ body{overflow:hidden!important}
  async function loadCatalog(){
   if(catalogPromise)return catalogPromise;
   loading=true;
-  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items:[];mergeDefinitions();return catalog}finally{loading=false}})();
+  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items.map(it=>({...it,id:it.id||it.item_id,cat:it.cat||it.category})):[];if(!catalog.length)throw new Error('فهرست فروشگاه خالی است');mergeDefinitions();return catalog}finally{loading=false}})();
   try{return await catalogPromise}finally{catalogPromise=null}
  }
  function ensureChrome(){
@@ -8412,9 +8412,9 @@ body{overflow:hidden!important}
   finally{chatBusy=false;if(btn)btn.disabled=false;input.focus()}
  }
  window.renderShop=renderShop;
- window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
- window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
- window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
+ window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
+ window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
+ window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(e){showToast(e.message||'اتصال فروشگاه برقرار نشد');return}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
  if(oldSwitch){window.switchScreenCore=function(name){const r=oldSwitch.apply(this,arguments);if(name==='shop')setTimeout(()=>renderShop(),0);return r}}
  ensureChrome();
 })();
