@@ -8482,6 +8482,7 @@ body{overflow:hidden!important}
  window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
  if(oldSwitch){window.switchScreenCore=function(name){const r=oldSwitch.apply(this,arguments);if(name==='shop')setTimeout(()=>renderShop(),0);return r}}
  ensureChrome();
+ api({action:'lock_status',payload:{}}).then(r=>{window.warneholdShopLockedItems=r.locked||[];try{renderInventory()}catch(_){}}).catch(()=>{});
 })();
 </script>
 
