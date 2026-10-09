@@ -8257,7 +8257,7 @@ body{overflow:hidden!important}
  const CATEGORY_LABELS={Weapons:'⚔️ سلاح‌ها',Armor:'🛡️ زره و دفاع',Potions:'🧪 پوشن‌ها',Accessories:'🔮 اکسسوری',Tools:'🧰 ابزار و تله',Scrolls:'📜 کتاب و طومار',Materials:'💎 مواد اولیه',Survival:'🏕️ سفر و بقا',Crafting:'🔨 آهنگری و ساخت',Relics:'🗝️ آثار باستانی',Hunting:'🏹 شکارچی',BlackMarket:'☠️ بازار سیاه'};
  const CURRENCY={gold:{icon:'🪙',label:'سکه'},gems:{icon:'💎',label:'جم'},bloodTokens:{icon:'🩸',label:'مهره خون'},ancientDust:{icon:'✨',label:'غبار باستانی'},hunterMarks:{icon:'🏹',label:'نشان شکارچی'}};
  const RARITY_LABEL={common:'معمولی',uncommon:'غیرمعمول',rare:'کمیاب',epic:'حماسی',legendary:'افسانه‌ای',mythic:'اساطیری',unique:'یگانه'};
- let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null,activeVendor='capital',extraView='catalog',shopMeta={reputation:{},favorites:[],quests:[],upgrades:{}};
+ let catalog=[],mode='buy',activeCat='Weapons',search='',sort='recommended',busy=false,loading=false,chatBusy=false,chatHistory=[],detailId=null,activeVendor='capital',extraView='catalog',tradeQty=1,shopMeta={reputation:{},favorites:[],quests:[],upgrades:{}};
  const oldBuy=window.buyItem,oldSell=window.sellItem,oldGemBuy=window.buyItemWithGems,oldSwitch=window.switchScreenCore;
  const $=s=>document.querySelector(s),esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function session(){try{return accountSession||localStorage.getItem('warnehold_account_session')||readRememberedAccount()||''}catch(_){return accountSession||''}}
@@ -8298,6 +8298,7 @@ body{overflow:hidden!important}
    const toolbar=document.createElement('div');toolbar.id='wh-shop-toolbar';toolbar.className='wh-shop-toolbar';
    toolbar.innerHTML='<input class="wh-shop-search" id="wh-shop-search" type="search" maxlength="70" placeholder="🔎 جست‌وجوی کالا..." aria-label="جست‌وجوی کالا"><select class="wh-shop-sort" id="wh-shop-sort" aria-label="مرتب‌سازی"><option value="recommended">پیشنهادی</option><option value="priceUp">ارزان‌تر</option><option value="priceDown">گران‌تر</option><option value="rarity">کمیاب‌تر</option><option value="stock">موجودی بیشتر</option></select>';
    list.parentNode.insertBefore(toolbar,list);
+   const qty=document.createElement('select');qty.id='wh-shop-qty';qty.className='wh-shop-sort';qty.setAttribute('aria-label','تعداد معامله');qty.style.marginTop='6px';qty.innerHTML='<option value="1">تعداد ۱</option><option value="2">تعداد ۲</option><option value="5">تعداد ۵</option><option value="10">تعداد ۱۰</option><option value="20">تعداد ۲۰</option>';qty.value=String(tradeQty);qty.onchange=()=>{tradeQty=Math.max(1,Math.min(20,Number(qty.value)||1))};toolbar.appendChild(qty);
   }
   if(!$('#wh-shop-extra-nav')){
    const nav=document.createElement('div');nav.id='wh-shop-extra-nav';nav.className='wh-shop-extra';
@@ -8386,6 +8387,9 @@ body{overflow:hidden!important}
  }
  async function shopAction(action,id,qty,currency,button){
   if(busy)return;const it=itemFor(id);if(!it){showToast('این آیتم در کاتالوگ معتبر نیست');return}
+  const n=Math.max(1,Math.min(20,Number(qty)||1));const c=CURRENCY[currency||it.currency]||CURRENCY.gold;const unit=(currency==='gems'&&Number(it.gemPrice)>0)?Number(it.gemPrice):Number(it.price||0);
+  const verb=action==='buy'?'خرید':action==='sell'?'فروش':'بازیافت';
+  if(!confirm(verb+' '+n+' عدد «'+it.name+'»؟'+(action==='buy'?'\nهزینه تقریبی: '+(unit*n)+' '+c.label:'')))return;qty=n;
   if(action==='buy'&&Number(it.stock)<=0){showToast('این کالا فعلاً ناموجود است');return}
   busy=true;if(button)button.disabled=true;
   try{
@@ -8427,7 +8431,12 @@ body{overflow:hidden!important}
   finally{chatBusy=false;if(btn)btn.disabled=false;input.focus()}
  }
  async function negotiateItem(id,button){if(busy)return;busy=true;if(button)button.disabled=true;try{const q=await api({action:'negotiate',payload:{itemId:id,vendorId:activeVendor}});const content=$('#wh-shop-detail-content');if(content){const box=document.createElement('div');box.className='wh-shop-extra-panel';box.innerHTML='<b>پیشنهاد فروشنده: '+Number(q.discountPercent)+'٪ تخفیف</b><div class="wh-shop-extra-note">قیمت اصلی '+Number(q.basePrice)+' · قیمت نهایی '+Number(q.finalPrice)+' · اعتبار دو دقیقه</div><button type="button" class="wh-shop-buy" data-quote-buy="1">قبول پیشنهاد و خرید</button>';content.appendChild(box);box.querySelector('[data-quote-buy]').onclick=async()=>{if(busy)return;busy=true;try{const r=await api({action:'buy_quote',payload:{quoteId:q.quoteId}});if(r.character&&state){Object.assign(state,r.character);await saveState();renderHUD();renderInventory();renderChar()}$('#wh-shop-detail').hidden=true;showToast('خرید با تخفیف ثبت شد');await renderShop()}catch(e){showToast(e.message||'خرید تخفیفی انجام نشد')}finally{busy=false}}}}catch(e){showToast(e.message||'مذاکره انجام نشد')}finally{busy=false;if(button)button.disabled=false}}
-  window.renderShop=renderShop;
+  const oldUseConsumable=window.useConsumable;
+ window.useConsumable=async function(id){
+  try{const r=await api({action:'consume',itemId:id});if(r.character&&state){Object.assign(state,r.character);await saveState();renderHUD();renderInventory();renderChar();showToast('آیتم مصرف شد: '+(itemFor(id)?.name||id)+' · +'+Number(r.amount||0)+(r.kind==='heal'?' HP':' انرژی'))}}
+  catch(e){showToast(e.message||'مصرف آیتم انجام نشد')}
+ };
+ window.renderShop=renderShop;
  window.buyItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('buy',id,1,itemFor(id).currency,null);if(oldBuy)return oldBuy(id)};
  window.buyItemWithGems=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}const it=itemFor(id);if(it&&Number(it.gemPrice)>0)return shopAction('buy',id,1,'gems',null);if(oldGemBuy)return oldGemBuy(id)};
  window.sellItem=async function(id){if(!catalog.length){try{await loadCatalog()}catch(_){}}if(itemFor(id))return shopAction('sell',id,1,null,null);if(oldSell)return oldSell(id)};
