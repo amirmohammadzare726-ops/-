@@ -7194,6 +7194,7 @@ async function reactToEnemyAttack(reaction){
   if(b.enemyWeaken>0){ dmg = Math.round(dmg*(1-b.enemyWeaken)); b.enemyWeaken=0; }
   if(b.playerShield>0){ dmg = Math.round(dmg*(1-b.playerShield)); b.playerShield=0; }
   state.hp = Math.max(0, state.hp - dmg);
+  if(window.warneholdShopDurabilityTick) window.warneholdShopDurabilityTick();
   pushLog('sys', `[Engine] ${b.enemyName} ${action==='special'?'با یک حمله ویژه':''}حمله کرد: ${dmg} آسیب`);
 
   if(reaction==='dodge_counter' && state.hp>0){
@@ -8435,7 +8436,24 @@ body{overflow:hidden!important}
   finally{chatBusy=false;if(btn)btn.disabled=false;input.focus()}
  }
  async function negotiateItem(id,button){if(busy)return;busy=true;if(button)button.disabled=true;try{const q=await api({action:'negotiate',payload:{itemId:id,vendorId:activeVendor}});const content=$('#wh-shop-detail-content');if(content){const box=document.createElement('div');box.className='wh-shop-extra-panel';box.innerHTML='<b>پیشنهاد فروشنده: '+Number(q.discountPercent)+'٪ تخفیف</b><div class="wh-shop-extra-note">قیمت اصلی '+Number(q.basePrice)+' · قیمت نهایی '+Number(q.finalPrice)+' · اعتبار دو دقیقه</div><button type="button" class="wh-shop-buy" data-quote-buy="1">قبول پیشنهاد و خرید</button>';content.appendChild(box);box.querySelector('[data-quote-buy]').onclick=async()=>{if(busy)return;busy=true;try{const r=await api({action:'buy_quote',payload:{quoteId:q.quoteId}});if(r.character&&state){Object.assign(state,r.character);await saveState();renderHUD();renderInventory();renderChar()}$('#wh-shop-detail').hidden=true;showToast('خرید با تخفیف ثبت شد');await renderShop()}catch(e){showToast(e.message||'خرید تخفیفی انجام نشد')}finally{busy=false}}}}catch(e){showToast(e.message||'مذاکره انجام نشد')}finally{busy=false;if(button)button.disabled=false}}
-  const oldUseConsumable=window.useConsumable;
+  window.equipItem=async function(itemId){
+  if(!itemId||!state)return;const def=SHOP_ITEMS.find(x=>x.id===itemId);
+  if(!def||!def.slot){showToast('این آیتم قابل تجهیز نیست');return}
+  if(!state.inventory.some(x=>x.id===itemId&&Number(x.qty)>0)){showToast('این آیتم در کوله‌پشتی نیست');return}
+  if(state.level<itemLevelReq(def)){showToast('سطح شخصیت برای این تجهیزات کافی نیست');return}
+  try{const r=await api({action:'equip',payload:{itemId}});if(r.character)Object.assign(state,r.character);await saveState();renderChar();renderInventory();renderHUD();showToast(def.name+' تجهیز شد')}
+  catch(e){showToast(e.message||'تجهیز کردن انجام نشد')}
+ };
+ window.unequipItem=async function(slotId){
+  if(!state?.equipment?.[slotId])return;
+  try{const r=await api({action:'unequip',payload:{slot:slotId}});if(r.character)Object.assign(state,r.character);await saveState();renderChar();renderInventory();renderHUD();showToast('تجهیزات باز شد')}
+  catch(e){showToast(e.message||'بازکردن تجهیزات انجام نشد')}
+ };
+ window.warneholdShopDurabilityTick=async function(){
+  try{const r=await api({action:'durability',payload:{}});if(r.upgrades&&state){state.equipUpgrades=r.upgrades;shopMeta.upgrades=r.upgrades;await saveState();renderChar();renderHUD()}}
+  catch(e){console.warn('server durability tick failed',e)}
+ };
+ const oldUseConsumable=window.useConsumable;
  window.useConsumable=async function(id){
   try{const r=await api({action:'consume',itemId:id});if(r.character&&state){Object.assign(state,r.character);await saveState();renderHUD();renderInventory();renderChar();showToast('آیتم مصرف شد: '+(itemFor(id)?.name||id)+' · +'+Number(r.amount||0)+(r.kind==='heal'?' HP':' انرژی'))}}
   catch(e){showToast(e.message||'مصرف آیتم انجام نشد')}
