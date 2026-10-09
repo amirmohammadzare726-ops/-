@@ -8362,7 +8362,7 @@ body{overflow:hidden!important}
    }).join('')+'</div>';
   }
  }
- async function renderShop(){
+ async async function renderShop(){
   ensureChrome();const list=$('#shop-list');if(list)list.innerHTML='<div class="wh-shop-empty">در حال بازکردن بازار و بررسی موجودی سرور...</div>';
   try{await loadCatalog();ensureChrome();if(!catalog.some(i=>i.cat===activeCat))activeCat=(catalog.find(i=>i.cat)?.cat)||'Weapons';drawTabs();renderCurrencyPills();drawList()}
   catch(e){console.error('Warnehold shop catalog error',e);if(list)list.innerHTML='<div class="wh-shop-empty">اتصال فروشگاه برقرار نشد: '+esc(e.message)+'<br><button type="button" class="wh-shop-detail-btn" id="wh-shop-retry" style="margin-top:10px">تلاش دوباره</button></div>';$('#wh-shop-retry')?.addEventListener('click',renderShop)}
@@ -9673,4 +9673,5 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 setInterval(()=>{try{if(window.state)init();}catch(e){console.debug("WW init",e)}},3000);
 window.whLivingWorld={npcs:NPCS,missions:MISSIONS,events:EVENTS,open:openWorld,render:renderLivingWorld,activeEvent:activeEvent};
 })();
-</script>\n</html>
+</script>
+</html>
