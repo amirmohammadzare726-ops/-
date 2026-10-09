@@ -8284,7 +8284,7 @@ body{overflow:hidden!important}
  async function loadCatalog(){
   if(catalogPromise)return catalogPromise;
   loading=true;
-  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items.map(it=>({...it,id:it.id||it.item_id,cat:it.cat||it.category})):[];if(!catalog.length)throw new Error('فهرست فروشگاه خالی است');mergeDefinitions();return catalog}finally{loading=false}})();
+  catalogPromise=(async()=>{try{const data=await api({action:'catalog'});catalog=Array.isArray(data.items)?data.items.filter(it=>it&&typeof it==='object').map(it=>({...it,id:String(it.id||it.item_id||''),cat:String(it.cat||it.category||'').trim(),name:String(it.name||'کالای ناشناس'),desc:String(it.desc||''),price:Math.max(0,Number(it.price)||0),gemPrice:Math.max(0,Number(it.gemPrice)||0),stock:Math.max(0,Number(it.stock)||0),levelReq:Math.max(1,Number(it.levelReq)||1),sellPrice:Math.max(0,Number(it.sellPrice)||0),rarity:String(it.rarity||'common'),currency:CURRENCY[it.currency]?it.currency:'gold'})).filter(it=>it.id&&it.cat&&it.price>0):[];if(!catalog.length)throw new Error('فهرست معتبر فروشگاه خالی است؛ کاتالوگ سرور را بررسی کن');mergeDefinitions();return catalog}finally{loading=false}})();
   try{return await catalogPromise}finally{catalogPromise=null}
  }
  function ensureChrome(){
@@ -8325,7 +8325,7 @@ body{overflow:hidden!important}
  function drawTabs(){
   const tabs=$('#shop-tabs');if(!tabs)return;
   const modeRow='<div class="wh-shop-mode-row">'+[['buy','🛒 خرید'],['sell','💰 فروش'],['salvage','♻️ بازیافت']].map(([m,l])=>'<button type="button" class="shop-tab '+(mode===m?'active':'')+'" data-shop-mode="'+m+'">'+l+'</button>').join('')+'</div>';
-  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+CATEGORY_ORDER.filter(c=>catalog.some(i=>i.cat===c)).map(c=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+c+'">'+esc(CATEGORY_LABELS[c]||c)+'</button>').join('')+'</div>':'';
+  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+[...new Set([...CATEGORY_ORDER.filter(c=>catalog.some(i=>i.cat===c)),...catalog.map(i=>i.cat)])].filter(c=>catalog.some(i=>i.cat===c)).map(c=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+esc(c)+'">'+esc(CATEGORY_LABELS[c]||c)+'</button>').join('')+'</div>':'';
   tabs.innerHTML=modeRow+cats;
  }
  function sortedItems(items){
@@ -8333,7 +8333,7 @@ body{overflow:hidden!important}
   if(sort==='priceUp')a.sort((x,y)=>x.price-y.price);else if(sort==='priceDown')a.sort((x,y)=>y.price-x.price);else if(sort==='rarity')a.sort((x,y)=>(rv[y.rarity]||0)-(rv[x.rarity]||0));else if(sort==='stock')a.sort((x,y)=>(y.stock||0)-(x.stock||0));else a.sort((x,y)=>(rv[x.rarity]||0)-(rv[y.rarity]||0)||x.price-y.price);
   return a;
  }
- function canAfford(it,currency){const main=it.currency||'gold';const key=currency||main;const price=(currency==='gems'&&main!=='gems')?(Number(it.gemPrice)||0):(Number(it.price)||0);return balance(key)>=price}
+ function canAfford(it,currency){const main=CURRENCY[it.currency]?it.currency:'gold';const key=currency||main;if(!CURRENCY[key])return false;const price=(key==='gems'&&main!=='gems')?Number(it.gemPrice):Number(it.price);if(!Number.isFinite(price)||price<=0)return false;return balance(key)>=price}
  function drawList(){
   const list=$('#shop-list');if(!list)return;
   if(!catalog.length){list.innerHTML='<div class="wh-shop-empty">کاتالوگ فروشگاه هنوز بارگذاری نشده. فروشگاه را دوباره باز کن.</div>';return}
@@ -8343,11 +8343,11 @@ body{overflow:hidden!important}
    items=sortedItems(items);
    if(!items.length){list.innerHTML='<div class="wh-shop-empty">کالایی با این مشخصات پیدا نشد.</div>';return}
    list.innerHTML='<div class="wh-shop-grid">'+items.map(it=>{
-    const c=CURRENCY[it.currency]||CURRENCY.gold,stock=Number(it.stock)||0,disabled=stock<=0||!canAfford(it,it.currency);
+    const c=CURRENCY[it.currency]||CURRENCY.gold,stock=Number(it.stock)||0,tooHigh=(Number(state?.level)||1)<(Number(it.levelReq)||1),disabled=stock<=0||tooHigh||!canAfford(it,it.currency);
     const stockText=stock<=0?'ناموجود':('موجودی '+stock.toLocaleString('fa-IR'));
     const alt=Number(it.gemPrice)>0?'<button type="button" class="wh-shop-buy alt" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="gems" '+((stock<=0||balance('gems')<Number(it.gemPrice))?'disabled':'')+'>💎 '+Number(it.gemPrice).toLocaleString('fa-IR')+' جم</button>':'';
     const mod=it.mod&&Object.keys(it.mod).length?Object.entries(it.mod).map(([k,v])=>({atk:'حمله',def:'دفاع',magic:'جادو',spd:'سرعت',crit:'ضربه بحرانی',luck:'شانس',hp:'جان',energy:'انرژی'}[k]||k)+' '+(v>0?'+':'')+v).join(' · '):'';
-    return '<article class="wh-item-card rarity-'+esc(it.rarity||'common')+'"><div class="wh-item-top"><div class="wh-item-icon">'+esc(it.icon||'📦')+'</div><div class="wh-item-heading"><div class="wh-item-name">'+esc(it.name)+'</div><span class="wh-item-rarity r-'+esc(it.rarity||'common')+'">'+esc(RARITY_LABEL[it.rarity]||it.rarity||'معمولی')+'</span></div></div><div class="wh-item-desc">'+esc(it.desc||'کالای وارنهولد')+(mod?'<br><span style="color:#d8bd83">'+esc(mod)+'</span>':'')+'</div><div class="wh-item-meta"><span class="wh-stock '+(stock<=0?'empty':'')+'">'+stockText+'</span><span>Lv '+Number(it.levelReq||1)+'</span></div><div class="wh-item-price">'+esc(c.icon)+' '+Number(it.price||0).toLocaleString('fa-IR')+' '+esc(c.label)+'</div><div class="wh-item-actions"><button type="button" class="wh-shop-buy" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="'+esc(it.currency||'gold')+'" '+(disabled?'disabled':'')+'>'+(stock<=0?'ناموجود':(!canAfford(it,it.currency)?'ارز کافی نیست':'خرید'))+'</button>'+alt+'<button type="button" class="wh-shop-detail-btn" data-shop-action="details" data-item-id="'+esc(it.id)+'">جزئیات آیتم</button></div></article>';
+    return '<article class="wh-item-card rarity-'+esc(it.rarity||'common')+'"><div class="wh-item-top"><div class="wh-item-icon">'+esc(it.icon||'📦')+'</div><div class="wh-item-heading"><div class="wh-item-name">'+esc(it.name)+'</div><span class="wh-item-rarity r-'+esc(it.rarity||'common')+'">'+esc(RARITY_LABEL[it.rarity]||it.rarity||'معمولی')+'</span></div></div><div class="wh-item-desc">'+esc(it.desc||'کالای وارنهولد')+(mod?'<br><span style="color:#d8bd83">'+esc(mod)+'</span>':'')+'</div><div class="wh-item-meta"><span class="wh-stock '+(stock<=0?'empty':'')+'">'+stockText+'</span><span>Lv '+Number(it.levelReq||1)+'</span></div><div class="wh-item-price">'+esc(c.icon)+' '+Number(it.price||0).toLocaleString('fa-IR')+' '+esc(c.label)+'</div><div class="wh-item-actions"><button type="button" class="wh-shop-buy" data-shop-action="buy" data-item-id="'+esc(it.id)+'" data-currency="'+esc(it.currency||'gold')+'" '+(disabled?'disabled':'')+'>'+(stock<=0?'ناموجود':(tooHigh?'نیاز به سطح '+Number(it.levelReq):(!canAfford(it,it.currency)?'ارز کافی نیست':'خرید')))+'</button>'+alt+'<button type="button" class="wh-shop-detail-btn" data-shop-action="details" data-item-id="'+esc(it.id)+'">جزئیات آیتم</button></div></article>';
    }).join('')+'</div>';
   }else{
    const inv=Array.isArray(state?.inventory)?state.inventory:[];
@@ -8356,7 +8356,7 @@ body{overflow:hidden!important}
    if(!filtered.length){list.innerHTML='<div class="wh-shop-empty">'+(mode==='sell'?'کالای قابل فروش این بازار در انبار نیست.':'آیتم قابل بازیافتی در انبار نیست.')+'</div>';return}
    list.innerHTML='<div class="wh-shop-grid">'+filtered.map(({owned,def})=>{
     const equipped=Object.values(state.equipment||{}).filter(x=>x===owned.id).length,available=Math.max(0,(Number(owned.qty)||0)-equipped);
-    const sellPrice=Number(def?.sellPrice)||Math.max(1,Math.round((Number(def?.price)||5)*.45));
+    const sellPrice=Number(def?.sellPrice)>0?Number(def.sellPrice):Math.max(1,Math.round((Number(def?.price)||5)*.45));
     const salvage=def&&def.salvageCurrency&&Number(def.salvageValue)>0;
     const currency=CURRENCY[def?.salvageCurrency]||CURRENCY.gold;
     const action=mode==='sell'?'sell':'salvage';
@@ -8372,6 +8372,9 @@ body{overflow:hidden!important}
  async function shopAction(action,id,qty,currency,button){
   if(busy)return;const it=itemFor(id);if(!it){showToast('این آیتم در کاتالوگ معتبر نیست');return}
   if(action==='buy'&&Number(it.stock)<=0){showToast('این کالا فعلاً ناموجود است');return}
+  if(action==='buy'&&(Number(state?.level)||1)<(Number(it.levelReq)||1)){showToast('برای خرید این کالا به سطح '+Number(it.levelReq||1)+' نیاز داری');return}
+  if(action==='buy'&&!canAfford(it,currency||it.currency)){showToast('موجودی ارز برای این خرید کافی نیست');return}
+  if(action==='sell'){const owned=(state?.inventory||[]).find(x=>x.id===id);const equipped=Object.values(state?.equipment||{}).filter(x=>x===id).length;if(!owned||Number(owned.qty||0)-equipped<1){showToast('این آیتم در دسترس فروش نیست یا مجهز شده');return}}
   busy=true;if(button)button.disabled=true;
   try{
    const result=await api({action,itemId:id,qty:qty||1,currency:currency||null});
