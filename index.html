@@ -9964,7 +9964,7 @@ const oldRenderMap=window.renderMap;
 function pct(id){return Math.max(0,Math.min(100,Math.round((state.regionExploration&&state.regionExploration[id])||0)))}
 function known(id){return (state.discoveredRegions||[]).includes(id)}
 function addPanel(){
- const list=document.getElementById('region-list');if(!list||!window.REGIONS)return;
+ const list=document.getElementById('region-list');if(!list||typeof REGIONS==='undefined')return;
  let panel=document.getElementById('wh-region-expedition');if(panel)panel.remove();
  panel=document.createElement('section');panel.id='wh-region-expedition';
  const cards=IDS.map(id=>{
