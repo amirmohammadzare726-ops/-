@@ -5135,25 +5135,28 @@ function degradeEquipmentOnDefeat(){
     state.equipUpgrades[itemId] = {level: info.level, durability:newDur};
   });
 }
-function equipItem(itemId){
-  const def = SHOP_ITEMS.find(x=>x.id===itemId);
-  if(!def || !def.slot) return;
-  const owned = state.inventory.find(x=>x.id===itemId);
-  if(!owned) return;
-  const req = itemLevelReq(def);
-  if(state.level < req){ showToast(`این تجهیزات به Level ${req} نیاز دارد`); return; }
-  if(!state.equipment) state.equipment = {};
-  state.equipment[def.slot] = itemId;
-  saveState();
-  renderChar(); renderInventory(); renderHUD();
-  showToast(`${def.name} تجهیز شد`);
-  if(def.rarity==='legendary') checkAchievement('first_legendary');
+async function equipItem(itemId){
+  const def=SHOP_ITEMS.find(x=>x.id===itemId);
+  if(!def||!def.slot)return;
+  if(!state.inventory.some(x=>x.id===itemId)){showToast('این آیتم در کوله‌پشتی نیست');return;}
+  if(state.level<itemLevelReq(def)){showToast('سطح شخصیت برای این تجهیزات کافی نیست');return;}
+  if(!window.warneholdShopAction){showToast('ارتباط امن تجهیزات آماده نیست');return;}
+  try{
+    const result=await window.warneholdShopAction('equip',itemId);
+    if(!result?.ok||!result.character)throw new Error(result?.error||'تجهیز ذخیره نشد');
+    state={...state,...result.character};await saveState();
+    renderChar();renderInventory();renderHUD();showToast(def.name+' تجهیز شد');
+    if(def.rarity==='legendary')checkAchievement('first_legendary');
+  }catch(error){showToast(error?.message||'تجهیز انجام نشد');}
 }
-function unequipItem(slotId){
-  if(!state.equipment || !state.equipment[slotId]) return;
-  state.equipment[slotId] = null;
-  saveState();
-  renderChar(); renderInventory(); renderHUD();
+async function unequipItem(slotId){
+  if(!state.equipment||!state.equipment[slotId])return;
+  if(!window.warneholdShopAction){showToast('ارتباط امن تجهیزات آماده نیست');return;}
+  try{
+    const result=await window.warneholdShopAction('unequip',slotId);
+    if(!result?.ok||!result.character)throw new Error(result?.error||'بازکردن تجهیز ذخیره نشد');
+    state={...state,...result.character};await saveState();renderChar();renderInventory();renderHUD();
+  }catch(error){showToast(error?.message||'بازکردن تجهیز انجام نشد');}
 }
 
 let state = null; // player state, persisted
