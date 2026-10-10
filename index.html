@@ -8684,16 +8684,18 @@ body{overflow:hidden!important}
 
 
 <style id="wh-background-final-fix">
-/* FIX: the runtime sets .screen background-image:none!important and paints artwork on ::before.
-   Apply the assets to that real layer, after every older style block. */
-#screen-auth{background-image:url('/assets/warnehold-bg-auth.svg')!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
-#screen-start::before{content:"";position:absolute;inset:0;z-index:-3!important;background-image:url('/assets/warnehold-bg-auth.svg')!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;opacity:1!important;pointer-events:none!important}
-#screen-map::before{background-image:url('/assets/warnehold-bg-world.svg')!important;opacity:1!important}
-#screen-worldmap::before,#screen-village-map::before,#screen-journey::before,#screen-wh-world::before,#screen-wh-creatures::before{background-image:url('/assets/warnehold-bg-world.svg')!important;opacity:1!important}
-#screen-battle::before,#screen-pvp::before,#screen-boss-event::before{background-image:url('/assets/warnehold-bg-battle.svg')!important;opacity:1!important}
-#screen-shop::before,#screen-animeshop::before,#screen-auction::before,#screen-blacksmith::before,#screen-transfer::before{background-image:url('/assets/warnehold-bg-shop.svg')!important;opacity:1!important}
-#screen-welcome::before,#screen-quest::before,#screen-job::before,#screen-social::before,#screen-chat::before,#screen-notifcenter::before,#screen-collection::before,#screen-inv::before,#screen-char::before{background-image:url('/assets/warnehold-bg-world.svg')!important;opacity:.88!important}
-#game-wrap .screen::before{background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;pointer-events:none!important}
+/* Restore the original photographic backgrounds. Keep artwork behind controls. */
+#game-wrap .screen{position:relative!important;isolation:isolate!important;overflow:hidden;background-color:transparent!important;background-image:none!important}
+#game-wrap .screen::before{content:"";position:absolute;inset:0;z-index:0!important;pointer-events:none!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;opacity:1!important;transform:scale(1.015)}
+#game-wrap .screen::after{content:"";position:absolute;inset:0;z-index:1!important;pointer-events:none!important;background:linear-gradient(180deg,rgba(8,7,6,.18),rgba(8,7,6,.64))}
+#game-wrap .screen>*{position:relative;z-index:2}
+#screen-auth{background-image:linear-gradient(rgba(8,7,6,.24),rgba(8,7,6,.64)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg')!important;background-size:cover!important;background-position:center!important}
+#screen-start::before,#screen-welcome::before{background-image:url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important}
+#screen-map::before,#screen-char::before,#screen-inv::before,#screen-social::before,#screen-chat::before,#screen-notifcenter::before,#screen-transfer::before,#screen-collection::before{background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg')!important}
+#screen-worldmap::before,#screen-village-map::before,#screen-journey::before,#screen-wh-world::before,#screen-wh-creatures::before{background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f171f5f3-ab32-418d-b2cb-0cdbf636a751.jpg')!important}
+#screen-battle::before,#screen-pvp::before,#screen-boss-event::before{background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/4c513103-7b0c-477e-ac43-0c4248d9e3ec.jpg')!important}
+#screen-shop::before,#screen-animeshop::before,#screen-auction::before,#screen-blacksmith::before{background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg')!important}
+#screen-quest::before,#screen-job::before{background-image:url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important}
 </style>
 </body>
 
