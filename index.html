@@ -5660,7 +5660,7 @@ function renderMap(){
   list.appendChild(exploreCard);
 }
 
-async function exploreAction(){
+async async function exploreAction(){
   bumpDaily('daily_explore', 1);
   const undiscoveredRegions = REGION_DISCOVERY_ORDER.filter(id=> !(state.discoveredRegions||[]).includes(id) && REGIONS[id] && REGIONS[id].minLevel <= state.level+2);
   const currentHidden = Object.entries(HIDDEN_LOCATIONS).filter(([hid,h])=> h.region===state.region && !state.discoveredLocations.includes(hid) && state.level>=h.minLevel);
@@ -5698,7 +5698,7 @@ async function exploreAction(){
   }
 }
 
-async function travelTo(id){
+async async function travelTo(id){
   if(!REGIONS[id]) return;
   if(isRegionLocked(id)){ showToast(`🔒 ${REGIONS[id].name} هنوز باز نشده — ${regionLockReason(id)}`); return; }
   // Update 11: هزینه سفر — فقط برای مناطق خارج از خوشه خانه بازیکن، و فقط وقتی واقعاً وارد یک منطقه جدید می‌شویم
