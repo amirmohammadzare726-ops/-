@@ -6094,6 +6094,7 @@ function renderInventory(){
     const row = document.createElement('div');
     row.className='item-row';
     const def = SHOP_ITEMS.find(x=>x.id===item.id);
+    const art = document.createElement('div'); art.className='wh-inv-art rarity-'+(def?.rarity||'common'); art.setAttribute('aria-hidden','true'); art.textContent=def?.icon||'📦'; row.appendChild(art);
     const equippedElsewhere = def && def.slot && state.equipment && state.equipment[def.slot]===item.id;
     const req = def ? itemLevelReq(def) : 1;
     const levelOk = state.level >= req;
@@ -8231,6 +8232,8 @@ body{overflow:hidden!important}
 #screen-shop.wh-shop-v2 .wh-item-art:before{content:'';position:absolute;inset:-50%;z-index:-1;background:conic-gradient(from 20deg,transparent,#d7b56820,transparent,#a98bff20,transparent);animation:whItemOrbit 14s linear infinite}
 #screen-shop.wh-shop-v2 .wh-item-art:after{content:'';position:absolute;left:12%;right:12%;bottom:10px;height:1px;background:linear-gradient(90deg,transparent,var(--art-glow,#d7b568aa),transparent);box-shadow:0 0 14px var(--art-glow,#d7b56866)}
 #screen-shop.wh-shop-v2 .wh-item-art .wh-item-art-symbol{font-size:43px;line-height:1.2;filter:drop-shadow(0 0 12px var(--art-glow,#d7b56866));animation:whItemFloat 3.6s ease-in-out infinite}
+.item-row .wh-inv-art{flex:none;width:48px;height:48px;display:grid;place-items:center;border:1px solid #d8bd8355;border-radius:10px;background:radial-gradient(circle at 50% 35%,#b58b4c44,transparent 68%),linear-gradient(145deg,#302535,#111016);font-size:25px;filter:drop-shadow(0 0 8px #d7b56818)}
+.item-row .wh-inv-art.rarity-rare{border-color:#62b7ff88;background:radial-gradient(circle,#62b7ff30,transparent 70%),#17131e}.item-row .wh-inv-art.rarity-epic{border-color:#bd7cff99;background:radial-gradient(circle,#bd7cff30,transparent 70%),#17131e}.item-row .wh-inv-art.rarity-legendary{border-color:#f5c75e99;background:radial-gradient(circle,#f5c75e30,transparent 70%),#17131e}.item-row .wh-inv-art.rarity-mythic{border-color:#e88bff99;background:radial-gradient(circle,#e88bff30,transparent 70%),#17131e}
 #screen-shop.wh-shop-v2 .wh-item-art .wh-item-art-label{position:absolute;bottom:16px;right:8px;left:8px;text-align:center;font-size:9px;letter-spacing:1.5px;color:#d9c7a0a8;text-transform:uppercase}
 #screen-shop.wh-shop-v2 .rarity-uncommon .wh-item-art{--art-glow:#68cb8a66;border-color:#68cb8a55}
 #screen-shop.wh-shop-v2 .rarity-rare .wh-item-art{--art-glow:#62b7ff70;border-color:#62b7ff66}
