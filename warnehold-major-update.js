@@ -12,8 +12,8 @@ const modes=[
 ];
 const quickPrompts=[
  {mode:'guide',text:'برای پیشرفت الان بهتره چه کاری انجام بدم؟'},
- {mode:'quest',text:'یک مأموریت متناسب با سطح و منطقه فعلی من پیشنهاد بده.'},
- {mode:'world',text:'یک رویداد داستانی جذاب برای منطقه فعلی بساز.'},
+ {mode:'quest',text:'برای سطح و منطقه فعلی من یک مأموریت تازه پیشنهاد بده؛ هدف، دو مرحله، خطر و پاداش پیشنهادی را مشخص کن و روشن بگو ثبت نشده است.'},
+ {mode:'world',text:'رویداد پویای امروز را برای منطقه فعلی من بساز؛ نشانه، اتفاق اصلی، دو انتخاب و پیامد احتمالی هر انتخاب را بنویس.'},
  {mode:'boss_director',text:'برای رویداد امروز یک باس تازه با ظاهر، فازها و نقطه‌ضعف منحصربه‌فرد طراحی کن.'},
  {mode:'battle',text:'با توجه به وضعیت فعلی بازی، چند نکته برای فایت بگو.'}
 ];
@@ -54,6 +54,7 @@ function build(){
    const gameContext=typeof ai.context==='function'?(ai.context(activeMode)||{}):{};
    const context={...gameContext,source:'floating_companion',activeScreen:document.querySelector('.screen.active')?.id||'',requestedAt:new Date().toISOString()};
    if(activeMode==='boss_director'){context.action='generate';context.eventDate=new Date().toISOString().slice(0,10);context.seed='warnehold-boss-'+context.eventDate;}
+   if(activeMode==='world'||activeMode==='quest'){context.eventDate=new Date().toISOString().slice(0,10);context.seed='warnehold-'+activeMode+'-'+context.eventDate+'-'+String(context.screen||'world');}
    const result=await ai.ask(message,activeMode,context);
    output.textContent=(result&&result.answer)||'پاسخی دریافت نشد.';
    input.value='';
