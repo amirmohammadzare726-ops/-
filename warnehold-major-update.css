@@ -60,3 +60,12 @@ button:active{filter:brightness(1.12)}
 .wh-major-ai-quick button:active{transform:scale(.98);background:rgba(105,77,151,.24)}
 .wh-major-ai-quick button:focus-visible{outline:2px solid #c6a8ff;outline-offset:2px}
 @media(max-width:420px){.wh-major-ai-quick button{max-width:185px;font-size:11px}}
+
+/* Stage 2: lightweight illustrated game backdrops (SVG, cached locally). */
+#screen-auth{background-image:linear-gradient(180deg,rgba(5,6,15,.34),rgba(5,6,15,.80)),url('/assets/warnehold-bg-auth.svg')!important;background-size:cover,cover!important;background-position:center!important;background-repeat:no-repeat!important;background-attachment:scroll!important}
+#screen-start,#screen-welcome{background-image:linear-gradient(180deg,rgba(6,8,17,.70),rgba(6,8,17,.91)),url('/assets/warnehold-bg-auth.svg')!important;background-size:cover,cover!important;background-position:center!important;background-repeat:no-repeat!important}
+#screen-map,#screen-worldmap,#screen-village-map,#screen-journey,#screen-wh-world,#screen-wh-creatures{background-image:linear-gradient(180deg,rgba(5,12,19,.70),rgba(5,12,19,.90)),url('/assets/warnehold-bg-world.svg')!important;background-size:cover,cover!important;background-position:center!important;background-repeat:no-repeat!important}
+#screen-battle,#screen-boss-event,#screen-pvp{background-image:linear-gradient(180deg,rgba(13,5,13,.72),rgba(7,8,15,.91)),url('/assets/warnehold-bg-battle.svg')!important;background-size:cover,cover!important;background-position:center!important;background-repeat:no-repeat!important}
+#screen-shop,#screen-animeshop,#screen-blacksmith,#screen-auction,#screen-transfer{background-image:linear-gradient(180deg,rgba(9,8,22,.72),rgba(7,8,16,.92)),url('/assets/warnehold-bg-shop.svg')!important;background-size:cover,cover!important;background-position:center!important;background-repeat:no-repeat!important}
+#screen-social,#screen-chat,#screen-collection,#screen-inv,#screen-quest,#screen-job,#screen-notifcenter{background-image:linear-gradient(180deg,rgba(7,10,18,.78),rgba(7,8,15,.94)),url('/assets/warnehold-bg-world.svg')!important;background-size:cover,cover!important;background-position:center!important;background-repeat:no-repeat!important}
+@media(prefers-reduced-motion:reduce){#screen-auth,#screen-start,#screen-map,#screen-worldmap,#screen-battle,#screen-boss-event,#screen-shop{background-attachment:scroll!important}}
