@@ -10099,11 +10099,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #screen-auth .auth-explosion::after{animation:burstRing 1.05s cubic-bezier(.1,.8,.2,1) both}
 @media(prefers-reduced-motion:reduce){#screen-auth .auth-explosion{display:none!important}}
 
-<style id="wh-transparent-panels-final-v1">
-/* Keep the artwork visible through UI panels; retain readable, compact controls. */
-.screen::after{
-  background:linear-gradient(180deg,rgba(7,6,5,.07),rgba(7,6,5,.24) 88%)!important;
-}
+<style id="wh-transparent-panels-final-v2">
+/* Final panel transparency pass: override older opaque panel rules without touching screen artwork or game logic. */
+.screen.active .panel,
+.screen.active .card,
+.screen.active .box,
+.screen.active .modal:not(.item-modal-backdrop),
+.screen.active .section-card,
+.screen.active .list-card,
+.screen.active [class*="-panel"]:not(.item-modal-backdrop),
+.screen.active [class*="-card"],
 .screen.active .region,
 .screen.active .enemy-card,
 .screen.active .combat-log,
@@ -10122,52 +10127,73 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .screen.active .chat-sub,
 .screen.active .chat-messages,
 .screen.active .power-row,
-.screen.active #power-panel,
-.screen.active #battle-item-panel,
 .screen.active .village-map-wrap,
 .screen.active .trade-col,
 .screen.active .craft-card,
 .screen.active .rank-row,
-.screen.active .admin-quest-row{
-  background-color:rgba(18,14,11,.38)!important;
-  background-image:linear-gradient(135deg,rgba(255,255,255,.035),rgba(0,0,0,.08))!important;
-  border-color:rgba(201,162,75,.24)!important;
-  box-shadow:0 5px 18px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.035)!important;
-  backdrop-filter:blur(2px) saturate(1.06)!important;
-  -webkit-backdrop-filter:blur(2px) saturate(1.06)!important;
+.screen.active .admin-quest-row,
+#wh-settings-screen .wh-setting-card,
+#wh-more-panel,
+#wh-secondary-back,
+#wh-game-nav,
+#wh-game-nav button,
+#screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab,
+#screen-shop.wh-shop-v2 .wh-shop-search,
+#screen-shop.wh-shop-v2 .wh-shop-sort,
+#screen-shop.wh-shop-v2 .wh-shop-detail-btn,
+#screen-shop.wh-shop-v2 .wh-shop-empty,
+#screen-shop.wh-shop-v2 .wh-shop-ai-msg,
+#screen-shop.wh-shop-v2 .wh-shop-stat,
+#screen-battle .enemy-card,
+#screen-battle .combat-log,
+#screen-char .identity-card,
+#screen-worldmap .region,
+#screen-village-map .region {
+  background-color: rgba(18,14,11,.22)!important;
+  background-image: none!important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.10)!important;
+  border-color: rgba(201,162,75,.22)!important;
+  backdrop-filter: blur(1px)!important;
+  -webkit-backdrop-filter: blur(1px)!important;
 }
-.screen.active .chat-messages{background-color:rgba(12,10,15,.32)!important}
-.screen.active .msg-bubble{background-color:rgba(18,14,11,.38)!important}
+.screen.active .chat-messages {background-color:rgba(12,10,15,.20)!important}
+.screen.active .msg-bubble {background-color:rgba(18,14,11,.24)!important;background-image:none!important}
 .screen.active button.secondary,
 .screen.active .action-btn,
 .screen.active .buy-btn,
 .screen.active .mini-btn,
 .screen.active .shop-tab,
-.screen.active .chat-tab{
-  background-color:rgba(20,15,12,.42)!important;
+.screen.active .chat-tab,
+#wh-game-nav button {
+  background-color:rgba(20,15,12,.28)!important;
   background-image:none!important;
-  backdrop-filter:blur(2px)!important;
-  -webkit-backdrop-filter:blur(2px)!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.10)!important;
+  backdrop-filter:blur(1px)!important;
+  -webkit-backdrop-filter:blur(1px)!important;
 }
 .screen.active .shop-tab.active,
-.screen.active .chat-tab.active{background:var(--gold)!important}
+.screen.active .chat-tab.active {background:var(--gold)!important}
 .screen.active .section-title,
 .screen.active .ww-hero,
-.screen.active .ww-tabs{background-color:transparent!important}
+.screen.active .ww-tabs,
 #screen-auth .auth-shell,
 #screen-auth .auth-panel,
-#screen-auth .auth-step{
-  background:transparent!important;
-  background-color:transparent!important;
-  box-shadow:none!important;
-  backdrop-filter:none!important;
-  -webkit-backdrop-filter:none!important;
-}
+#screen-auth .auth-step,
 #screen-start .seal,
 #screen-start h1,
 #screen-start .tagline,
 #screen-start .step-track,
-#screen-start .cstep{background-color:transparent!important}
+#screen-start .cstep {
+  background-color:transparent!important;
+  background-image:none!important;
+}
+#screen-auth .auth-shell,
+#screen-auth .auth-panel,
+#screen-auth .auth-step {
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
 </style>
 </style>
 </html>
