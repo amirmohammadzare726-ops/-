@@ -8221,7 +8221,7 @@ body{overflow:hidden!important}
 #screen-shop.wh-shop-v2 .wh-shop-mode-row .shop-tab.active{background:linear-gradient(135deg,#e8c66e,#a87832);color:#21150a;border-color:#f5d78a;box-shadow:0 0 16px #d4a34a25}
 #screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab{border-radius:9px;background:#19151d;border-color:#42313b;color:#c8bba9;padding:8px 10px;font-family:inherit;font-size:12px}
 #screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab.active{background:linear-gradient(135deg,#3c2733,#6e3436);border-color:#c49a51;color:#ffe7b2;box-shadow:inset 0 0 0 1px #f5d99422}
-#screen-shop.wh-shop-v2 #wh-shop-toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important;align-items:center!important;flex:none!important} #screen-shop.wh-shop-v2 #wh-shop-extra-nav{display:none!important} #screen-shop.wh-shop-v2 #wh-shop-hero{display:none!important} #screen-shop.wh-shop-v2 #shop-tabs{display:block!important;flex:none!important;min-height:32px!important} #screen-shop.wh-shop-v2 #shop-list{display:block!important;visibility:visible!important;opacity:1!important;flex:1 1 auto!important;min-height:180px!important;overflow-y:auto!important} #screen-shop.wh-shop-v2 #wh-shop-rarity-filter,#screen-shop.wh-shop-v2 #wh-shop-currency-filter{display:none!important}
+#screen-shop.wh-shop-v2 #wh-shop-toolbar{display:none!important} #screen-shop.wh-shop-v2 #wh-shop-extra-nav{display:none!important} #screen-shop.wh-shop-v2 #wh-shop-hero{display:none!important} #screen-shop.wh-shop-v2 #shop-tabs{display:block!important;flex:none!important;min-height:32px!important} #screen-shop.wh-shop-v2 #shop-list{display:block!important;visibility:visible!important;opacity:1!important;flex:1 1 auto!important;min-height:180px!important;overflow-y:auto!important} #screen-shop.wh-shop-v2 #wh-shop-rarity-filter,#screen-shop.wh-shop-v2 #wh-shop-currency-filter{display:none!important}
 #screen-shop.wh-shop-v2 .wh-shop-search{flex:1;min-width:0;border:1px solid #6e5639;background:#100d14;color:#f8e8c9;border-radius:10px;padding:10px 11px;font-size:13px;outline:none}
 #screen-shop.wh-shop-v2 .wh-shop-search:focus{border-color:#e4bd68;box-shadow:0 0 0 2px #e4bd6822}
 #screen-shop.wh-shop-v2 .wh-shop-sort{max-width:118px;border:1px solid #6e5639;background:#19141c;color:#f4dfb6;border-radius:10px;padding:9px 6px;font-size:11px}
@@ -8358,16 +8358,8 @@ body{overflow:hidden!important}
  function ensureChrome(){
   const screen=$('#screen-shop');if(!screen)return;screen.classList.add('wh-shop-v2');
   const tabs=$('#shop-tabs'),list=$('#shop-list');if(!tabs||!list)return;
-  /* cinematic expansion hero removed to restore classic shop header */  if(!$('#wh-shop-toolbar')){
-   const toolbar=document.createElement('div');toolbar.id='wh-shop-toolbar';toolbar.className='wh-shop-toolbar';
-   toolbar.innerHTML='<input class="wh-shop-search" id="wh-shop-search" type="search" maxlength="70" placeholder="🔎 جست‌وجوی کالا..." aria-label="جست‌وجوی کالا"><select class="wh-shop-sort" id="wh-shop-sort" aria-label="مرتب‌سازی"><option value="recommended">پیشنهادی</option><option value="priceUp">ارزان‌تر</option><option value="priceDown">گران‌تر</option><option value="rarity">کمیاب‌تر</option><option value="stock">موجودی بیشتر</option></select>';
-   list.parentNode.insertBefore(toolbar,list);
-   const qty=document.createElement('select');qty.id='wh-shop-qty';qty.className='wh-shop-sort';qty.setAttribute('aria-label','تعداد معامله');qty.style.marginTop='6px';qty.innerHTML='<option value="1">تعداد ۱</option><option value="2">تعداد ۲</option><option value="5">تعداد ۵</option><option value="10">تعداد ۱۰</option><option value="20">تعداد ۲۰</option>';qty.value=String(tradeQty);qty.onchange=()=>{tradeQty=Math.max(1,Math.min(20,Number(qty.value)||1))};toolbar.appendChild(qty);
-   const filters=document.createElement('div');filters.className='wh-shop-extra';filters.style.width='100%';filters.innerHTML='<select id="wh-shop-rarity-filter" class="wh-shop-sort" aria-label="فیلتر کمیابی"><option value="all">همه کمیابی‌ها</option><option value="common">معمولی</option><option value="uncommon">غیرمعمول</option><option value="rare">کمیاب</option><option value="epic">حماسی</option><option value="legendary">افسانه‌ای</option><option value="mythic">اساطیری</option><option value="unique">یگانه</option></select><select id="wh-shop-currency-filter" class="wh-shop-sort" aria-label="فیلتر ارز"><option value="all">همه ارزها</option><option value="gold">سکه</option><option value="gems">جم</option><option value="bloodTokens">مهره خون</option><option value="ancientDust">غبار باستانی</option><option value="hunterMarks">نشان شکارچی</option></select><select id="wh-shop-stock-filter" class="wh-shop-sort" aria-label="فیلتر موجودی"><option value="all">همه موجودی‌ها</option><option value="available">فقط موجود</option><option value="low">موجودی کم</option></select>';
-   toolbar.appendChild(filters);
-   filters.querySelector('#wh-shop-rarity-filter').value=rarityFilter;filters.querySelector('#wh-shop-currency-filter').value=currencyFilter;filters.querySelector('#wh-shop-stock-filter').value=stockFilter;
-   filters.querySelector('#wh-shop-rarity-filter').onchange=e=>{rarityFilter=e.target.value;drawList()};filters.querySelector('#wh-shop-currency-filter').onchange=e=>{currencyFilter=e.target.value;drawList()};filters.querySelector('#wh-shop-stock-filter').onchange=e=>{stockFilter=e.target.value;drawList()};
-  }
+  /* Classic shop restored: no search, quantity selector, recommendation/sort toolbar, or extra filters. */
+  const oldToolbar=$('#wh-shop-toolbar');if(oldToolbar)oldToolbar.remove();
   /* Compact working merchant chat entry; the old hero button was removed with its parent. */
   if(!$('#wh-shop-ai-launch')){
    const launch=document.createElement('button');launch.type='button';launch.id='wh-shop-ai-launch';launch.className='wh-shop-ai-launch';launch.textContent='✦ گفت‌وگو با فروشنده';launch.style.cssText='position:relative;display:block;left:auto;bottom:auto;margin:8px 0 10px;width:100%;z-index:5;border-radius:12px;padding:11px;background:linear-gradient(135deg,#4a2431,#211721);color:#ffe9b3;border:1px solid #c39a50';
@@ -8377,7 +8369,7 @@ body{overflow:hidden!important}
   if(!$('#wh-shop-ai')){
    const ai=document.createElement('section');ai.id='wh-shop-ai';ai.className='wh-shop-ai';ai.hidden=true;
    ai.innerHTML='<div class="wh-shop-ai-head"><span>✦ فروشنده هوشمند</span><button type="button" class="wh-shop-detail-btn" id="wh-shop-ai-close">بستن</button></div><div class="wh-shop-ai-log" id="wh-shop-ai-log"><div class="wh-shop-ai-msg">سلام مسافر وارنهولد؛ دنبال چه وسیله‌ای می‌گردی؟</div></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px"><button class="wh-shop-detail-btn wh-shop-quick" data-q="با بودجه فعلی من بهترین خرید چیه؟">بهترین خرید</button><button class="wh-shop-detail-btn wh-shop-quick" data-q="برای منطقه بعدی چه تجهیزاتی پیشنهاد می‌کنی؟">تجهیزات سفر</button><button class="wh-shop-detail-btn wh-shop-quick" data-q="چطور غبار باستانی و نشان شکارچی به دست بیارم؟">راهنمای ارزها</button></div><form class="wh-shop-ai-form" id="wh-shop-ai-form"><input class="wh-shop-ai-input" id="wh-shop-ai-input" maxlength="500" autocomplete="off" placeholder="با فروشنده صحبت کن..."><button class="wh-shop-ai-send" id="wh-shop-ai-send" type="submit">ارسال</button></form>';
-   toolbar.parentNode.insertBefore(ai,list);
+   list.parentNode.insertBefore(ai,list);
   }
   if(!$('#wh-shop-detail')){
    const modal=document.createElement('div');modal.id='wh-shop-detail';modal.className='wh-shop-detail';modal.hidden=true;modal.innerHTML='<div class="wh-shop-detail-card" id="wh-shop-detail-content"></div>';screen.appendChild(modal);
@@ -8478,7 +8470,7 @@ body{overflow:hidden!important}
   if(!catalog.length){list.innerHTML='<div class="wh-shop-empty">کاتالوگ فروشگاه هنوز بارگذاری نشده. فروشگاه را دوباره باز کن.</div>';return}
   if(mode==='buy'){
    let items=vendorItems(catalog).filter(i=>activeCat==='all'||i.cat===activeCat);
-   if(search)items=items.filter(i=>(i.name+' '+i.desc+' '+i.rarity+' '+(CATEGORY_LABELS[i.cat]||i.cat)).toLocaleLowerCase().includes(search));if(rarityFilter!=='all')items=items.filter(i=>i.rarity===rarityFilter);if(currencyFilter!=='all')items=items.filter(i=>(i.currency||'gold')===currencyFilter);if(stockFilter==='available')items=items.filter(i=>Number(i.stock)>0);else if(stockFilter==='low')items=items.filter(i=>Number(i.stock)>0&&Number(i.stock)<=3);
+   if(rarityFilter!=='all')items=items.filter(i=>i.rarity===rarityFilter);if(currencyFilter!=='all')items=items.filter(i=>(i.currency||'gold')===currencyFilter);if(stockFilter==='available')items=items.filter(i=>Number(i.stock)>0);else if(stockFilter==='low')items=items.filter(i=>Number(i.stock)>0&&Number(i.stock)<=3);
    items=sortedItems(items);
    if(!items.length){list.innerHTML='<div class="wh-shop-empty">کالایی با این مشخصات پیدا نشد.</div>';return}
    list.innerHTML='<div class="wh-shop-grid">'+items.map(it=>{
