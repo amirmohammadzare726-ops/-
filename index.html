@@ -327,7 +327,15 @@
   .wm-node.locked{cursor:default; opacity:0.5;}
   .wm-node.locked .wm-dot{background:#555; border-color:#777;}
 
-/* UPDATE: SIX NEW REGIONS — distinct mobile-safe visual identities; decoration only, gameplay untouched */
+/* Region atmosphere belongs to the map screen itself; no overlay layers or hit-test changes. */
+  #screen-map[data-region-theme="cursed_swamp"]{background-image:radial-gradient(ellipse at 85% 8%,rgba(103,145,58,.18),transparent 38%),linear-gradient(180deg,rgba(11,28,20,.72),rgba(8,12,13,.96))}
+  #screen-map[data-region-theme="mist_isles"]{background-image:radial-gradient(ellipse at 18% 8%,rgba(80,167,203,.2),transparent 42%),linear-gradient(180deg,rgba(10,28,41,.72),rgba(8,12,17,.96))}
+  #screen-map[data-region-theme="spiritlands"]{background-image:radial-gradient(ellipse at 80% 10%,rgba(158,124,222,.22),transparent 40%),linear-gradient(180deg,rgba(26,19,45,.75),rgba(8,9,17,.97))}
+  #screen-map[data-region-theme="crystal_realm"]{background-image:radial-gradient(ellipse at 22% 9%,rgba(81,224,238,.2),transparent 40%),linear-gradient(180deg,rgba(10,34,45,.74),rgba(7,12,20,.97))}
+  #screen-map[data-region-theme="chaos_realm"]{background-image:radial-gradient(ellipse at 78% 8%,rgba(236,63,84,.2),transparent 42%),linear-gradient(180deg,rgba(42,13,25,.76),rgba(12,8,14,.97))}
+  #screen-map[data-region-theme="riftlands"]{background-image:radial-gradient(ellipse at 24% 8%,rgba(224,150,72,.2),transparent 40%),linear-gradient(180deg,rgba(38,25,22,.76),rgba(10,10,17,.97))}
+
+  /* UPDATE: SIX NEW REGIONS — distinct mobile-safe visual identities; decoration only, gameplay untouched */
   .region.region-cursed_swamp{background:linear-gradient(125deg,rgba(30,67,43,.96),rgba(10,20,19,.97) 68%,rgba(92,116,47,.18));border-color:rgba(110,155,78,.52)}
   .region.region-mist_isles{background:linear-gradient(125deg,rgba(27,66,87,.96),rgba(10,19,29,.97) 68%,rgba(112,174,199,.18));border-color:rgba(102,169,194,.5)}
   .region.region-spiritlands{background:linear-gradient(125deg,rgba(59,48,91,.96),rgba(14,12,27,.97) 68%,rgba(159,128,222,.18));border-color:rgba(157,128,218,.52)}
@@ -5650,6 +5658,8 @@ function regionLockReason(id){
 }
 
 function renderMap(){
+  const mapScreen = $('#screen-map');
+  if(mapScreen) mapScreen.dataset.regionTheme = state.region || 'village';
   const list = $('#region-list'); list.innerHTML='';
   Object.entries(REGIONS).forEach(([id, r])=>{
     if(!(state.discoveredRegions||[]).includes(id) && !r.alwaysVisible) return; // مناطق ویژه جدید تا زمان کشف قابل سفر نیستند
