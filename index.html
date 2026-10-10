@@ -6053,19 +6053,22 @@ function renderChar(){
 }
 
 async function useConsumable(itemId){
-  const def = SHOP_ITEMS.find(x=>x.id===itemId);
-  const effect = CONSUMABLE_EFFECTS[itemId];
-  if(!def || !def.consumable || !effect) return;
-  if(effect.battleOnly){ showToast('این آیتم فقط در Battle قابل استفاده است'); return; }
-  const item = state.inventory.find(x=>x.id===itemId);
-  if(!item || item.qty<=0) return;
-  if(effect.kind==='heal'){ state.hp = Math.min(state.hpMax, state.hp+effect.amount); showToast(`+${effect.amount} HP`); }
-  else if(effect.kind==='energy'){ state.energy = Math.min(state.energyMax, state.energy+effect.amount); showToast(`+${effect.amount} انرژی`); }
-  item.qty -= 1;
-  if(item.qty<=0) state.inventory = state.inventory.filter(x=>x.id!==itemId);
-  await saveState();
-  renderHUD(); renderInventory();
-  if(state.hp>=state.hpMax && state.hpRecoveryEndsAt){ state.hpRecoveryEndsAt=null; saveState(); tickRecoveryTimer(); }
+  const def=SHOP_ITEMS.find(x=>x.id===itemId),effect=CONSUMABLE_EFFECTS[itemId];
+  if(!def||!def.consumable||!effect)return;
+  if(effect.battleOnly){showToast('این آیتم فقط در Battle قابل استفاده است');return;}
+  const item=state.inventory.find(x=>x.id===itemId);
+  if(!item||item.qty<=0)return;
+  if(!window.warneholdShopAction){showToast('ارتباط امن فروشگاه آماده نیست');return;}
+  try{
+    const result=await window.warneholdShopAction('consume',itemId);
+    if(!result||!result.ok||!result.character)throw new Error(result?.error||'مصرف آیتم تأیید نشد');
+    state={...state,...result.character};
+    await saveState();
+    renderHUD();renderInventory();
+    const amount=Number(result.amount)||0;
+    showToast(result.kind==='heal'?'+'+amount+' جان بازیابی شد':'+'+amount+' انرژی بازیابی شد');
+    if(state.hp>=state.hpMax&&state.hpRecoveryEndsAt){state.hpRecoveryEndsAt=null;await saveState();tickRecoveryTimer();}
+  }catch(error){showToast(error?.message||'مصرف آیتم انجام نشد');}
 }
 function deleteItem(itemId){
   const item = state.inventory.find(x=>x.id===itemId);
