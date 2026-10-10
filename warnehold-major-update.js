@@ -6,6 +6,7 @@ const modes=[
  {id:'npc',label:'شخصیت هوشمند'},
  {id:'quest',label:'ایده مأموریت'},
  {id:'world',label:'رویداد جهان'},
+ {id:'boss_director',label:'مدیر باس'},
  {id:'battle',label:'تحلیل فایت'},
  {id:'social',label:'اجتماعی'}
 ];
@@ -13,6 +14,7 @@ const quickPrompts=[
  {mode:'guide',text:'برای پیشرفت الان بهتره چه کاری انجام بدم؟'},
  {mode:'quest',text:'یک مأموریت متناسب با سطح و منطقه فعلی من پیشنهاد بده.'},
  {mode:'world',text:'یک رویداد داستانی جذاب برای منطقه فعلی بساز.'},
+ {mode:'boss_director',text:'برای رویداد امروز یک باس تازه با ظاهر، فازها و نقطه‌ضعف منحصربه‌فرد طراحی کن.'},
  {mode:'battle',text:'با توجه به وضعیت فعلی بازی، چند نکته برای فایت بگو.'}
 ];
 let activeMode='guide',busy=false;
@@ -51,6 +53,7 @@ function build(){
   try{
    const gameContext=typeof ai.context==='function'?(ai.context(activeMode)||{}):{};
    const context={...gameContext,source:'floating_companion',activeScreen:document.querySelector('.screen.active')?.id||'',requestedAt:new Date().toISOString()};
+   if(activeMode==='boss_director'){context.action='generate';context.eventDate=new Date().toISOString().slice(0,10);context.seed='warnehold-boss-'+context.eventDate;}
    const result=await ai.ask(message,activeMode,context);
    output.textContent=(result&&result.answer)||'پاسخی دریافت نشد.';
    input.value='';
