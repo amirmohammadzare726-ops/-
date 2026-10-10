@@ -9928,4 +9928,109 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 setInterval(()=>{try{if(window.state)init();}catch(e){console.debug("WW init",e)}},3000);
 window.whLivingWorld={npcs:NPCS,missions:MISSIONS,events:EVENTS,open:openWorld,render:renderLivingWorld,activeEvent:activeEvent};
 })();
-</script>\n</html>
+</script>\n
+<style id="wh-regions-expedition-v1">
+#wh-region-expedition{margin:12px 0 16px;padding:12px;border:1px solid rgba(201,162,75,.28);border-radius:14px;background:linear-gradient(145deg,rgba(17,25,27,.97),rgba(14,13,22,.98));}
+.wh-exp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.wh-exp-title{color:var(--gold);font-weight:800;font-size:14px}
+.wh-exp-sub{font-size:10px;color:var(--dim);line-height:1.6;margin-bottom:9px}
+.wh-exp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.wh-exp-card{position:relative;overflow:hidden;min-width:0;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:linear-gradient(145deg,var(--wh-exp-a),var(--wh-exp-b));}
+.wh-exp-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 0%,rgba(255,255,255,.12),transparent 48%);pointer-events:none}
+.wh-exp-card>*{position:relative}
+.wh-exp-name{font-size:12px;font-weight:800;color:#f6e9cc;line-height:1.5}
+.wh-exp-desc{font-size:10px;color:#d2d0d1;line-height:1.6;margin:4px 0 7px;min-height:32px}
+.wh-exp-meta{font-size:9px;color:#e7d5ad;line-height:1.7;margin-bottom:7px}
+.wh-exp-bar{height:5px;border-radius:9px;background:rgba(0,0,0,.35);overflow:hidden;margin:5px 0 8px}
+.wh-exp-bar span{display:block;height:100%;background:linear-gradient(90deg,#7d9f8d,#d9bd70);border-radius:9px}
+.wh-exp-card button{width:100%;font-size:10px;padding:8px 5px}
+.wh-exp-card.wh-exp-locked{filter:saturate(.6)}
+.wh-exp-hint{font-size:10px;color:#bbb;padding:8px;border-radius:9px;background:rgba(0,0,0,.2);margin-top:9px;line-height:1.7}
+@media(max-width:360px){.wh-exp-grid{grid-template-columns:1fr}.wh-exp-desc{min-height:0}}
+</style>
+<script id="wh-regions-expedition-v1-script">
+(function(){
+'use strict';
+const IDS=['cursed_swamp','mist_isles','spiritlands','crystal_realm','chaos_realm','riftlands'];
+const ART={
+ cursed_swamp:{icon:'☠️',a:'#18382e',b:'#11191c',path:'باتلاق‌های نفرین‌شده',resources:'گیاه سمی · خاکستر نفرین · ریشه مرداب',event:'مه سمی و تله‌های کهنه'},
+ mist_isles:{icon:'🌫️',a:'#183b4a',b:'#121923',path:'مسیر دریایی شکسته',resources:'مروارید مه · پوسته دریایی · بقایای کشتی',event:'کشتی گمشده یا طوفان ناگهانی'},
+ spiritlands:{icon:'👻',a:'#39294d',b:'#161426',path:'دروازه ارواح',resources:'خاکستر روح · جوهر شبح · فانوس خاموش',event:'ردپای روح یا شکاف میان جهان‌ها'},
+ crystal_realm:{icon:'💎',a:'#263d60',b:'#15172b',path:'راهروهای بازتابی',resources:'خرده بلور · هسته بازتابی · سنگ کریستالی',event:'بلور تقلیدگر یا موج انرژی'},
+ chaos_realm:{icon:'🌀',a:'#542635',b:'#1a1724',path:'مسیرهای بی‌ثبات',resources:'تکه آشوب · جوهر جهش · هسته ناپایدار',event:'جهش محیط یا وارونگی مسیر'},
+ riftlands:{icon:'🪐',a:'#2c3155',b:'#151624',path:'پل‌های شکاف‌خورده',resources:'غبار شکاف · نخ میان‌جهانی · سنگ‌درز',event:'مسیر متغیر یا نگهبان شکاف'}
+};
+const oldRenderMap=window.renderMap;
+function pct(id){return Math.max(0,Math.min(100,Math.round((state.regionExploration&&state.regionExploration[id])||0)))}
+function known(id){return (state.discoveredRegions||[]).includes(id)}
+function addPanel(){
+ const list=document.getElementById('region-list');if(!list||!window.REGIONS)return;
+ let panel=document.getElementById('wh-region-expedition');if(panel)panel.remove();
+ panel=document.createElement('section');panel.id='wh-region-expedition';
+ const cards=IDS.map(id=>{
+  const r=REGIONS[id],v=ART[id];if(!r)return '';
+  const found=known(id),locked=isRegionLocked(id),p=pct(id);
+  return '<article class="wh-exp-card'+(locked?' wh-exp-locked':'')+'" style="--wh-exp-a:'+v.a+';--wh-exp-b:'+v.b+'">'+
+   '<div class="wh-exp-name">'+v.icon+' '+r.name+(found?'':' · ناشناخته')+'</div>'+
+   '<div class="wh-exp-desc">'+r.desc+'</div>'+
+   '<div class="wh-exp-meta">⚠️ خطر: '+r.danger+' · حداقل سطح '+r.minLevel+'<br>👾 موجودات: '+r.encounters.length+'/8 · هزینه سفر: '+(r.travelFee||0)+' ین</div>'+
+   '<div class="wh-exp-bar"><span style="width:'+p+'%"></span></div>'+
+   '<div class="wh-exp-meta">پیشرفت کاوش: '+p+'%'+(found?' · کشف شده':' · هنوز کشف نشده')+'</div>'+
+   '<button class="'+(locked?'secondary':'primary')+'" data-wh-exp="'+id+'">'+(locked?(found?'🔒 شرایط ورود':'🔍 تلاش برای کشف'):(state.region===id?'📍 منطقه فعلی':'🧭 سفر به منطقه'))+'</button></article>';
+ }).join('');
+ panel.innerHTML='<div class="wh-exp-head"><div class="wh-exp-title">🧭 اکتشاف مناطق ویژه</div><div style="font-size:10px;color:var(--dim)">۶ منطقه · ۴۸ موجود</div></div>'+
+ '<div class="wh-exp-sub">هر منطقه مسیر، منابع و رویدادهای مخصوص خودش را دارد. برای حفظ تعادل، سطح ورود، هزینه سفر و نتیجه برخوردها همچنان توسط قوانین بازی کنترل می‌شود.</div>'+
+ '<div class="wh-exp-grid">'+cards+'</div>'+
+ '<div class="wh-exp-hint">🗺️ مسیرها: '+IDS.map(id=>ART[id].path).join(' · ')+'<br>🎲 رویدادهای منطقه‌ای: '+IDS.map(id=>ART[id].event).join(' · ')+'</div>';
+ list.prepend(panel);
+ panel.querySelectorAll('[data-wh-exp]').forEach(btn=>btn.addEventListener('click',()=>{
+  const id=btn.getAttribute('data-wh-exp'),r=REGIONS[id];
+  if(!known(id)){
+   if(state.level < Math.max(1,r.minLevel-2)){showToast('برای یافتن سرنخ‌های این منطقه باید حداقل به Level '+Math.max(1,r.minLevel-2)+' برسی.');return;}
+   if(typeof exploreAction==='function'){exploreAction();showToast('🔎 در حال جست‌وجوی نشانه‌های منطقه ویژه...');}
+   return;
+  }
+  if(isRegionLocked(id)){showToast('🔒 '+r.name+' — '+regionLockReason(id));return;}
+  if(state.region===id){if(typeof exploreAction==='function')exploreAction();return;}
+  if(typeof startJourney==='function')startJourney(id);
+ }));
+}
+if(typeof window.renderMap==='function'){
+ const base=window.renderMap;
+ window.renderMap=function(){base();try{addPanel();}catch(e){console.warn('region panel render',e)}};
+}
+const baseWorld=window.renderWorldMap;
+if(typeof baseWorld==='function'){
+ window.renderWorldMap=function(){baseWorld();const board=document.getElementById('worldmap-board');if(!board)return;
+  IDS.forEach(id=>{const node=board.querySelectorAll('.wm-node');node.forEach(n=>{if(n.textContent.includes(REGIONS[id].name)){n.onclick=null;n.addEventListener('click',()=>{if(!known(id)){showToast('برای کشف این منطقه از کاوش نقشه استفاده کن.');return;}if(isRegionLocked(id)){showToast('🔒 '+REGIONS[id].name+' — '+regionLockReason(id));return;}if(state.region!==id)startJourney(id);else switchScreen('map');});}})});
+ };
+}
+const baseStart=window.startJourney;
+if(typeof baseStart==='function'){
+ window.startJourney=function(id){baseStart(id);if(state.journey&&state.journey.toId===id){state.journey.regionExpedition=true;state.journey.startedAt=state.journey.startedAt||Date.now();state.journey.estimatedMinutes=({cursed_swamp:7,mist_isles:6,spiritlands:10,crystal_realm:8,chaos_realm:12,riftlands:11})[id]||4;saveState();}};
+}
+function enhanceJourney(){
+ const p=document.getElementById('journey-progress'),j=state&&state.journey;if(!p||!j||!j.regionExpedition)return;
+ const r=REGIONS[j.toId];if(!r)return;
+ const mins=j.estimatedMinutes||5;
+ p.textContent=p.textContent+' · مسیر تقریبی '+mins+' دقیقه · '+(ART[j.toId]?.path||'مسیر ناشناخته');
+}
+const baseJourney=window.renderJourney;
+if(typeof baseJourney==='function'){
+ window.renderJourney=async function(){await baseJourney();try{enhanceJourney()}catch(e){}};
+}
+const baseExplore=window.exploreAction;
+if(typeof baseExplore==='function'){
+ window.exploreAction=async function(){
+  const before=(state.discoveredRegions||[]).length;
+  const result=await baseExplore();
+  if((state.discoveredRegions||[]).length>before){try{window.renderMap()}catch(e){}}
+  return result;
+ };
+}
+const init=()=>{try{if(typeof renderMap==='function')renderMap();}catch(e){}};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,500));else setTimeout(init,500);
+})();
+</script>
+
+</html>
