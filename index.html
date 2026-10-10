@@ -9821,7 +9821,8 @@ const EVENTS=[
 {id:"ev_spirit",name:"دروازه ارواح",region:7,desc:"یک مسیر ویژه برای دارندگان توانایی روحی باز می‌شود",bonus:"spirit"},
 {id:"ev_chaos",name:"شکاف آشوب",region:9,desc:"رویدادهای غیرقابل پیش‌بینی در قلمرو آشوب رخ می‌دهد",bonus:"chaos"}
 ];
-const regName=i=>(window.whCreatureWorld&&window.whCreatureWorld.regions&&window.whCreatureWorld.regions[i]&&window.whCreatureWorld.regions[i].name)||(["پایتخت وارنهولد","جنگل سایه‌ها","قله‌های یخ‌زده","بیابان سرخ","سرزمین آتشفشان","مرداب نفرین‌شده","جزایر مه‌آلود","سرزمین ارواح","قلمرو کریستال","قلمرو آشوب"][i]||"منطقه");
+const WW_REGION_LABELS=["پایتخت وارنهولد","جنگل سایه‌ها","قله‌های یخ‌زده","بیابان سرخ","سرزمین آتشفشان","مرداب نفرین‌شده","جزایر مه‌آلود","سرزمین ارواح","قلمرو کریستال","قلمرو آشوب","قلمرو شکاف‌ها"];
+const regName=i=>WW_REGION_LABELS[Number(i)]||"منطقه";
 function ww(){return state.whLivingWorld||(state.whLivingWorld={missions:{},npcTalk:{},regionDefeats:{},typeDefeats:{},totalDefeats:0,eventSeed:""});}
 function todayKey(){return new Date().toISOString().slice(0,10);}
 function activeEvent(){const seed=todayKey();let n=0;for(let i=0;i<seed.length;i++)n+=seed.charCodeAt(i)*(i+3);return EVENTS[n%EVENTS.length];}
