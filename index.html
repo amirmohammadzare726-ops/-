@@ -5558,7 +5558,7 @@ const HIDDEN_LOCATIONS = {
   hl_shrine:   {name:'معبد مخفی', type:'Secret Shrine', region:'lake', minLevel:5, reward:{gold:70, xp:40}, desc:'زیارتگاهی فراموش‌شده در ساحل دریاچه'},
   hl_treasure: {name:'محل گنج', type:'Treasure Location', region:'desert', minLevel:7, requiresQuest:'q_main_ruins', reward:{gold:150, materials:[{id:'mat_sand', qty:3}]}, desc:'نشانه‌ای کهنه از گنجی مدفون زیر شن'},
 };
-const REGION_DISCOVERY_ORDER = ['village','forest','mountain','lake','ruins','capital','desert','village_desert','village_snow','village_volcanic','cave','snow','volcanic','danger_zone'];
+const REGION_DISCOVERY_ORDER = ['village','forest','mountain','lake','ruins','capital','desert','village_desert','village_snow','village_volcanic','cave','snow','volcanic','danger_zone','mist_isles','cursed_swamp','crystal_realm','spiritlands','riftlands','chaos_realm'];
 
 /* Update 11: منطقه خانه‌ی بازیکن (طبق دهکده انتخاب‌شده هنگام ساخت شخصیت) همیشه بدون نیاز به Level/Capital باز است —
    دقیقاً مثل رفتار قبلیِ 'village'/'forest' برای همه بازیکنان قدیمی (که homeRegion آن‌ها 'village' است). */
@@ -5570,6 +5570,7 @@ function isRegionLocked(id){
   const r = REGIONS[id];
   if(!r) return true;
   if(homeClusterRegions().includes(id)) return false;
+  if(r.requiresDiscovery && !(state.discoveredRegions||[]).includes(id)) return true;
   if(state.level < r.minLevel) return true;
   if(r.requiresCapital && !state.capitalUnlocked) return true;
   return false;
@@ -5577,6 +5578,7 @@ function isRegionLocked(id){
 function regionLockReason(id){
   const r = REGIONS[id];
   if(homeClusterRegions().includes(id)) return '';
+  if(r.requiresDiscovery && !(state.discoveredRegions||[]).includes(id)) return 'نیاز به کشف از طریق کاوش';
   if(r.requiresCapital && !state.capitalUnlocked) return 'نیاز به Unlock کردن پایتخت';
   if(state.level < r.minLevel) return `نیاز به Level ${r.minLevel}`;
   return '';
@@ -5585,7 +5587,7 @@ function regionLockReason(id){
 function renderMap(){
   const list = $('#region-list'); list.innerHTML='';
   Object.entries(REGIONS).forEach(([id, r])=>{
-    if(!(state.discoveredRegions||[]).includes(id)) return; // مناطق کشف‌نشده در نقشه نشان داده نمی‌شوند
+    if(!(state.discoveredRegions||[]).includes(id) && !r.alwaysVisible) return; // مناطق ویژه جدید تا زمان کشف قابل سفر نیستند
     const locked = isRegionLocked(id);
     const explorePct = Math.min(100, Math.round((state.regionExploration&&state.regionExploration[id])||0));
     const div = document.createElement('div');
@@ -5593,10 +5595,11 @@ function renderMap(){
     div.innerHTML = `
       <div>
         <div class="rname">${r.name} ${locked?'🔒':''}${r.hub?' 🏘️':''}</div>
-        <div class="rdesc">${r.desc}${locked?` · ${regionLockReason(id)}`:''}${!locked && r.travelFee && !homeClusterRegions().includes(id) ? ` · هزینه سفر: ${r.travelFee} ین`:''}${!r.hub?` · Exploration: ${explorePct}%`:''}</div>
+        <div class="rdesc">${r.desc}${!(state.discoveredRegions||[]).includes(id)?' · هنوز کشف نشده':locked?` · ${regionLockReason(id)}`:''}${!locked && r.travelFee && !homeClusterRegions().includes(id) ? ` · هزینه سفر: ${r.travelFee} ین`:''}${!r.hub?` · کاوش: ${explorePct}%`:''} · حداقل Level ${r.minLevel} · موجودات: ${(r.encounters||[]).length}</div>
       </div>
       <div class="rdanger">${r.danger}</div>`;
-    if(!locked){ div.onclick = () => { if(window.whMapTravelAssistant){ window.whMapTravelAssistant.selectTarget(id); window.whMapTravelAssistant.open('travel'); } else if(r.hub && id!==state.region){ startJourney(id); } else if(id==='village'){ travelTo(id).then(()=> switchScreen('villagemap')); } else { travelTo(id); } }; }
+    if(!locked && (state.discoveredRegions||[]).includes(id)){ div.onclick = () => { if(window.whMapTravelAssistant){ window.whMapTravelAssistant.selectTarget(id); window.whMapTravelAssistant.open('travel'); } else if(r.hub && id!==state.region){ startJourney(id); } else if(id==='village'){ travelTo(id).then(()=> switchScreen('villagemap')); } else { travelTo(id); } }; }
+    else if(r.alwaysVisible){ div.onclick = () => showToast(!(state.discoveredRegions||[]).includes(id) ? 'برای باز کردن این منطقه، از گزینه کاوش استفاده کن.' : `🔒 ${r.name} — ${regionLockReason(id)}`); }
     list.appendChild(div);
   });
   const exploreCard = document.createElement('div');
@@ -5881,6 +5884,12 @@ const WORLD_MAP_NODES = {
   volcanic:         {x:50, y:95},
   cave:             {x:68, y:82},
   danger_zone:      {x:32, y:88},
+  mist_isles:       {x:8, y:30},
+  cursed_swamp:     {x:91, y:29},
+  crystal_realm:    {x:10, y:72},
+  spiritlands:      {x:89, y:72},
+  riftlands:        {x:32, y:31},
+  chaos_realm:      {x:68, y:31},
 };
 
 function renderWorldMap(){
@@ -5893,9 +5902,9 @@ function renderWorldMap(){
     const node = document.createElement('div');
     node.className = 'wm-node' + (r.hub?' hub':'') + (state.region===id?' current':'') + ((locked||!discovered)?' locked':'');
     node.style.left = pos.x+'%'; node.style.top = pos.y+'%';
-    const label = discovered ? `${r.name}${r.hub?' 🏘️':''}` : '؟؟؟';
+    const label = (discovered || r.alwaysVisible) ? `${r.name}${r.hub?' 🏘️':''}` : '؟؟؟';
     node.innerHTML = `<div class="wm-dot"></div><div class="wm-label">${label}${(discovered&&locked)?' 🔒':''}</div>`;
-    if(discovered && !locked){
+    if((discovered || r.alwaysVisible) && !locked){
       node.onclick = ()=>{
         if(window.whMapTravelAssistant){ window.whMapTravelAssistant.selectTarget(id); window.whMapTravelAssistant.open('travel'); }
         else if(r.hub && id!==state.region){ startJourney(id); }
@@ -5904,6 +5913,8 @@ function renderWorldMap(){
       };
     } else if(discovered && locked){
       node.onclick = ()=> showToast(`🔒 ${r.name} — ${regionLockReason(id)}`);
+    } else if(r.alwaysVisible && !discovered){
+      node.onclick = ()=> showToast('برای باز کردن این منطقه، از گزینه کاوش استفاده کن.');
     }
     board.appendChild(node);
   });
