@@ -327,6 +327,23 @@
   .wm-node.locked{cursor:default; opacity:0.5;}
   .wm-node.locked .wm-dot{background:#555; border-color:#777;}
 
+/* UPDATE: SIX NEW REGIONS — distinct mobile-safe visual identities; decoration only, gameplay untouched */
+  .region.region-cursed_swamp{background:linear-gradient(125deg,rgba(30,67,43,.96),rgba(10,20,19,.97) 68%,rgba(92,116,47,.18));border-color:rgba(110,155,78,.52)}
+  .region.region-mist_isles{background:linear-gradient(125deg,rgba(27,66,87,.96),rgba(10,19,29,.97) 68%,rgba(112,174,199,.18));border-color:rgba(102,169,194,.5)}
+  .region.region-spiritlands{background:linear-gradient(125deg,rgba(59,48,91,.96),rgba(14,12,27,.97) 68%,rgba(159,128,222,.18));border-color:rgba(157,128,218,.52)}
+  .region.region-crystal_realm{background:linear-gradient(125deg,rgba(31,74,93,.96),rgba(9,17,29,.97) 68%,rgba(94,222,235,.2));border-color:rgba(98,214,232,.52)}
+  .region.region-chaos_realm{background:linear-gradient(125deg,rgba(89,29,40,.96),rgba(22,10,18,.97) 68%,rgba(238,76,83,.2));border-color:rgba(223,75,86,.52)}
+  .region.region-riftlands{background:linear-gradient(125deg,rgba(65,48,37,.96),rgba(14,13,22,.97) 68%,rgba(219,151,80,.2));border-color:rgba(211,147,78,.52)}
+  #worldmap-board{background-image:radial-gradient(ellipse at 12% 28%,rgba(84,160,177,.16),transparent 24%),radial-gradient(ellipse at 87% 28%,rgba(173,70,83,.15),transparent 25%),radial-gradient(ellipse at 14% 78%,rgba(129,100,204,.14),transparent 24%),radial-gradient(ellipse at 86% 76%,rgba(97,169,111,.13),transparent 24%),linear-gradient(145deg,#111923,#10130f 58%,#17101a)}
+  .wm-node.region-cursed_swamp .wm-dot{background:#526f38;border-color:#9bc46a;box-shadow:0 0 10px rgba(137,188,82,.32)}
+  .wm-node.region-mist_isles .wm-dot{background:#386b83;border-color:#8fd2e8;box-shadow:0 0 10px rgba(104,194,226,.32)}
+  .wm-node.region-spiritlands .wm-dot{background:#60498c;border-color:#c1a7ff;box-shadow:0 0 10px rgba(165,132,241,.32)}
+  .wm-node.region-crystal_realm .wm-dot{background:#287c8c;border-color:#8df4ff;box-shadow:0 0 10px rgba(92,231,245,.32)}
+  .wm-node.region-chaos_realm .wm-dot{background:#8a2839;border-color:#ff7782;box-shadow:0 0 10px rgba(244,73,91,.32)}
+  .wm-node.region-riftlands .wm-dot{background:#855b30;border-color:#f0bd77;box-shadow:0 0 10px rgba(230,166,88,.32)}
+  .wm-node.region-cursed_swamp.current .wm-dot,.wm-node.region-mist_isles.current .wm-dot,.wm-node.region-spiritlands.current .wm-dot,.wm-node.region-crystal_realm.current .wm-dot,.wm-node.region-chaos_realm.current .wm-dot,.wm-node.region-riftlands.current .wm-dot{background:var(--blood-bright);border-color:#fff;box-shadow:0 0 12px var(--blood-bright)}
+  @media(max-width:380px){.wm-node{width:54px}.wm-node .wm-label{font-size:8.5px}#worldmap-board{max-height:62vh}}
+
 /* WARNEHOLD V9 BACKGROUND FX — isolated visual layer only */
 #wh-v9-bg{
   position:fixed;
@@ -5639,7 +5656,7 @@ function renderMap(){
     const locked = isRegionLocked(id);
     const explorePct = Math.min(100, Math.round((state.regionExploration&&state.regionExploration[id])||0));
     const div = document.createElement('div');
-    div.className = 'region' + (locked?' locked':'') + (state.region===id?' current':'');
+    div.className = 'region region-' + id + (locked?' locked':'') + (state.region===id?' current':'');
     div.innerHTML = `
       <div>
         <div class="rname">${r.name} ${locked?'🔒':''}${r.hub?' 🏘️':''}</div>
@@ -5948,7 +5965,9 @@ function renderWorldMap(){
     const discovered = (state.discoveredRegions||[]).includes(id);
     const locked = isRegionLocked(id);
     const node = document.createElement('div');
-    node.className = 'wm-node' + (r.hub?' hub':'') + (state.region===id?' current':'') + ((locked||!discovered)?' locked':'');
+    node.className = 'wm-node region-' + id + (r.hub?' hub':'') + (state.region===id?' current':'') + ((locked||!discovered)?' locked':'');
+    node.title = `${r.name} — خطر: ${r.danger} — حداقل سطح: ${r.minLevel}`;
+    node.setAttribute('aria-label', node.title);
     node.style.left = pos.x+'%'; node.style.top = pos.y+'%';
     const label = (discovered || r.alwaysVisible) ? `${r.name}${r.hub?' 🏘️':''}` : '؟؟؟';
     node.innerHTML = `<div class="wm-dot"></div><div class="wm-label">${label}${(discovered&&locked)?' 🔒':''}</div>`;
