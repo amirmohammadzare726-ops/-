@@ -63,18 +63,24 @@ function updateVisibility(){
 function observe(){
  const root=document.getElementById('app')||document.body;
  const observer=new MutationObserver(records=>{
-  let screenChanged=false,visibilityChanged=false;
-  for(const r of records){if(r.type==='attributes'&&r.attributeName==='class'&&r.target.classList?.contains('screen')){if(r.target.classList.contains('active')&&!(r.oldValue||'').includes('active'))screenChanged=true;}else visibilityChanged=true}
+  let screenChanged=false;
+  for(const r of records){
+   if(r.type==='attributes'&&r.attributeName==='class'&&r.target.classList?.contains('screen')&&r.target.classList.contains('active')&&!(r.oldValue||'').includes('active'))screenChanged=true;
+  }
   if(screenChanged){
    const screen=document.querySelector('.screen.active');
    if(screen&&!screen.classList.contains('wh-major-enter')){
     screen.classList.add('wh-major-enter');
     screen.addEventListener('animationend',()=>screen.classList.remove('wh-major-enter'),{once:true});
    }
+   updateVisibility();
   }
-  if(visibilityChanged||screenChanged)updateVisibility();
  });
- observer.observe(root,{subtree:true,attributes:true,attributeOldValue:true,attributeFilter:['class','style']});
+ observer.observe(root,{subtree:true,attributes:true,attributeOldValue:true,attributeFilter:['class']});
+ const visibilityObserver=new MutationObserver(updateVisibility);
+ const game=document.getElementById('game-wrap'),auth=document.getElementById('screen-auth');
+ if(game)visibilityObserver.observe(game,{attributes:true,attributeFilter:['style']});
+ if(auth)visibilityObserver.observe(auth,{attributes:true,attributeFilter:['class']});
  updateVisibility();
 }
 function init(){build();observe();setTimeout(updateVisibility,800);setTimeout(updateVisibility,2200)}
