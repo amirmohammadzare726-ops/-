@@ -8368,7 +8368,12 @@ body{overflow:hidden!important}
    filters.querySelector('#wh-shop-rarity-filter').value=rarityFilter;filters.querySelector('#wh-shop-currency-filter').value=currencyFilter;filters.querySelector('#wh-shop-stock-filter').value=stockFilter;
    filters.querySelector('#wh-shop-rarity-filter').onchange=e=>{rarityFilter=e.target.value;drawList()};filters.querySelector('#wh-shop-currency-filter').onchange=e=>{currencyFilter=e.target.value;drawList()};filters.querySelector('#wh-shop-stock-filter').onchange=e=>{stockFilter=e.target.value;drawList()};
   }
-  /* removed cluttered extra vendor/navigation panel; classic category tabs remain */
+  /* Compact working merchant chat entry; the old hero button was removed with its parent. */
+  if(!$('#wh-shop-ai-launch')){
+   const launch=document.createElement('button');launch.type='button';launch.id='wh-shop-ai-launch';launch.className='wh-shop-ai-launch';launch.textContent='✦ گفت‌وگو با فروشنده';launch.style.cssText='position:relative;display:block;left:auto;bottom:auto;margin:8px 0 10px;width:100%;z-index:5;border-radius:12px;padding:11px;background:linear-gradient(135deg,#4a2431,#211721);color:#ffe9b3;border:1px solid #c39a50';
+   tabs.parentNode.insertBefore(launch,list);
+  }
+  
   if(!$('#wh-shop-ai')){
    const ai=document.createElement('section');ai.id='wh-shop-ai';ai.className='wh-shop-ai';ai.hidden=true;
    ai.innerHTML='<div class="wh-shop-ai-head"><span>✦ فروشنده هوشمند</span><button type="button" class="wh-shop-detail-btn" id="wh-shop-ai-close">بستن</button></div><div class="wh-shop-ai-log" id="wh-shop-ai-log"><div class="wh-shop-ai-msg">سلام مسافر وارنهولد؛ دنبال چه وسیله‌ای می‌گردی؟</div></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px"><button class="wh-shop-detail-btn wh-shop-quick" data-q="با بودجه فعلی من بهترین خرید چیه؟">بهترین خرید</button><button class="wh-shop-detail-btn wh-shop-quick" data-q="برای منطقه بعدی چه تجهیزاتی پیشنهاد می‌کنی؟">تجهیزات سفر</button><button class="wh-shop-detail-btn wh-shop-quick" data-q="چطور غبار باستانی و نشان شکارچی به دست بیارم؟">راهنمای ارزها</button></div><form class="wh-shop-ai-form" id="wh-shop-ai-form"><input class="wh-shop-ai-input" id="wh-shop-ai-input" maxlength="500" autocomplete="off" placeholder="با فروشنده صحبت کن..."><button class="wh-shop-ai-send" id="wh-shop-ai-send" type="submit">ارسال</button></form>';
