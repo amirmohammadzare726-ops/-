@@ -8352,7 +8352,7 @@ body{overflow:hidden!important}
  }
  async function loadCatalog(){
   if(loading)return;loading=true;
-  try{const previous=lastCatalogVendor===activeVendor?Object.fromEntries(catalog.map(i=>[i.id,Number(i.stock)||0])):{};const requestVendor=null;const data=await api({action:'catalog'});const vendorInfoNode=$('#wh-shop-vendor-info');if(vendorInfoNode&&data.vendorInfo)vendorInfoNode.textContent=data.vendorInfo.name+' · محل: '+data.vendorInfo.location+' · '+data.vendorInfo.rotation+(data.vendorInfo.lockedReason?' · 🔒 '+data.vendorInfo.lockedReason:'');catalog=Array.isArray(data.items)?data.items:[];catalog=catalog.map(i=>({...i,stock:2147483647,initialStock:2147483647,restockMinutes:0,restockAt:null}));lastCatalogVendor=requestVendor;mergeDefinitions();try{shopMeta=await api({action:'status',payload:{}});if(state&&shopMeta.upgrades){state.equipUpgrades=shopMeta.upgrades;await saveState()}try{const locks=await api({action:'lock_status',payload:{}});window.warneholdShopLockedItems=locks.locked||[]}catch(lockError){console.warn('item lock state unavailable',lockError)}}catch(metaError){console.warn('shop meta unavailable',metaError)}if(previous&&Object.keys(previous).length){const favs=Array.isArray(shopMeta.favorites)?shopMeta.favorites:[];const restocked=catalog.find(i=>favs.includes(i.id)&&previous[i.id]===0&&Number(i.stock)>0);if(restocked&&typeof showToast==='function')showToast('★ کالای موردعلاقه دوباره موجود شد: '+restocked.name)}}
+  try{const previous=lastCatalogVendor===activeVendor?Object.fromEntries(catalog.map(i=>[i.id,Number(i.stock)||0])):{};const requestVendor=null;const data=await api({action:'catalog'});const vendorInfoNode=$('#wh-shop-vendor-info');if(vendorInfoNode&&data.vendorInfo)vendorInfoNode.textContent=data.vendorInfo.name+' · محل: '+data.vendorInfo.location+' · '+data.vendorInfo.rotation+(data.vendorInfo.lockedReason?' · 🔒 '+data.vendorInfo.lockedReason:'');catalog=Array.isArray(data.items)?data.items:[];catalog=catalog.map(i=>({...i,stock:2147483647,initialStock:2147483647,restockMinutes:0,restockAt:null}));if(!catalog.some(i=>i.cat===activeCat))activeCat='all';lastCatalogVendor=requestVendor;mergeDefinitions();renderCurrencyPills();try{shopMeta=await api({action:'status',payload:{}});if(state&&shopMeta.upgrades){state.equipUpgrades=shopMeta.upgrades;await saveState()}try{const locks=await api({action:'lock_status',payload:{}});window.warneholdShopLockedItems=locks.locked||[]}catch(lockError){console.warn('item lock state unavailable',lockError)}}catch(metaError){console.warn('shop meta unavailable',metaError)}if(previous&&Object.keys(previous).length){const favs=Array.isArray(shopMeta.favorites)?shopMeta.favorites:[];const restocked=catalog.find(i=>favs.includes(i.id)&&previous[i.id]===0&&Number(i.stock)>0);if(restocked&&typeof showToast==='function')showToast('★ کالای موردعلاقه دوباره موجود شد: '+restocked.name)}}
   finally{loading=false}
  }
  function ensureChrome(){
@@ -8360,7 +8360,7 @@ body{overflow:hidden!important}
   const tabs=$('#shop-tabs'),list=$('#shop-list');if(!tabs||!list)return;
   if(!$('#wh-shop-hero')){
    const hero=document.createElement('div');hero.id='wh-shop-hero';hero.className='wh-shop-hero';
-   hero.innerHTML='<div class="wh-shop-hero-inner"><div class="wh-shop-kicker">WARNEHOLD · MERCHANTS GUILD</div><div class="wh-shop-title">بازار بزرگ وارنهولد</div><div class="wh-shop-subtitle" id="wh-shop-vendor-info">تمام کالاهای وارنهولد · موجودی نامحدود · خرید مستقیم</div><div class="wh-shop-currencies" id="wh-shop-currencies"></div></div><button type="button" class="wh-shop-ai-launch" id="wh-shop-ai-launch">✦ گفت‌وگو با فروشنده</button>';
+   hero.innerHTML='<div class="wh-shop-hero-inner"><div class="wh-shop-kicker">WARNEHOLD · MERCHANTS GUILD</div><div class="wh-shop-title">بازار بزرگ وارنهولد</div><div class="wh-shop-subtitle" id="wh-shop-vendor-info">تمام کالاهای وارنهولد · موجودی نامحدود</div><div class="wh-shop-currencies" id="wh-shop-currencies"></div></div>';
    tabs.parentNode.insertBefore(hero,tabs);
   }
   if(!$('#wh-shop-toolbar')){
@@ -8404,7 +8404,7 @@ body{overflow:hidden!important}
  function drawTabs(){
   const tabs=$('#shop-tabs');if(!tabs)return;
   const modeRow='<div class="wh-shop-mode-row">'+[['buy','🛒 خرید'],['sell','💰 فروش'],['salvage','♻️ بازیافت']].map(([m,l])=>'<button type="button" class="shop-tab '+(mode===m?'active':'')+'" data-shop-mode="'+m+'">'+l+'</button>').join('')+'</div>';
-  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+CATEGORY_ORDER.filter(c=>vendorItems(catalog).some(i=>i.cat===c)).map(c=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+c+'">'+esc(CATEGORY_LABELS[c]||c)+'</button>').join('')+'</div>':'';
+  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+[['all','🛍️ همه کالاها'],...CATEGORY_ORDER.filter(c=>vendorItems(catalog).some(i=>i.cat===c)).map(c=>[c,CATEGORY_LABELS[c]||c])].map(([c,l])=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+c+'">'+esc(l)+'</button>').join('')+'</div>':'';
   tabs.innerHTML=modeRow+cats;
  }
  function sortedItems(items){
@@ -8482,7 +8482,7 @@ body{overflow:hidden!important}
   const list=$('#shop-list');if(!list)return;if(extraView!=='catalog'){renderExtraView();return}list.classList.remove('wh-shop-extra-panel');
   if(!catalog.length){list.innerHTML='<div class="wh-shop-empty">کاتالوگ فروشگاه هنوز بارگذاری نشده. فروشگاه را دوباره باز کن.</div>';return}
   if(mode==='buy'){
-   let items=vendorItems(catalog).filter(i=>i.cat===activeCat);
+   let items=vendorItems(catalog).filter(i=>activeCat==='all'||i.cat===activeCat);
    if(search)items=items.filter(i=>(i.name+' '+i.desc+' '+i.rarity+' '+(CATEGORY_LABELS[i.cat]||i.cat)).toLocaleLowerCase().includes(search));if(rarityFilter!=='all')items=items.filter(i=>i.rarity===rarityFilter);if(currencyFilter!=='all')items=items.filter(i=>(i.currency||'gold')===currencyFilter);if(stockFilter==='available')items=items.filter(i=>Number(i.stock)>0);else if(stockFilter==='low')items=items.filter(i=>Number(i.stock)>0&&Number(i.stock)<=3);
    items=sortedItems(items);
    if(!items.length){list.innerHTML='<div class="wh-shop-empty">کالایی با این مشخصات پیدا نشد.</div>';return}
