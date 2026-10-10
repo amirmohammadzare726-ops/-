@@ -52,3 +52,11 @@ button:active{filter:brightness(1.12)}
 .wh-major-ai-foot{font-size:9px;color:#898296;padding:0 12px 10px;line-height:1.5}
 @media(max-width:360px){#wh-major-ai-launch{width:44px;height:44px;left:8px}#wh-major-ai-panel{left:8px;width:calc(100vw - 16px)}}
 @media(prefers-reduced-motion:reduce){.wh-major-enter,#screen-auth::before,#wh-major-ai-panel.open{animation:none!important}button,.region{transition:none!important}}
+
+
+/* Quick actions for the AI companion */
+.wh-major-ai-quick{display:flex;gap:7px;overflow-x:auto;padding:3px 1px 8px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.wh-major-ai-quick button{flex:0 0 auto;max-width:220px;border:1px solid rgba(192,164,255,.22);border-radius:12px;background:rgba(105,77,151,.13);color:#e7defa;padding:8px 10px;font:inherit;font-size:12px;line-height:1.5;text-align:right;cursor:pointer}
+.wh-major-ai-quick button:active{transform:scale(.98);background:rgba(105,77,151,.24)}
+.wh-major-ai-quick button:focus-visible{outline:2px solid #c6a8ff;outline-offset:2px}
+@media(max-width:420px){.wh-major-ai-quick button{max-width:185px;font-size:11px}}
