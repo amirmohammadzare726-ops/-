@@ -9649,7 +9649,7 @@ function regionCreatures(){return creatures.filter(function(c){return c.region==
 function renderExpansion(){
 var root=document.getElementById("whx-root");if(!root)return;
 var reg=regions.find(function(r){return r.id===activeRegion})||regions[0];
-var s=state||{},discovered=creatures.filter(function(c){return (s.defeatedMonsterIds||[]).includes(c.id)}).length;
+var s=state||{},newRegionIds=regions.map(function(r){return r.id}),newCreatures=creatures.filter(function(c){return newRegionIds.indexOf(c.region)>=0}),discovered=newCreatures.filter(function(c){return (s.defeatedMonsterIds||[]).includes(c.id)}).length;
 var head='<div class="whx-head"><div class="whx-kicker">WARNEHOLD · BESTIARY / BATTLE ENGINE</div><div class="whx-title">جهان موجودات</div><div class="whx-sub">شش منطقه جدید · هشت موجود در هر منطقه · اتصال به نقشه، سفر، کاوش و فایت اصلی</div><div class="whx-statrow"><div class="whx-stat"><b>۶</b><span>منطقه جدید</span></div><div class="whx-stat"><b>۴۸</b><span>موجود جدید</span></div><div class="whx-stat"><b>'+discovered+'/۵۰</b><span>موجود شکست‌داده‌شده</span></div></div></div>';
 var rg='<div class="whx-section-title">انتخاب قلمرو</div><div class="whx-region-grid">';
 regions.forEach(function(r){rg+='<button class="whx-region '+(r.id===activeRegion?"active":"")+'" data-whx-region="'+r.id+'" style="--glow:'+r.glow+'"><span class="em">'+r.icon+'</span><b>'+r.name+'</b><small>'+r.desc+'</small><span class="lvl">خطر '+r.danger+' · Level '+r.level+'+</span></button>'});rg+='</div>';
