@@ -9,6 +9,12 @@ const modes=[
  {id:'battle',label:'تحلیل فایت'},
  {id:'social',label:'اجتماعی'}
 ];
+const quickPrompts=[
+ {mode:'guide',text:'برای پیشرفت الان بهتره چه کاری انجام بدم؟'},
+ {mode:'quest',text:'یک مأموریت متناسب با سطح و منطقه فعلی من پیشنهاد بده.'},
+ {mode:'world',text:'یک رویداد داستانی جذاب برای منطقه فعلی بساز.'},
+ {mode:'battle',text:'با توجه به وضعیت فعلی بازی، چند نکته برای فایت بگو.'}
+];
 let activeMode='guide',busy=false;
 const el=(tag,attrs={},text='')=>{const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k==='class')n.className=v;else if(k.startsWith('data-')||k==='type'||k==='title'||k==='aria-label'||k==='role')n.setAttribute(k,v);else n[k]=v});if(text)n.textContent=text;return n};
 function build(){
@@ -23,13 +29,15 @@ function build(){
  head.append(titleBox,close);
  const modeRow=el('div',{class:'wh-major-ai-modes','role':'group','aria-label':'حالت هوش مصنوعی'});
  modes.forEach(m=>{const b=el('button',{type:'button','data-mode':m.id},m.label);if(m.id===activeMode)b.classList.add('active');b.addEventListener('click',()=>setMode(m.id));modeRow.append(b)});
+ const quickRow=el('div',{class:'wh-major-ai-quick','aria-label':'پیشنهادهای سریع'});
+ quickPrompts.forEach(p=>{const b=el('button',{type:'button'},p.text);b.addEventListener('click',()=>{setMode(p.mode);input.value=p.text;input.focus()});quickRow.append(b)});
  const output=el('div',{id:'wh-major-ai-output','aria-live':'polite','aria-atomic':'false'});
  const compose=el('form',{class:'wh-major-ai-compose'});
  const input=el('textarea',{id:'wh-major-ai-input',rows:2,placeholder:'چی می‌خوای بدونی؟', 'aria-label':'پیام به هوش مصنوعی'});
  const send=el('button',{id:'wh-major-ai-send',type:'submit'},'پرسیدن');
  compose.append(input,send);
  const foot=el('div',{class:'wh-major-ai-foot'},'هوش مصنوعی پیشنهاد و داستان می‌سازد؛ سکه، آیتم و نتیجه فایت را خودش تغییر نمی‌دهد.');
- panel.append(head,modeRow,output,compose,foot);
+ panel.append(head,modeRow,quickRow,output,compose,foot);
  document.body.append(launch,panel);
  launch.addEventListener('click',()=>{panel.classList.toggle('open');if(panel.classList.contains('open'))setTimeout(()=>input.focus(),60)});
  close.addEventListener('click',()=>panel.classList.remove('open'));
@@ -41,7 +49,8 @@ function build(){
   if(!ai||typeof ai.ask!=='function'){output.textContent='هوش مصنوعی هنوز آماده نشده. یک‌بار صفحه رو تازه کن.';return}
   busy=true;send.disabled=true;send.textContent='...';output.textContent='دارم فکر می‌کنم…';
   try{
-   const context={source:'floating_companion',activeScreen:document.querySelector('.screen.active')?.id||'',requestedAt:new Date().toISOString()};
+   const gameContext=typeof ai.context==='function'?(ai.context(activeMode)||{}):{};
+   const context={...gameContext,source:'floating_companion',activeScreen:document.querySelector('.screen.active')?.id||'',requestedAt:new Date().toISOString()};
    const result=await ai.ask(message,activeMode,context);
    output.textContent=(result&&result.answer)||'پاسخی دریافت نشد.';
    input.value='';
