@@ -1,0 +1,54 @@
+/* Warnehold Major Update — additive visual layer, no gameplay selectors or state mutation */
+:root{--wh-glow:rgba(201,162,75,.24);--wh-glass:rgba(13,13,24,.82)}
+html{background:#080810}
+body{background:radial-gradient(ellipse at 50% -10%,rgba(74,48,112,.2),transparent 48%),#080810}
+#app{background:transparent}
+.screen{position:relative;isolation:isolate;background-color:#0a0a13;background-image:radial-gradient(ellipse at 92% 0%,rgba(128,80,154,.12),transparent 38%),radial-gradient(ellipse at 4% 70%,rgba(44,92,111,.09),transparent 35%),linear-gradient(180deg,rgba(10,10,19,.92),rgba(7,8,14,.98));}
+.screen::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.6;background-image:radial-gradient(circle at 17% 14%,rgba(255,255,255,.18) 0 1px,transparent 1.5px),radial-gradient(circle at 74% 32%,rgba(201,162,75,.2) 0 1px,transparent 1.5px),radial-gradient(circle at 42% 78%,rgba(153,130,221,.15) 0 1px,transparent 1.5px);background-size:97px 113px,139px 127px,181px 157px}
+#screen-auth{min-height:100dvh;justify-content:center;background:radial-gradient(ellipse at 50% 20%,rgba(128,67,158,.25),transparent 36%),radial-gradient(ellipse at 50% 100%,rgba(120,38,55,.24),transparent 48%),linear-gradient(145deg,#080812,#15101f 52%,#080910);overflow:hidden}
+#screen-auth::before{opacity:.8;background-image:radial-gradient(circle at 15% 23%,rgba(240,203,126,.38) 0 1px,transparent 2px),radial-gradient(circle at 83% 36%,rgba(164,139,255,.34) 0 1px,transparent 2px),radial-gradient(circle at 65% 78%,rgba(255,255,255,.25) 0 1px,transparent 2px);background-size:73px 89px,127px 137px,163px 149px;animation:whStarDrift 24s linear infinite}
+.auth-shell{position:relative;z-index:1}
+.auth-panel{background:linear-gradient(150deg,rgba(24,20,38,.94),rgba(9,10,18,.96));border:1px solid rgba(201,162,75,.35);box-shadow:0 24px 90px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.04);backdrop-filter:blur(10px)}
+.auth-welcome{text-shadow:0 0 26px rgba(201,162,75,.25)}
+#screen-map{background-image:radial-gradient(ellipse at 50% -5%,rgba(74,104,89,.2),transparent 50%),linear-gradient(180deg,#0c1214,#080a10 72%)}
+#screen-battle{background-image:radial-gradient(ellipse at 50% 0%,rgba(153,39,55,.18),transparent 42%),linear-gradient(180deg,#170c16,#080810 75%)}
+#screen-char{background-image:radial-gradient(ellipse at 85% 0%,rgba(201,162,75,.15),transparent 45%),linear-gradient(180deg,#15120f,#090a11 75%)}
+#screen-inv,#screen-blacksmith,#screen-shop,#screen-animeshop,#screen-collection{background-image:radial-gradient(ellipse at 12% 0%,rgba(80,138,158,.15),transparent 42%),linear-gradient(180deg,#0c121b,#090a12 76%)}
+#screen-social,#screen-chat{background-image:radial-gradient(ellipse at 90% 0%,rgba(89,85,165,.18),transparent 45%),linear-gradient(180deg,#11101e,#080a12 78%)}
+#screen-worldmap,#screen-village-map,#screen-journey{background-image:radial-gradient(ellipse at 48% 0%,rgba(51,123,120,.16),transparent 45%),linear-gradient(180deg,#0b171b,#080a12 78%)}
+#screen-quest,#screen-job,#screen-auction,#screen-transfer,#screen-pvp{background-image:radial-gradient(ellipse at 90% 0%,rgba(143,80,109,.16),transparent 44%),linear-gradient(180deg,#160f19,#090a12 78%)}
+.region,.enemy-card,.wh-boss-shell,.shop-card,.msg-bubble,.wh-setting-card,.identity-card,.quest-card,.daily-card{box-shadow:0 8px 26px rgba(0,0,0,.18)}
+.region{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.region:not(.locked):active{transform:scale(.985)}
+.region.current{box-shadow:inset 0 0 0 1px var(--gold-dim),0 0 24px rgba(201,162,75,.08)}
+#nav{padding-bottom:env(safe-area-inset-bottom);background:rgba(10,10,18,.96);backdrop-filter:blur(14px);border-top-color:rgba(201,162,75,.22);box-shadow:0 -8px 28px rgba(0,0,0,.22)}
+#nav button{min-height:59px;transition:color .18s ease,background .18s ease}
+#nav button.active{background:linear-gradient(180deg,rgba(201,162,75,.09),transparent)}
+#nav button.active .ic{filter:drop-shadow(0 0 7px rgba(201,162,75,.7))}
+button{transition:filter .16s ease,transform .16s ease,border-color .16s ease}
+button:active{filter:brightness(1.12)}
+.wh-major-enter{animation:whMajorEnter .24s ease-out both}
+@keyframes whMajorEnter{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes whStarDrift{from{background-position:0 0,0 0,0 0}to{background-position:73px 89px,-127px 137px,163px -149px}}
+#wh-major-ai-launch{position:fixed;left:12px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:5400;width:48px;height:48px;border-radius:16px;border:1px solid rgba(201,162,75,.72);background:linear-gradient(145deg,#3c2856,#15101f 70%);color:#f3d89a;box-shadow:0 8px 28px rgba(0,0,0,.45),0 0 22px rgba(154,108,211,.14);font-size:21px;display:none;align-items:center;justify-content:center;cursor:pointer}
+#wh-major-ai-launch::after{content:"AI";position:absolute;bottom:-5px;right:-5px;font:700 8px system-ui;background:#d6b56b;color:#17101c;border-radius:5px;padding:2px 4px}
+#wh-major-ai-panel{position:fixed;left:12px;bottom:calc(132px + env(safe-area-inset-bottom));z-index:5399;width:min(350px,calc(100vw - 24px));max-height:min(66dvh,560px);display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(201,162,75,.45);border-radius:18px;background:linear-gradient(155deg,rgba(24,20,39,.98),rgba(8,10,18,.98));box-shadow:0 18px 60px rgba(0,0,0,.58);color:#eee7d9;backdrop-filter:blur(18px)}
+#wh-major-ai-panel.open{display:flex;animation:whMajorEnter .18s ease-out}
+.wh-major-ai-head{display:flex;align-items:center;gap:9px;padding:12px 13px;border-bottom:1px solid rgba(201,162,75,.2);background:linear-gradient(90deg,rgba(121,78,160,.15),rgba(201,162,75,.06))}
+.wh-major-ai-orb{width:35px;height:35px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(140deg,#8b69c5,#352348);box-shadow:0 0 18px rgba(143,104,197,.28);font-size:19px}
+.wh-major-ai-title{font-weight:800;color:#f0d79c;font-size:14px}
+.wh-major-ai-sub{font-size:10px;color:#a9a3b8;margin-top:2px}
+#wh-major-ai-close{margin-inline-start:auto;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(255,255,255,.04);color:#d8d1e1;padding:5px 9px;font-size:17px}
+.wh-major-ai-modes{display:flex;gap:6px;padding:10px 10px 6px;overflow-x:auto;scrollbar-width:none}
+.wh-major-ai-modes button{white-space:nowrap;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.035);color:#c7bfd4;padding:7px 10px;font-size:11px}
+.wh-major-ai-modes button.active{border-color:rgba(201,162,75,.65);background:rgba(201,162,75,.13);color:#f3d89a}
+#wh-major-ai-output{margin:5px 10px 8px;min-height:92px;max-height:28dvh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.2);padding:11px;font-size:12px;line-height:1.9;color:#e9e2f0}
+#wh-major-ai-output:empty::before{content:"از راهنمای بازی، ایده مأموریت، شخصیت‌های هوشمند یا رویداد جهان کمک بگیر.";color:#8e879b}
+.wh-major-ai-compose{display:flex;align-items:flex-end;gap:7px;padding:0 10px 10px}
+#wh-major-ai-input{flex:1;min-width:0;min-height:42px;max-height:100px;resize:vertical;border:1px solid rgba(201,162,75,.25);border-radius:12px;background:rgba(0,0,0,.28);color:#f7f0e4;padding:10px;font:inherit;font-size:12px;outline:none}
+#wh-major-ai-input:focus{border-color:rgba(201,162,75,.7)}
+#wh-major-ai-send{border:1px solid rgba(201,162,75,.55);border-radius:12px;background:linear-gradient(145deg,#806038,#49304f);color:#fff0c7;padding:10px 12px;min-height:42px;font-size:12px;font-weight:700}
+#wh-major-ai-send:disabled{opacity:.55}
+.wh-major-ai-foot{font-size:9px;color:#898296;padding:0 12px 10px;line-height:1.5}
+@media(max-width:360px){#wh-major-ai-launch{width:44px;height:44px;left:8px}#wh-major-ai-panel{left:8px;width:calc(100vw - 16px)}}
+@media(prefers-reduced-motion:reduce){.wh-major-enter,#screen-auth::before,#wh-major-ai-panel.open{animation:none!important}button,.region{transition:none!important}}
