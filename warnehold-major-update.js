@@ -64,7 +64,7 @@ function observe(){
  const root=document.getElementById('app')||document.body;
  const observer=new MutationObserver(records=>{
   let screenChanged=false,visibilityChanged=false;
-  for(const r of records){if(r.type==='attributes'&&r.attributeName==='class'&&r.target.classList?.contains('screen')){if(r.target.classList.contains('active')&&!(r.oldValue||'').split(/\\s+/).includes('active'))screenChanged=true;}else visibilityChanged=true}
+  for(const r of records){if(r.type==='attributes'&&r.attributeName==='class'&&r.target.classList?.contains('screen')){if(r.target.classList.contains('active')&&!(r.oldValue||'').includes('active'))screenChanged=true;}else visibilityChanged=true}
   if(screenChanged){
    const screen=document.querySelector('.screen.active');
    if(screen&&!screen.classList.contains('wh-major-enter')){
