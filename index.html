@@ -8221,7 +8221,7 @@ body{overflow:hidden!important}
 #screen-shop.wh-shop-v2 .wh-shop-mode-row .shop-tab.active{background:linear-gradient(135deg,#e8c66e,#a87832);color:#21150a;border-color:#f5d78a;box-shadow:0 0 16px #d4a34a25}
 #screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab{border-radius:9px;background:#19151d;border-color:#42313b;color:#c8bba9;padding:8px 10px;font-family:inherit;font-size:12px}
 #screen-shop.wh-shop-v2 .wh-shop-cat-row .shop-tab.active{background:linear-gradient(135deg,#3c2733,#6e3436);border-color:#c49a51;color:#ffe7b2;box-shadow:inset 0 0 0 1px #f5d99422}
-#screen-shop.wh-shop-v2 .wh-shop-toolbar{flex:none;display:flex;gap:7px;align-items:center}
+#screen-shop.wh-shop-v2 #wh-shop-toolbar,#screen-shop.wh-shop-v2 #wh-shop-extra-nav,#screen-shop.wh-shop-v2 #wh-shop-hero{display:none!important}
 #screen-shop.wh-shop-v2 .wh-shop-search{flex:1;min-width:0;border:1px solid #6e5639;background:#100d14;color:#f8e8c9;border-radius:10px;padding:10px 11px;font-size:13px;outline:none}
 #screen-shop.wh-shop-v2 .wh-shop-search:focus{border-color:#e4bd68;box-shadow:0 0 0 2px #e4bd6822}
 #screen-shop.wh-shop-v2 .wh-shop-sort{max-width:118px;border:1px solid #6e5639;background:#19141c;color:#f4dfb6;border-radius:10px;padding:9px 6px;font-size:11px}
@@ -8358,12 +8358,7 @@ body{overflow:hidden!important}
  function ensureChrome(){
   const screen=$('#screen-shop');if(!screen)return;screen.classList.add('wh-shop-v2');
   const tabs=$('#shop-tabs'),list=$('#shop-list');if(!tabs||!list)return;
-  if(!$('#wh-shop-hero')){
-   const hero=document.createElement('div');hero.id='wh-shop-hero';hero.className='wh-shop-hero';
-   hero.innerHTML='<div class="wh-shop-hero-inner"><div class="wh-shop-kicker">WARNEHOLD · MERCHANTS GUILD</div><div class="wh-shop-title">بازار بزرگ وارنهولد</div><div class="wh-shop-subtitle" id="wh-shop-vendor-info">تمام کالاهای وارنهولد · موجودی نامحدود</div><div class="wh-shop-currencies" id="wh-shop-currencies"></div></div>';
-   tabs.parentNode.insertBefore(hero,tabs);
-  }
-  if(!$('#wh-shop-toolbar')){
+  /* cinematic expansion hero removed to restore classic shop header */  if(!$('#wh-shop-toolbar')){
    const toolbar=document.createElement('div');toolbar.id='wh-shop-toolbar';toolbar.className='wh-shop-toolbar';
    toolbar.innerHTML='<input class="wh-shop-search" id="wh-shop-search" type="search" maxlength="70" placeholder="🔎 جست‌وجوی کالا..." aria-label="جست‌وجوی کالا"><select class="wh-shop-sort" id="wh-shop-sort" aria-label="مرتب‌سازی"><option value="recommended">پیشنهادی</option><option value="priceUp">ارزان‌تر</option><option value="priceDown">گران‌تر</option><option value="rarity">کمیاب‌تر</option><option value="stock">موجودی بیشتر</option></select>';
    list.parentNode.insertBefore(toolbar,list);
@@ -8404,7 +8399,7 @@ body{overflow:hidden!important}
  function drawTabs(){
   const tabs=$('#shop-tabs');if(!tabs)return;
   const modeRow='<div class="wh-shop-mode-row">'+[['buy','🛒 خرید'],['sell','💰 فروش'],['salvage','♻️ بازیافت']].map(([m,l])=>'<button type="button" class="shop-tab '+(mode===m?'active':'')+'" data-shop-mode="'+m+'">'+l+'</button>').join('')+'</div>';
-  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+[['all','🛍️ همه کالاها'],...CATEGORY_ORDER.filter(c=>vendorItems(catalog).some(i=>i.cat===c)).map(c=>[c,CATEGORY_LABELS[c]||c])].map(([c,l])=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+c+'">'+esc(l)+'</button>').join('')+'</div>':'';
+  const cats=mode==='buy'?'<div class="wh-shop-cat-row">'+[['all','همه کالاها'],...CATEGORY_ORDER.filter(c=>vendorItems(catalog).some(i=>i.cat===c)).map(c=>[c,CATEGORY_LABELS[c]||c])].map(([c,l])=>'<button type="button" class="shop-tab '+(activeCat===c?'active':'')+'" data-shop-cat="'+c+'">'+esc(l)+'</button>').join('')+'</div>':'';
   tabs.innerHTML=modeRow+cats;
  }
  function sortedItems(items){
