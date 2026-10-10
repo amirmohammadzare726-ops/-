@@ -1,4 +1,4 @@
-const CACHE_NAME = 'warnehold-shell-v2';
+const CACHE_NAME = 'warnehold-shell-v3';
 const SHELL = ['/index.html','/warnehold-major-update.css','/warnehold-major-update.js'];
 
 self.addEventListener('install', event => {
