@@ -10,7 +10,7 @@ const modes=[
  {id:'social',label:'اجتماعی'}
 ];
 let activeMode='guide',busy=false;
-const el=(tag,attrs={},text='')=>{const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k==='class')n.className=v;else if(k==='type'||k==='title'||k==='aria-label')n.setAttribute(k,v);else n[k]=v});if(text)n.textContent=text;return n};
+const el=(tag,attrs={},text='')=>{const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k==='class')n.className=v;else if(k.startsWith('data-')||k==='type'||k==='title'||k==='aria-label'||k==='role')n.setAttribute(k,v);else n[k]=v});if(text)n.textContent=text;return n};
 function build(){
  if(document.getElementById('wh-major-ai-launch'))return;
  const launch=el('button',{id:'wh-major-ai-launch',type:'button','aria-label':'باز کردن دستیار هوشمند وارنهولد',title:'دستیار هوشمند'},'✦');
@@ -64,7 +64,7 @@ function observe(){
  const root=document.getElementById('app')||document.body;
  const observer=new MutationObserver(records=>{
   let screenChanged=false,visibilityChanged=false;
-  for(const r of records){if(r.type==='attributes'&&r.attributeName==='class'&&r.target.classList?.contains('screen'))screenChanged=true;else visibilityChanged=true}
+  for(const r of records){if(r.type==='attributes'&&r.attributeName==='class'&&r.target.classList?.contains('screen')){if(r.target.classList.contains('active')&&!(r.oldValue||'').split(/\\s+/).includes('active'))screenChanged=true;}else visibilityChanged=true}
   if(screenChanged){
    const screen=document.querySelector('.screen.active');
    if(screen&&!screen.classList.contains('wh-major-enter')){
@@ -74,7 +74,7 @@ function observe(){
   }
   if(visibilityChanged||screenChanged)updateVisibility();
  });
- observer.observe(root,{subtree:true,attributes:true,attributeFilter:['class','style']});
+ observer.observe(root,{subtree:true,attributes:true,attributeOldValue:true,attributeFilter:['class','style']});
  updateVisibility();
 }
 function init(){build();observe();setTimeout(updateVisibility,800);setTimeout(updateVisibility,2200)}
