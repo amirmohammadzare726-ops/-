@@ -1,5 +1,5 @@
-const CACHE_NAME = 'warnehold-shell-v3';
-const SHELL = ['/index.html','/warnehold-major-update.css','/warnehold-major-update.js'];
+const CACHE_NAME = 'warnehold-shell-v4';
+const SHELL = ['/index.html','/warnehold-major-update.css','/warnehold-major-update.js','/assets/warnehold-bg-auth.svg','/assets/warnehold-bg-world.svg','/assets/warnehold-bg-battle.svg','/assets/warnehold-bg-shop.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
