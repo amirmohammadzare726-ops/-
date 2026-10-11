@@ -7017,6 +7017,8 @@ function attemptPreFightRun(){
 }
 
 function startBattle(enemyId){
+  /* WH Combat Zones v1: remember the combat/hunting screen so repeat fights never force a return through world travel. */
+  try { const activeCombatScreen=document.querySelector('#game-wrap .screen.active'); const activeCombatId=activeCombatScreen&&activeCombatScreen.id; if(activeCombatId&&['screen-wh-creatures','screen-battle','screen-boss-event','screen-pvp'].includes(activeCombatId)){window.__whCombatReturnScreen=activeCombatId;}else if(!window.__whCombatReturnScreen){window.__whCombatReturnScreen='screen-map';} } catch (_) {}
   const base = ENEMIES[enemyId];
   state.battle = {
     enemyId,
@@ -7148,7 +7150,7 @@ async function playerAction(kind, powerId){
     if(success){
       pushLog('sys', 'شما با موفقیت فرار کردید.');
       renderBattleUI();
-      setTimeout(()=>{ state.battle=null; startRecoveryIfNeeded(); saveState(); showBattleIdle(); switchScreen('map'); }, 700);
+      setTimeout(()=>{ state.battle=null; startRecoveryIfNeeded(); saveState(); showBattleIdle(); window.__whCombatReturnScreen=null; switchScreen('map'); }, 700);
       return;
     } else {
       pushLog('sys', 'فرار ناموفق بود!');
@@ -7311,7 +7313,7 @@ async function reactToEnemyAttack(reaction){
       state.battle.over = true;
       startRecoveryIfNeeded();
       saveState();
-      setTimeout(()=>{ state.battle=null; saveState(); showBattleIdle(); switchScreen('map'); }, 1200);
+      setTimeout(()=>{ state.battle=null; saveState(); showBattleIdle(); const dest=window.__whCombatReturnScreen||'screen-map'; window.__whCombatReturnScreen=null; if(dest==='screen-wh-creatures'&&typeof openExpansion==='function'){openExpansion();}else if(dest==='screen-boss-event'&&typeof openBossScreen==='function'){openBossScreen();}else if(dest==='screen-pvp'){switchScreen('pvp');}else{switchScreen('map');} }, 1200);
       ['react-dodge-counter','react-clash','react-dodge-flee'].forEach(id=> $('#'+id).disabled = false);
       return;
     }
