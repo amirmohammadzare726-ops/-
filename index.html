@@ -8820,6 +8820,31 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
 })();
 </script>
 
+<script id="wh-force-visible-regions-shortcut">
+(function(){
+  function addRegionsShortcut(){
+    const home=document.getElementById('screen-map');
+    if(!home)return;
+    const quick=home.querySelector('.wh-v8-quick');
+    if(!quick)return;
+    if(quick.querySelector('[data-wh-regions-shortcut="1"]'))return;
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.setAttribute('data-wh-regions-shortcut','1');
+    btn.textContent='🧭 مناطق جهان و سفر';
+    btn.style.cssText='display:block!important;visibility:visible!important;opacity:1!important;width:100%;min-height:54px;grid-column:1/-1;background:linear-gradient(135deg,rgba(42,29,54,.98),rgba(12,16,25,.98));border:1px solid #b99b62;border-radius:14px;color:#f3dfad;font-weight:700;font-size:15px;margin:8px 0;position:relative;z-index:5;';
+    btn.addEventListener('click',function(){
+      if(typeof window.switchScreen==='function')window.switchScreen('regions');
+      else if(typeof window.switchScreenCore==='function')window.switchScreenCore('regions');
+      else {const s=document.getElementById('screen-regions'); if(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));s.classList.add('active');}}
+    });
+    quick.appendChild(btn);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addRegionsShortcut);
+  else addRegionsShortcut();
+  setTimeout(addRegionsShortcut,800);
+})();
+</script>
 </body>
 
 <style id="wh-game-ui-final">
