@@ -8778,6 +8778,10 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
     }
     const regionList=document.getElementById('region-list');
     if(regionList&&regionList.parentElement!==regions)regions.appendChild(regionList);
+    const shortcuts=document.getElementById('open-pvp-btn')?.parentElement;
+    if(shortcuts&&shortcuts.parentElement!==regions)regions.insertBefore(shortcuts,regionList||null);
+    const worldMapButton=document.getElementById('open-worldmap-btn');
+    if(worldMapButton&&worldMapButton.parentElement!==regions)regions.insertBefore(worldMapButton,regionList||null);
     const dailyTitle=Array.from(home.querySelectorAll('h3')).find(e=>e.textContent.includes('فعالیت‌های روزانه'));
     const daily=document.getElementById('daily-panel');
     if(dailyTitle&&dailyTitle.parentElement!==regions)regions.appendChild(dailyTitle);
