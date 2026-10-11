@@ -10370,4 +10370,41 @@ else start();
 setInterval(start,2500);
 })();
 </script>
+
+<style id="wh-v12-viewport-lock">
+/* V12 — Keep the active game scene inside the phone viewport; scroll the scene, not the whole page. */
+@supports (height: 100dvh) {
+  body:has(#game-wrap[style*="display: flex"]) {
+    height:100dvh !important;
+    overflow:hidden !important;
+  }
+  body:has(#game-wrap[style*="display: flex"]) #app {
+    height:100dvh !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+  }
+  body:has(#game-wrap[style*="display: flex"]) #game-wrap {
+    height:100dvh !important;
+    min-height:0 !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+    flex:1 1 auto !important;
+  }
+  #game-wrap > .screen {
+    min-height:0 !important;
+    height:auto !important;
+    max-height:none !important;
+    flex:1 1 0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain;
+    padding-bottom:calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+    scrollbar-width:thin;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #game-wrap .screen.active { scroll-behavior:auto !important; }
+}
+</style>
+
 </html>
