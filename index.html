@@ -10464,49 +10464,57 @@ setInterval(start,2500);
 </style>
 
 
-<style id="wh-v13-background-layer-repair">
-/* Keep scene artwork behind the UI; never let a pseudo-element cover the game. */
-#game-wrap > .screen{
+<style id="wh-v14-background-layer-repair">
+/* V14: reliable foreground/midground/background order. The artwork must never sit behind the black game shell. */
+#game-wrap .screen{
   position:relative!important;
   isolation:isolate!important;
   background-color:transparent!important;
-  background-image:none!important;
 }
-#game-wrap > .screen::before{
+#game-wrap .screen::before{
   content:""!important;
   position:absolute!important;
   inset:0!important;
-  z-index:-2!important;
+  z-index:0!important;
   pointer-events:none!important;
   background-size:cover!important;
   background-position:center center!important;
   background-repeat:no-repeat!important;
+  background-color:transparent!important;
   opacity:1!important;
-  filter:saturate(1.02) contrast(1.02) brightness(1.04)!important;
-  transform:scale(1.015)!important;
+  filter:saturate(1.04) contrast(1.03) brightness(1.12)!important;
+  transform:none!important;
 }
-#game-wrap > .screen::after{
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked)::after{
   content:""!important;
   position:absolute!important;
   inset:0!important;
-  z-index:-1!important;
+  z-index:1!important;
   pointer-events:none!important;
-  background:linear-gradient(180deg,rgba(7,6,5,.06),rgba(7,6,5,.28) 88%)!important;
+  background:linear-gradient(180deg,rgba(5,5,7,.04),rgba(5,5,7,.30) 92%)!important;
 }
-#game-wrap > .screen > *{
-  position:relative;
-  z-index:1;
+#game-wrap .screen:not(#screen-auth):not(#screen-start):not(#screen-blocked) > *{
+  position:relative!important;
+  z-index:2!important;
 }
-#screen-auth > .auth-particles{
+#game-wrap .screen > .auth-particles{
   position:absolute!important;
   inset:0!important;
-  z-index:2!important;
+  z-index:3!important;
   pointer-events:none!important;
 }
 #screen-map .wh-v8-home,
+#screen-map .wh-v8-quick,
 #screen-map .wh-v8-quick button{
-  position:relative;
-  z-index:2;
+  position:relative!important;
+  z-index:2!important;
+}
+/* The dedicated regions/travel screen also gets real scene art. */
+#screen-regions::before,
+#screen-quest::before,
+#screen-job::before,
+#screen-welcome::before{
+  background-image:url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important;
 }
 </style>
 
