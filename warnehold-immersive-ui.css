@@ -8,7 +8,7 @@
 }
 html{min-height:100%;background:#090b10}
 body{min-height:100dvh;background:#090b10}
-#app{min-height:100dvh;min-height:100svh;overflow:clip;background:#090b10}
+#app{min-height:100dvh;min-height:100svh;background:#090b10}
 .screen{
   position:relative;
   isolation:isolate;
@@ -46,9 +46,6 @@ body{min-height:100dvh;background:#090b10}
 #screen-social,#screen-chat,#screen-collection,#screen-inv,#screen-quest,#screen-job,#screen-notifcenter{
   background-image:linear-gradient(180deg,rgba(5,9,16,.36),rgba(5,7,13,.76)),url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important;
 }
-/* Bring actual screen content above the decorative backdrop. */
-.screen>*{position:relative}
-#screen-auth>* ,#screen-start>*{z-index:1}
 #hud{
   background:rgba(12,14,20,.92)!important;
   border-bottom:1px solid var(--wh-glass-line)!important;
