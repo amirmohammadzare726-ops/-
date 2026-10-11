@@ -198,3 +198,50 @@ button:focus-visible{outline:2px solid #e8c56f;outline-offset:2px}
   .screen.active:not(#screen-auth):not(#screen-start):not(#screen-blocked){animation:none!important}
   .region{transition:none!important}
 }
+
+
+/* Stage 3 hotfix — force refreshed stylesheet and make the RPG scenes unmistakable. */
+.screen{
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+  background-attachment:scroll!important;
+  border-top:1px solid rgba(220,184,104,.16);
+}
+.screen::before{
+  z-index:0!important;
+  background:linear-gradient(180deg,rgba(4,7,13,.10) 0%,rgba(4,7,13,.30) 42%,rgba(4,7,13,.62) 100%)!important;
+}
+.screen > *{position:relative;z-index:1}
+#screen-map{
+  background-image:linear-gradient(180deg,rgba(5,8,15,.10),rgba(5,8,15,.38) 55%,rgba(5,8,15,.60)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg')!important;
+}
+#screen-worldmap,#screen-village-map,#screen-journey{
+  background-image:linear-gradient(180deg,rgba(4,8,15,.08),rgba(4,8,15,.40) 55%,rgba(4,8,15,.62)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f171f5f3-ab32-418d-b2cb-0cdbf636a751.jpg')!important;
+}
+#screen-battle,#screen-boss-event,#screen-pvp{
+  background-image:linear-gradient(180deg,rgba(9,3,12,.08),rgba(5,5,12,.40) 55%,rgba(5,5,12,.66)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/4c513103-7b0c-477e-ac43-0c4248d9e3ec.jpg')!important;
+}
+#screen-shop,#screen-animeshop,#screen-blacksmith,#screen-auction,#screen-transfer{
+  background-image:linear-gradient(180deg,rgba(6,6,14,.08),rgba(5,5,12,.42) 55%,rgba(5,5,12,.66)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg')!important;
+}
+#screen-social,#screen-chat,#screen-collection,#screen-inv,#screen-quest,#screen-job,#screen-notifcenter{
+  background-image:linear-gradient(180deg,rgba(4,7,13,.12),rgba(5,5,12,.42) 55%,rgba(5,5,12,.68)),url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important;
+}
+#screen-map .section-title,#screen-worldmap .section-title,#screen-battle .section-title,
+#screen-shop .section-title,#screen-quest .section-title,#screen-job .section-title{
+  background:linear-gradient(100deg,rgba(10,12,18,.94),rgba(10,12,18,.60))!important;
+  border-inline-start:3px solid #d8b45f!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 0 18px rgba(201,162,75,.06)!important;
+}
+#hud{background:linear-gradient(100deg,rgba(9,11,17,.97),rgba(25,18,15,.96))!important}
+.bars{background:rgba(8,10,16,.92)!important}
+#nav{background:linear-gradient(180deg,rgba(15,15,20,.97),rgba(5,7,12,.99))!important}
+.region,.enemy-card,.item-row,.stat-box,.equip-slot-row,.pick-card,.action-btn,#power-panel,
+.quest-card,.shop-card,.chat-panel,.social-panel,.empty-note{
+  box-shadow:0 10px 26px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.025)!important;
+}
+@media(max-width:520px){
+  #app{width:100%;max-width:none}
+  .screen{min-height:calc(100svh - 68px);padding-top:14px}
+}
