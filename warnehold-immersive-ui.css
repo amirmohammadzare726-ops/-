@@ -415,3 +415,86 @@ button:focus-visible{outline:2px solid #e8c56f;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){
   #game-wrap .screen.active{animation:none!important}
 }
+
+
+/* Stage 5 — complete mobile-first scene composition. */
+html,body,#app{height:100%;min-height:100%;overscroll-behavior:none}
+body{overflow:hidden!important}
+#app{height:100dvh!important;height:100svh!important;min-height:0!important;overflow:hidden!important}
+#game-wrap{height:100dvh!important;height:100svh!important;min-height:0!important;flex:1 1 auto!important}
+#game-wrap .screen{isolation:isolate!important;scroll-padding-bottom:84px}
+#game-wrap .screen::before{pointer-events:none!important}
+#game-wrap .screen::after{pointer-events:none!important}
+#game-wrap .screen > *{position:relative;z-index:2}
+#game-wrap .screen > .section-title{z-index:3}
+#wh-game-nav .wh-icon{display:block;font-size:19px;line-height:1.05;margin-bottom:1px}
+#wh-game-nav button{font-family:inherit!important;letter-spacing:0!important}
+#wh-game-nav button.active{box-shadow:inset 0 2px rgba(255,222,154,.28),0 0 14px rgba(201,162,75,.08)!important}
+body:has(#screen-auth.active) #wh-game-nav,
+body:has(#screen-start.active) #wh-game-nav,
+body:has(#screen-blocked.active) #wh-game-nav,
+body:has(#screen-auth.active) #nav,
+body:has(#screen-start.active) #nav,
+body:has(#screen-blocked.active) #nav{display:none!important}
+body:has(#game-wrap[style*="display: flex"]) #wh-game-nav,
+body:has(#game-wrap[style*="display:flex"]) #wh-game-nav{display:flex!important}
+#game-wrap .screen h2.section-title{font-size:17px!important;line-height:1.35}
+#game-wrap .screen h3{font-size:14px!important}
+#game-wrap .screen p{line-height:1.7}
+#game-wrap .screen input,
+#game-wrap .screen select,
+#game-wrap .screen textarea{
+  max-width:100%!important;
+  border-radius:9px!important;
+  border-color:rgba(226,190,112,.25)!important;
+}
+#game-wrap .screen .wh-v8-home{
+  margin:0 0 12px!important;
+  padding:14px!important;
+  border:1px solid rgba(226,190,112,.32)!important;
+  border-radius:15px!important;
+  background:linear-gradient(145deg,rgba(26,25,30,.90),rgba(8,11,17,.72))!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.28)!important;
+}
+#game-wrap .wh-v8-home-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+#game-wrap .wh-v8-home-title{font-size:20px!important;font-weight:800;color:#f2d99e!important}
+#game-wrap .wh-v8-home-sub{font-size:11px;color:#c0b7a6!important;margin-top:3px}
+#game-wrap .wh-v8-home .eyebrow{font-size:9px!important;opacity:.65}
+#game-wrap .wh-v8-quick{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+#game-wrap .wh-v8-quick button{
+  min-height:55px!important;
+  padding:9px!important;
+  text-align:right!important;
+  border:1px solid rgba(226,190,112,.22)!important;
+  border-radius:10px!important;
+  background:linear-gradient(140deg,rgba(66,47,29,.58),rgba(11,14,21,.86))!important;
+  color:#eee1c4!important;font-size:12px!important;
+}
+#game-wrap .wh-v8-mini{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+#game-wrap .wh-v8-mini span{padding:5px 8px;border-radius:7px;background:rgba(0,0,0,.25);border:1px solid rgba(226,190,112,.12);font-size:10px}
+#game-wrap .wh-v8-battle{
+  padding:11px 12px!important;margin-bottom:10px!important;
+  border:1px solid rgba(214,75,75,.38)!important;border-radius:12px!important;
+  background:linear-gradient(130deg,rgba(71,18,27,.75),rgba(10,12,19,.88))!important;
+}
+#game-wrap .wh-v8-battle .row{display:flex;align-items:center;gap:8px;margin:5px 0}
+#game-wrap .wh-v8-battle .track{flex:1;min-width:0}
+#game-wrap .screen .region{padding:12px!important}
+#game-wrap .screen .region .region-name{font-size:14px!important}
+#game-wrap .screen .shop-tabs{top:0!important;z-index:5!important;border-radius:0 0 10px 10px}
+#game-wrap .screen .chat-messages{max-height:38dvh;overflow-y:auto}
+#game-wrap .screen .combat-log{max-height:26dvh;overflow-y:auto}
+#game-wrap #screen-auth,
+#game-wrap #screen-start,
+#game-wrap #screen-blocked{padding:0!important}
+#screen-auth .auth-shell{min-height:100dvh!important;min-height:100svh!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:22px 16px calc(26px + env(safe-area-inset-bottom))!important}
+#screen-auth .auth-panel{width:min(100%,440px)!important;margin:auto!important}
+@media(min-width:520px){
+  #game-wrap .screen{padding-left:20px!important;padding-right:20px!important}
+  #game-wrap .wh-v8-quick{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:350px){
+  #wh-game-nav button{font-size:9px!important;padding-inline:1px!important}
+  #wh-game-nav .wh-icon{font-size:17px!important}
+  #game-wrap .screen{padding-left:10px!important;padding-right:10px!important}
+}
