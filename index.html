@@ -5522,7 +5522,7 @@ function showToast(msg){
 
 function switchScreenCore(name){
   $$('.screen').forEach(s=>s.classList.remove('active'));
-  const map = {map:'screen-map', battle:'screen-battle', char:'screen-char', inv:'screen-inv', shop:'screen-shop', chat:'screen-chat', admin:'screen-admin', social:'screen-social', pvp:'screen-pvp', blacksmith:'screen-blacksmith', villagemap:'screen-village-map', worldmap:'screen-worldmap', notifcenter:'screen-notifcenter', animeshop:'screen-animeshop', collection:'screen-collection', welcome:'screen-welcome', auction:'screen-auction', journey:'screen-journey', quest:'screen-quest', job:'screen-job', transfer:'screen-transfer'};
+  const map = {map:'screen-map', regions:'screen-regions', battle:'screen-battle', char:'screen-char', inv:'screen-inv', shop:'screen-shop', chat:'screen-chat', admin:'screen-admin', social:'screen-social', pvp:'screen-pvp', blacksmith:'screen-blacksmith', villagemap:'screen-village-map', worldmap:'screen-worldmap', notifcenter:'screen-notifcenter', animeshop:'screen-animeshop', collection:'screen-collection', welcome:'screen-welcome', auction:'screen-auction', journey:'screen-journey', quest:'screen-quest', job:'screen-job', transfer:'screen-transfer'};
   $('#'+map[name]).classList.add('active');
   $$('#nav button').forEach(b=>b.classList.toggle('active', b.dataset.screen===name));
   stopChatPolling(); stopSocialPolling(); if(name!=='pvp') stopPvpPolling(); if(name!=='social') stopTradePolling(); if(name!=='villagemap') stopVillageMapLoop();
