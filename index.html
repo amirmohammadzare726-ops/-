@@ -5528,14 +5528,7 @@ function showToast(msg){
 }
 
 function switchScreenCore(name){
-  /* Combat access is tied to the player's actual region. Travel remains in Regions & Travel only. */
-  const here=(state&&state.region)||'capital';
-  if(name==='pvp'&&here!=='capital'){showToast('برای ورود به میدان PvP باید در پایتخت باشی. از بخش مناطق و سفر به پایتخت برگرد.');return;}
-  if(name==='battle'&&pendingEncounter){
-    const valid=REGIONS[here]&&Array.isArray(REGIONS[here].encounters)&&REGIONS[here].encounters.includes(pendingEncounter.id);
-    if(!valid){showToast('این برخورد مربوط به منطقه فعلی تو نیست. از بخش مناطق و سفر وارد منطقه درست شو.');pendingEncounter=null;return;}
-  }
-  $('.screen').forEach(s=>s.classList.remove('active'));
+  $$('.screen').forEach(s=>s.classList.remove('active'));
   const map = {map:'screen-map', regions:'screen-regions', battle:'screen-battle', char:'screen-char', inv:'screen-inv', shop:'screen-shop', chat:'screen-chat', admin:'screen-admin', social:'screen-social', pvp:'screen-pvp', blacksmith:'screen-blacksmith', villagemap:'screen-village-map', worldmap:'screen-worldmap', notifcenter:'screen-notifcenter', animeshop:'screen-animeshop', collection:'screen-collection', welcome:'screen-welcome', auction:'screen-auction', journey:'screen-journey', quest:'screen-quest', job:'screen-job', transfer:'screen-transfer'};
   $('#'+map[name]).classList.add('active');
   $$('#nav button').forEach(b=>b.classList.toggle('active', b.dataset.screen===name));
@@ -9609,11 +9602,7 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
     bossAnim=requestAnimationFrame(function(){renderBossCanvas(ev)})
   }
   function stopBossCanvas(){if(bossAnim)cancelAnimationFrame(bossAnim);bossAnim=null}
-  function openBossScreen(){
-    if(!state||state.region!=='capital'){showToast('میدان باس روزانه در پایتخت قرار دارد. اول از بخش مناطق و سفر به پایتخت برو.');return;}
-    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
-    document.getElementById('screen-boss-event').classList.add('active');renderBossEvent()
-  }
+  function openBossScreen(){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById('screen-boss-event').classList.add('active');renderBossEvent()}
   function bossEntryState(ev){
     var cd=Number(state.bossCooldownUntil||0),w=state.bossWound||null,seals=Number(state.bossSeals??1);
     return {cd:cd,wound:w,seals:seals,locked:Date.now()<cd||!!(w&&Date.now()<w.until)||seals<1}
@@ -9908,7 +9897,6 @@ if(typeof saveState==="function")saveState();if(typeof renderHUD==="function")re
 }
 function startCreatureFight(id){
 var c=byId[id],s=state;if(!c||!s)return;
-if(s.region!==c.region){var rn=(window.REGIONS&&window.REGIONS[c.region]&&window.REGIONS[c.region].name)||({capital:'پایتخت',forest:'جنگل سایه',mountain:'کوهستان یخ‌زده',lake:'دریاچه مه‌آلود',ruins:'ویرانه‌های باستانی',desert:'کویر سوزان',cave:'غار کریستالی'}[c.region]||c.region||'منطقه مربوط');showToast('برای مبارزه با '+c.name+' باید در '+rn+' باشی. از بخش مناطق و سفر به آنجا برو.');return;}
 var missing=missingTags(c);if(missing.length){showToast("قابلیت لازم را نداری: "+missing.map(function(t){return requiredByType[t].ability}).join("، "));return}
 if(Number(s.level||1)<c.level){showToast("برای این موجود حداقل Level "+c.level+" لازم است");return}
 if(s.battle&&!s.battle.over){showToast("اول فایت فعلی را تمام کن");return}
