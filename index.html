@@ -916,7 +916,6 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
         <button class="secondary" id="open-transfer-btn" style="flex:1;">💸 اقتصاد</button>
       </div>
       <button class="secondary" id="open-worldmap-btn" style="width:100%; margin-bottom:6px;">🌍 مشاهده World Map</button>
-      <button class="primary" id="open-regions-btn" style="width:100%; margin-bottom:10px;">🧭 مناطق جهان و سفر</button>
       <div id="world-event-banner"></div>
       <div class="admin-unlock" id="weekly-history-toggle" style="margin-bottom:10px;">🏆 قهرمانان هفته‌های قبل</div>
       <div id="weekly-history-box" style="display:none; margin-bottom:10px;"></div>
@@ -7607,7 +7606,6 @@ $('#admin-unlock-link').addEventListener('click', tryAdminUnlock);
 $('#blacksmith-back-btn').addEventListener('click', ()=> switchScreen('map'));
 $('#village-map-back-btn').addEventListener('click', ()=> switchScreen('map'));
 $('#open-worldmap-btn').addEventListener('click', ()=> switchScreen('worldmap'));
-$('#open-regions-btn').addEventListener('click', ()=> switchScreen('regions'));
 $('#regions-back-btn').addEventListener('click', ()=> switchScreen('map'));
 $('#open-pvp-btn').addEventListener('click', ()=> switchScreen('pvp'));
 $('#open-job-btn').addEventListener('click', ()=> switchScreen('job'));
@@ -8964,12 +8962,14 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
       box.innerHTML=
         '<div class="wh-v8-home-head"><div><div class="wh-v8-home-title">خانه وارنهولد</div><div class="wh-v8-home-sub">دسترسی سریع به مهم‌ترین بخش‌های بازی</div></div><div class="eyebrow">GAME HUB</div></div>'+
         '<div class="wh-v8-quick">'+
+        '<button data-go="regions">🧭 مناطق جهان و سفر</button>'+
+        '<button data-go="worldmap">🌍 نقشه جهان</button>'+
+        '<button data-go="battle">⚔️ ورود به فایت</button>'+
+        '<button data-go="quest">📜 مأموریت‌ها</button>'+
         '<button data-go="char">♙ شخصیت</button>'+
-        '<button data-go="battle">⚔️ نبرد</button>'+
-        '<button data-go="quest">✦ ماموریت‌ها</button>'+
-        '<button data-go="job">◈ فعالیت‌ها</button>'+
         '<button data-go="inv">🎒 تجهیزات و موجودی</button>'+
-        '<button data-go="collection">✧ مجموعه</button>'+
+        '<button data-go="shop">🏪 فروشگاه</button>'+
+        '<button data-go="transfer">💰 اقتصاد</button>'+
         '</div>'+
         '<div class="wh-v8-mini"><span>وضعیت سریع</span><span>سطح '+valFor('#hud .lvl')+'</span><span>مکان '+valFor('#hud .ploc')+'</span></div>';
       home.insertBefore(box,home.firstChild);
