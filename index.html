@@ -6981,7 +6981,35 @@ async function renderEncounterCard(){
     const narBox = $('#encounter-narrative');
     if(narBox) narBox.textContent = narr || `${e.name} در مسیر شما ظاهر شده و نگاهش را به شما دوخته است.`;
   } else {
-    box.innerHTML = 'اکنون در نبرد نیستید. از نقشه یک منطقه را انتخاب کنید تا با دشمنی روبرو شوید.';
+    const currentRegion = REGIONS[state.region];
+    const canRepeatHere = !!(currentRegion && Array.isArray(currentRegion.encounters) && currentRegion.encounters.length);
+    box.innerHTML = 'اکنون در نبرد نیستید.' + (canRepeatHere ? `<div class="npc-dialogue" style="margin-top:8px;">برای شروع فایت بعدی لازم نیست از منطقه فعلی خارج شوی.</div><button class="quest-btn ready" id="battle-repeat-current" style="width:100%;margin-top:8px;">⚔️ فایت بعدی در همین منطقه</button>` : '<div class="npc-dialogue">از نقشه یک منطقه دارای دشمن انتخاب کن تا با موجودی روبرو شوی.</div>');
+    const repeatBtn = $('#battle-repeat-current');
+    if (repeatBtn) repeatBtn.onclick = async () => {
+      if (state.battle && !state.battle.over) return;
+      if (typeof isRecovering === 'function' && isRecovering()) {
+        showToast('هنوز در حال بازیابی HP هستی؛ بعد از پایان بازیابی می‌تونی فایت بعدی رو شروع کنی.');
+        return;
+      }
+      const regionId = state.region;
+      const region = REGIONS[regionId];
+      if (!region || !Array.isArray(region.encounters) || !region.encounters.length) {
+        showToast('در منطقه فعلی دشمنی برای مبارزه وجود ندارد.');
+        return;
+      }
+      repeatBtn.disabled = true;
+      try {
+        const encounter = await rollEncounter(regionId);
+        if (!encounter) { showToast('فعلاً دشمن مناسبی برای این سطح پیدا نشد.'); return; }
+        pendingEncounter = encounter;
+        renderEncounterCard();
+      } catch (err) {
+        console.error('Repeat combat encounter failed:', err);
+        showToast('شروع فایت بعدی ناموفق بود؛ دوباره تلاش کن.');
+      } finally {
+        if (repeatBtn.isConnected) repeatBtn.disabled = false;
+      }
+    };
   }
 }
 
