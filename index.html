@@ -8698,6 +8698,115 @@ body{overflow:hidden!important}
 #screen-shop::before,#screen-animeshop::before,#screen-auction::before,#screen-blacksmith::before{background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg')!important}
 #screen-quest::before,#screen-job::before{background-image:url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important}
 </style>
+
+<style id="wh-final-mobile-rpg-shell">
+/* Warnehold — actual game-shell pass on the canonical index.html */
+:root{--wh-scene-nav:calc(66px + env(safe-area-inset-bottom))}
+html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:none;background:#07090e}
+#app{width:100%;height:100dvh;height:100svh;min-height:0;max-width:none;overflow:hidden}
+#game-wrap{height:100dvh!important;height:100svh!important;min-height:0!important;max-width:520px;width:100%;margin-inline:auto;overflow:hidden!important;isolation:isolate}
+#game-wrap .screen:not(.wh-secondary){flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;padding:12px 13px calc(var(--wh-scene-nav) + 12px)!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch}
+#game-wrap .screen:not(.active){display:none!important}
+#game-wrap .screen.active:not(.wh-secondary){display:flex!important}
+#game-wrap .screen::before{background-size:cover!important;background-position:center!important;transform:none!important;pointer-events:none!important}
+#game-wrap .screen::after{pointer-events:none!important}
+#game-wrap .screen> *{position:relative;z-index:2}
+#game-wrap #hud{flex:0 0 auto!important;min-height:48px;padding-top:max(5px,env(safe-area-inset-top))!important;padding-bottom:5px!important}
+#game-wrap #hud-bars{flex:0 0 auto!important;padding:4px 10px!important}
+#game-wrap #hud-currency{flex:0 0 auto!important;min-height:3px!important;padding:2px 12px!important}
+#wh-game-nav{left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(100%,520px)!important;bottom:0!important;height:auto!important;min-height:60px!important;padding:5px 5px calc(5px + env(safe-area-inset-bottom))!important;border-radius:17px 17px 0 0!important;border-left:0!important;border-right:0!important;border-bottom:0!important;z-index:5000!important;gap:3px!important;background:rgba(7,9,15,.97)!important;box-shadow:0 -9px 28px rgba(0,0,0,.42)!important}
+#wh-game-nav button{min-height:48px!important;border-radius:10px!important;font-size:10px!important;gap:3px!important}
+#wh-game-nav button .wh-icon{font-size:18px!important}
+#game-wrap .section-title{font-size:17px!important;line-height:1.3!important;margin:0 0 12px!important;padding:11px 13px!important;border:1px solid rgba(226,190,112,.30)!important;border-right:3px solid #d6ad59!important;border-radius:4px 11px 11px 4px!important;background:linear-gradient(100deg,rgba(20,21,29,.92),rgba(20,21,29,.48))!important;box-shadow:0 7px 20px rgba(0,0,0,.22)!important}
+#game-wrap .region,#game-wrap .enemy-card,#game-wrap .item-row,#game-wrap .stat-box,#game-wrap .equip-slot-row,#game-wrap .pick-card,#game-wrap .quest-card,#game-wrap .shop-item,#game-wrap .identity-card,#game-wrap .action-btn{border-radius:12px!important;border-color:rgba(226,190,112,.27)!important;box-shadow:0 8px 22px rgba(0,0,0,.22)!important}
+#game-wrap button.primary,#game-wrap button.secondary,#game-wrap .action-btn,#game-wrap .shop-tab,#game-wrap .chat-tab{min-height:42px;border-radius:10px!important}
+#screen-map{gap:8px}
+#screen-map>.section-title{display:none!important}
+#screen-map .wh-v8-home{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;min-height:clamp(330px,49svh,430px)!important;margin:0 0 12px!important;padding:17px!important;overflow:hidden;border:1px solid rgba(230,193,111,.42)!important;border-radius:17px!important;background-image:linear-gradient(180deg,rgba(5,7,13,.10) 0%,rgba(5,7,13,.25) 28%,rgba(5,7,13,.88) 100%),var(--wh-bg-city)!important;background-size:cover!important;background-position:center!important;box-shadow:0 15px 36px rgba(0,0,0,.36)!important}
+#screen-map .wh-v8-home::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 15%,rgba(231,190,98,.18),transparent 48%)}
+#screen-map .wh-v8-home-head{align-items:flex-start;margin-bottom:auto!important}
+#screen-map .wh-v8-home-title{font-size:23px!important;color:#ffe4a7!important;text-shadow:0 2px 18px rgba(0,0,0,.75)}
+#screen-map .wh-v8-home-sub{font-size:12px!important;color:#eee3d0!important;text-shadow:0 2px 8px #000}
+#screen-map .wh-v8-home .eyebrow{padding:5px 7px;border:1px solid rgba(255,223,158,.32);border-radius:7px;background:rgba(4,6,10,.45);color:#f1d99e!important}
+#screen-map .wh-v8-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+#screen-map .wh-v8-quick button{min-height:47px!important;padding:9px 10px!important;text-align:right!important;border:1px solid rgba(242,211,147,.34)!important;border-radius:10px!important;background:linear-gradient(115deg,rgba(31,28,30,.88),rgba(8,11,17,.82))!important;color:#fff0cf!important;font-size:12px!important;box-shadow:0 5px 15px rgba(0,0,0,.2)!important;backdrop-filter:blur(7px)}
+#screen-map .wh-v8-mini{flex-wrap:wrap!important;gap:6px!important;margin-top:0!important}
+#screen-map .wh-v8-mini span{padding:5px 8px!important;border:1px solid rgba(242,211,147,.18)!important;border-radius:7px!important;background:rgba(4,6,10,.58)!important;color:#e9dec7!important}
+#screen-map #open-pvp-btn,#screen-map #open-job-btn,#screen-map #open-quest-btn,#screen-map #open-transfer-btn{display:none!important}
+#screen-map #open-worldmap-btn{display:none!important}
+#screen-map #world-event-banner{margin:0!important}
+#screen-map #weekly-history-toggle{margin:0!important;padding:10px 12px;border:1px solid rgba(226,190,112,.24);border-radius:10px;background:rgba(10,12,18,.78);text-align:center}
+#screen-regions{background-color:#0b0e14!important;background-image:linear-gradient(180deg,rgba(5,9,15,.20),rgba(5,8,14,.70)),var(--wh-bg-map)!important;background-size:cover!important;background-position:center!important}
+#screen-regions .wh-regions-intro{margin:0 0 12px;padding:11px 12px;border:1px solid rgba(226,190,112,.22);border-radius:10px;background:rgba(7,10,16,.72);color:#ded4c2;font-size:12px;line-height:1.8}
+#screen-regions #region-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#screen-regions .region{min-width:0;min-height:88px;margin:0!important;padding:10px!important;background:linear-gradient(145deg,rgba(24,25,30,.91),rgba(7,11,17,.88))!important;backdrop-filter:blur(7px)}
+#screen-regions .region .rname{font-size:13px!important;line-height:1.45}
+#screen-regions .region .rdesc{font-size:10px!important;line-height:1.5}
+#screen-regions .region .rdanger{font-size:9px!important}
+#screen-regions #daily-panel,#screen-regions #village-npcs,#screen-regions #notif-feed{margin-bottom:12px}
+#screen-regions #daily-panel>* ,#screen-regions #village-npcs>* ,#screen-regions #notif-feed>*{max-width:100%}
+#screen-regions .wh-regions-back{width:100%;margin:0 0 12px}
+#screen-regions .wh-region-section-title{margin:18px 0 8px;color:#f0d79c;font-size:14px}
+#screen-worldmap #worldmap-board{min-height:42svh;border:1px solid rgba(226,190,112,.25);border-radius:14px;background:rgba(5,8,13,.48);padding:10px}
+#screen-battle .enemy-card{background:linear-gradient(155deg,rgba(67,17,29,.86),rgba(7,10,17,.93))!important}
+#screen-battle .combat-log{background:rgba(5,8,14,.88)!important;border-radius:12px!important}
+#screen-shop .shop-tabs{position:sticky;top:-12px;z-index:5;padding:7px 0;background:rgba(7,9,15,.94)!important;backdrop-filter:blur(12px)}
+#screen-auth{min-height:100svh!important;background-size:cover!important;background-position:center!important}
+#screen-auth .auth-shell{min-height:100svh!important}
+.screen.wh-secondary{z-index:4500!important;padding-top:max(16px,env(safe-area-inset-top))!important;padding-bottom:calc(var(--wh-scene-nav) + 14px)!important;overflow-y:auto!important;background-color:#090c13!important}
+@media(min-width:460px){#screen-map .wh-v8-quick{grid-template-columns:repeat(4,minmax(0,1fr))!important}#screen-regions #region-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-height:680px){#game-wrap #hud{min-height:42px!important}#screen-map .wh-v8-home{min-height:300px!important;padding:12px!important}#screen-map .wh-v8-home-title{font-size:20px!important}#screen-map .wh-v8-quick button{min-height:40px!important}}
+@media(max-width:360px){#screen-map .wh-v8-home{min-height:350px!important;padding:12px!important}#screen-regions #region-list{grid-template-columns:1fr}#wh-game-nav button{font-size:9px!important}}
+@media(prefers-reduced-motion:reduce){#game-wrap .screen.active{animation:none!important}#screen-map .wh-v8-quick button{transition:none!important}}
+</style>
+<script id="wh-final-mobile-rpg-shell-js">
+(function(){
+  if(window.__whFinalMobileRpgShell)return;
+  window.__whFinalMobileRpgShell=true;
+  function setup(){
+    const game=document.getElementById('game-wrap');
+    const home=document.getElementById('screen-map');
+    if(!game||!home)return;
+    let regions=document.getElementById('screen-regions');
+    if(!regions){
+      regions=document.createElement('section');
+      regions.id='screen-regions';
+      regions.className='screen wh-secondary';
+      regions.innerHTML='<h2 class="section-title">🗺️ مناطق و فعالیت‌ها</h2><div class="wh-regions-intro">از اینجا منطقه‌ات را انتخاب کن، فعالیت‌های روزانه را ببین و خبرهای جهان را دنبال کن.</div><button class="secondary wh-regions-back" type="button">← بازگشت به مقر</button>';
+      game.appendChild(regions);
+      regions.querySelector('.wh-regions-back').addEventListener('click',()=>window.switchScreen?.('screen-map'));
+    }
+    const regionList=document.getElementById('region-list');
+    if(regionList&&regionList.parentElement!==regions)regions.appendChild(regionList);
+    const dailyTitle=Array.from(home.querySelectorAll('h3')).find(e=>e.textContent.includes('فعالیت‌های روزانه'));
+    const daily=document.getElementById('daily-panel');
+    if(dailyTitle&&dailyTitle.parentElement!==regions)regions.appendChild(dailyTitle);
+    if(daily&&daily.parentElement!==regions)regions.appendChild(daily);
+    const npcs=document.getElementById('village-npcs');
+    if(npcs&&npcs.parentElement!==regions)regions.appendChild(npcs);
+    const notifTitle=Array.from(home.querySelectorAll('h3')).find(e=>e.textContent.includes('اعلان‌های جهانی'));
+    const feed=document.getElementById('notif-feed');
+    if(notifTitle&&notifTitle.parentElement!==regions)regions.appendChild(notifTitle);
+    if(feed&&feed.parentElement!==regions)regions.appendChild(feed);
+    const weeklyToggle=document.getElementById('weekly-history-toggle');
+    const weeklyBox=document.getElementById('weekly-history-box');
+    if(weeklyToggle&&weeklyToggle.parentElement!==regions)regions.appendChild(weeklyToggle);
+    if(weeklyBox&&weeklyBox.parentElement!==regions)regions.appendChild(weeklyBox);
+    const quick=home.querySelector('.wh-v8-quick');
+    if(quick&&!quick.dataset.whFinalReady){
+      quick.dataset.whFinalReady='1';
+      quick.innerHTML='<button data-go="worldmap">🌍 نقشه جهان</button><button data-go="regions">🗺️ مناطق</button><button data-go="battle">⚔️ ورود به فایت</button><button data-go="quest">📜 مأموریت‌ها</button><button data-go="char">♙ شخصیت</button><button data-go="inv">🎒 تجهیزات</button><button data-go="shop">🏪 فروشگاه</button><button data-go="transfer">💰 اقتصاد</button>';
+    }
+    const homeTitle=home.querySelector('.section-title');
+    if(homeTitle)homeTitle.textContent='مقر وارنهولد';
+    const intro=regions.querySelector('.wh-regions-intro');
+    if(intro)intro.setAttribute('aria-live','polite');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
+  else setup();
+})();
+</script>
+
 </body>
 
 <style id="wh-game-ui-final">
