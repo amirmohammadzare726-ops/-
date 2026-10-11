@@ -247,3 +247,171 @@ button:focus-visible{outline:2px solid #e8c56f;outline-offset:2px}
   #app{width:100%;max-width:none}
   #nav{max-width:none}
 }
+
+
+/* Stage 4 — mobile RPG shell: fixed game frame, scroll only inside the current scene. */
+#game-wrap{
+  min-height:100dvh!important;
+  min-height:100svh!important;
+  height:100dvh!important;
+  height:100svh!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  background:#090b10!important;
+}
+#game-wrap #hud{
+  flex:0 0 auto!important;
+  min-height:54px!important;
+  padding-top:max(7px,env(safe-area-inset-top))!important;
+  padding-bottom:7px!important;
+  position:relative!important;
+  z-index:8!important;
+}
+#game-wrap .bars{
+  flex:0 0 auto!important;
+  padding:5px 10px!important;
+  position:relative!important;
+  z-index:7!important;
+}
+#game-wrap .gold-line{flex:0 0 2px!important;margin:0!important;opacity:.7}
+#game-wrap .screen{
+  flex:1 1 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  width:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  padding:12px 13px calc(18px + env(safe-area-inset-bottom))!important;
+  scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch;
+}
+#game-wrap .screen::-webkit-scrollbar{display:none!important}
+#game-wrap .screen::before{
+  z-index:-2!important;
+  transform:none!important;
+}
+#game-wrap .screen::after{z-index:-1!important}
+#game-wrap .screen > *{position:relative;z-index:1}
+#game-wrap .screen.active{
+  animation:wh-scene-enter .2s ease-out both!important;
+}
+@keyframes wh-scene-enter{
+  from{opacity:.88;transform:translateY(3px)}
+  to{opacity:1;transform:translateY(0)}
+}
+/* Replace long web-like headings with compact in-game title plates. */
+#game-wrap .section-title{
+  position:relative!important;
+  margin:0 0 12px!important;
+  padding:12px 14px!important;
+  border:1px solid rgba(230,193,111,.34)!important;
+  border-right:3px solid #d6ad59!important;
+  border-radius:4px 12px 12px 4px!important;
+  background:linear-gradient(100deg,rgba(25,23,27,.92),rgba(25,23,27,.52))!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.22)!important;
+}
+#game-wrap .region,
+#game-wrap .enemy-card,
+#game-wrap .item-row,
+#game-wrap .stat-box,
+#game-wrap .equip-slot-row,
+#game-wrap .pick-card,
+#game-wrap .quest-card,
+#game-wrap .shop-card,
+#game-wrap .chat-panel,
+#game-wrap .social-panel,
+#game-wrap .identity-card,
+#game-wrap .action-btn{
+  border-radius:12px!important;
+  border:1px solid rgba(226,190,112,.28)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.22)!important;
+}
+#game-wrap button.primary,
+#game-wrap button.secondary,
+#game-wrap .action-btn,
+#game-wrap .shop-tab,
+#game-wrap .chat-tab{
+  min-height:42px;
+  border-radius:10px!important;
+}
+#game-wrap button.primary{
+  background:linear-gradient(135deg,#8f2630,#511820)!important;
+  border:1px solid rgba(244,194,115,.45)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 5px 16px rgba(0,0,0,.25)!important;
+}
+#game-wrap button.secondary{
+  border:1px solid rgba(226,190,112,.25)!important;
+}
+#game-wrap #hud .pname{font-size:15px!important;line-height:1.2}
+#game-wrap #hud .ploc{font-size:11px!important;opacity:.8}
+#game-wrap #hud .lvl{
+  border:1px solid rgba(230,193,111,.42)!important;
+  border-radius:9px!important;
+  min-width:34px!important;
+  text-align:center!important;
+  padding:5px!important;
+  background:rgba(76,53,22,.55)!important;
+}
+/* Persistent, compact navigation. Keep existing data-screen handlers intact. */
+#nav,#wh-game-nav{
+  position:fixed!important;
+  left:0!important;right:0!important;bottom:0!important;
+  z-index:100!important;
+  width:100%!important;
+  max-width:520px!important;
+  margin:0 auto!important;
+  padding:5px 5px calc(5px + env(safe-area-inset-bottom))!important;
+  display:flex!important;
+  justify-content:space-around!important;
+  align-items:stretch!important;
+  gap:3px!important;
+  border-top:1px solid rgba(226,190,112,.32)!important;
+  background:rgba(8,10,16,.97)!important;
+  box-shadow:0 -8px 26px rgba(0,0,0,.42)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+}
+#nav button,#wh-game-nav button{
+  flex:1 1 0!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:48px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  padding:4px 2px!important;
+  border:1px solid transparent!important;
+  border-radius:9px!important;
+  color:#bdb4a2!important;
+  font-size:10px!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+}
+#nav button .ic,#wh-game-nav button .ic{font-size:17px!important;line-height:1.1}
+#nav button.active,#wh-game-nav button.active{
+  color:#ffe0a0!important;
+  border-color:rgba(226,190,112,.25)!important;
+  background:linear-gradient(180deg,rgba(185,139,55,.22),rgba(185,139,55,.04))!important;
+}
+#game-wrap .screen.active{
+  padding-bottom:calc(74px + env(safe-area-inset-bottom))!important;
+}
+#game-wrap #screen-map > div:first-of-type{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+#game-wrap #screen-map > div:first-of-type button{width:100%!important;min-width:0!important}
+@media(max-height:650px){
+  #game-wrap #hud{min-height:46px!important;padding-top:4px!important;padding-bottom:4px!important}
+  #game-wrap .bars{padding:3px 8px!important}
+  #nav button,#wh-game-nav button{min-height:42px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #game-wrap .screen.active{animation:none!important}
+}
