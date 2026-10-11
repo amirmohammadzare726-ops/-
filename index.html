@@ -10196,4 +10196,64 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   -webkit-backdrop-filter:none!important;
 }
 </style>
+
+<script id="wh-ai-live-event-addon-v1">
+(function(){
+"use strict";
+if(window.__whAIEventAddonV1)return;
+window.__whAIEventAddonV1=true;
+function install(){
+ var panel=document.getElementById("ww-panel");
+ if(!panel)return;
+ var card=panel.querySelector(".ww-live");
+ if(!card||card.querySelector("#ww-ai-event-btn"))return;
+ var btn=document.createElement("button");
+ btn.id="ww-ai-event-btn";
+ btn.type="button";
+ btn.className="primary";
+ btn.textContent="✨ گسترش رویداد با هوش مصنوعی";
+ btn.style.cssText="width:100%;margin-top:8px";
+ var out=document.createElement("div");
+ out.id="ww-ai-event-result";
+ out.className="ww-note";
+ out.style.cssText="display:none;white-space:pre-wrap;margin-top:8px";
+ card.appendChild(btn);
+ card.appendChild(out);
+ btn.addEventListener("click",async function(){
+  if(btn.disabled)return;
+  btn.disabled=true;
+  btn.textContent="⏳ در حال ساخت روایت...";
+  out.style.display="block";
+  out.textContent="در حال ساخت روایت ویژه رویداد امروز...";
+  try{
+   if(typeof window.warneholdAIModule!=="function")throw new Error("ماژول هوش مصنوعی در دسترس نیست");
+   var title=card.querySelector(".ww-title b");
+   var desc=card.querySelector(".ww-desc");
+   var meta=card.querySelector(".ww-meta");
+   var eventName=title?title.textContent:"رویداد امروز";
+   var eventDesc=desc?desc.textContent:"";
+   var regionText=meta?meta.textContent:"";
+   var answer=await window.warneholdAIModule("world","برای رویداد روزانه وارنهولد یک روایت کوتاه، هیجان‌انگیز و قابل بازی بساز. فقط داستان و سرنخ بده. هیچ پاداش، پول، آیتم، مأموریت ثبت‌شده یا نتیجه مبارزه جعل نکن. رویداد: "+eventName+". شرح: "+eventDesc+". منطقه: "+regionText+".",{
+    event:eventName,eventDescription:eventDesc,region:regionText,
+    playerLevel:Number(window.state&&window.state.level)||1,
+    playerRegion:String(window.state&&window.state.region||"capital"),
+    eventDate:new Date().toISOString().slice(0,10)
+   });
+   out.textContent=String(answer||"روایتی دریافت نشد.").slice(0,2200);
+  }catch(e){out.textContent="ساخت روایت ناموفق بود: "+String(e&&e.message||"خطای اتصال");}
+  finally{btn.disabled=false;btn.textContent="✨ ساخت دوباره روایت";}
+ });
+}
+function start(){
+ var root=document.getElementById("screen-wh-world");
+ if(!root)return;
+ var observer=new MutationObserver(install);
+ observer.observe(root,{childList:true,subtree:true});
+ install();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);
+else start();
+setInterval(start,2500);
+})();
+</script>
 </html>
