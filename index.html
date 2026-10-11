@@ -8822,27 +8822,49 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
 
 <script id="wh-force-visible-regions-shortcut">
 (function(){
-  function addRegionsShortcut(){
+  if(window.__whRegionsShortcutPersistent) return;
+  window.__whRegionsShortcutPersistent = true;
+  function ensureRegionsShortcut(){
     const home=document.getElementById('screen-map');
-    if(!home)return;
+    if(!home) return;
     const quick=home.querySelector('.wh-v8-quick');
-    if(!quick)return;
-    if(quick.querySelector('[data-wh-regions-shortcut="1"]'))return;
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.setAttribute('data-wh-regions-shortcut','1');
-    btn.textContent='🧭 مناطق جهان و سفر';
-    btn.style.cssText='display:block!important;visibility:visible!important;opacity:1!important;width:100%;min-height:54px;grid-column:1/-1;background:linear-gradient(135deg,rgba(42,29,54,.98),rgba(12,16,25,.98));border:1px solid #b99b62;border-radius:14px;color:#f3dfad;font-weight:700;font-size:15px;margin:8px 0;position:relative;z-index:5;';
-    btn.addEventListener('click',function(){
-      if(typeof window.switchScreen==='function')window.switchScreen('regions');
-      else if(typeof window.switchScreenCore==='function')window.switchScreenCore('regions');
-      else {const s=document.getElementById('screen-regions'); if(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));s.classList.add('active');}}
-    });
-    quick.appendChild(btn);
+    if(!quick) return;
+    let btn=quick.querySelector('#wh-regions-travel-shortcut');
+    if(!btn){
+      btn=document.createElement('button');
+      btn.id='wh-regions-travel-shortcut';
+      btn.type='button';
+      btn.textContent='🧭 مناطق جهان و سفر';
+      btn.setAttribute('aria-label','مناطق جهان و سفر');
+      btn.style.cssText='display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:20!important;grid-column:1/-1!important;width:100%!important;min-height:56px!important;margin:8px 0!important;padding:12px!important;background:linear-gradient(135deg,rgba(55,38,20,.98),rgba(12,16,25,.98))!important;border:2px solid #d7b66f!important;border-radius:14px!important;color:#fff0c8!important;font-weight:800!important;font-size:15px!important;text-align:center!important;box-shadow:0 0 0 1px rgba(215,182,111,.18),0 8px 22px rgba(0,0,0,.4)!important;';
+      quick.appendChild(btn);
+    }
+    btn.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof window.switchScreen==='function') window.switchScreen('regions');
+      else {
+        const screen=document.getElementById('screen-regions');
+        if(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));screen.classList.add('active');}
+      }
+    };
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addRegionsShortcut);
-  else addRegionsShortcut();
-  setTimeout(addRegionsShortcut,800);
+  function start(){
+    ensureRegionsShortcut();
+    const home=document.getElementById('screen-map');
+    if(home && !home.__whRegionsObserver){
+      const observer=new MutationObserver(()=>ensureRegionsShortcut());
+      observer.observe(home,{childList:true,subtree:true});
+      home.__whRegionsObserver=observer;
+    }
+    let tries=0;
+    const retry=setInterval(()=>{
+      ensureRegionsShortcut();
+      if(++tries>=20) clearInterval(retry);
+    },500);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();
 </script>
 </body>
