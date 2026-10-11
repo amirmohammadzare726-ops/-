@@ -1,0 +1,106 @@
+/* Warnehold Immersive UI — presentation-only layer.
+   Intentionally does not change game state, handlers, navigation IDs, or screen logic. */
+:root{
+  --wh-glass:rgba(12,15,22,.72);
+  --wh-glass-strong:rgba(9,12,18,.86);
+  --wh-glass-line:rgba(221,190,119,.27);
+  --wh-shadow:0 14px 34px rgba(0,0,0,.28);
+}
+html{min-height:100%;background:#090b10}
+body{min-height:100dvh;background:#090b10}
+#app{min-height:100dvh;min-height:100svh;overflow:clip;background:#090b10}
+.screen{
+  position:relative;
+  isolation:isolate;
+  min-height:calc(100dvh - 68px);
+  min-height:calc(100svh - 68px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(201,162,75,.38) transparent;
+  background-color:#10131a;
+}
+.screen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,8,15,.26),rgba(5,8,15,.56) 60%,rgba(5,8,15,.78));
+}
+#screen-auth,#screen-start,#screen-blocked{background-color:#0a0c13}
+#screen-map,#screen-worldmap,#screen-village-map,#screen-journey,#screen-wh-world,#screen-wh-creatures{
+  background-image:linear-gradient(180deg,rgba(4,9,17,.30),rgba(5,8,14,.72)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/dcf40ad1-1dc7-482d-8d17-9574e354a424.jpg')!important;
+  background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-attachment:scroll!important;
+}
+#screen-worldmap,#screen-village-map,#screen-journey{
+  background-image:linear-gradient(180deg,rgba(4,9,17,.28),rgba(5,8,14,.70)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f171f5f3-ab32-418d-b2cb-0cdbf636a751.jpg')!important;
+}
+#screen-battle,#screen-boss-event,#screen-pvp{
+  background-image:linear-gradient(180deg,rgba(10,4,12,.26),rgba(5,7,13,.72)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/4c513103-7b0c-477e-ac43-0c4248d9e3ec.jpg')!important;
+}
+#screen-shop,#screen-animeshop,#screen-blacksmith,#screen-auction,#screen-transfer{
+  background-image:linear-gradient(180deg,rgba(7,7,16,.30),rgba(5,7,13,.75)),url('https://cdn.creativeclaw.co/u/3f8a5c32/images/f6e4b7fe-273d-4fce-b995-db8f71123522.jpg')!important;
+}
+#screen-social,#screen-chat,#screen-collection,#screen-inv,#screen-quest,#screen-job,#screen-notifcenter{
+  background-image:linear-gradient(180deg,rgba(5,9,16,.36),rgba(5,7,13,.76)),url('https://cdn.creativeclaw.co/u/3f21bde8-a2e7-464b-bdb9-5efd1f2711df.jpg')!important;
+}
+/* Bring actual screen content above the decorative backdrop. */
+.screen>*{position:relative}
+#screen-auth>* ,#screen-start>*{z-index:1}
+#hud{
+  background:rgba(12,14,20,.92)!important;
+  border-bottom:1px solid var(--wh-glass-line)!important;
+  box-shadow:0 6px 22px rgba(0,0,0,.20);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.bars{background:rgba(12,14,20,.82)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#nav{
+  padding:5px max(6px,env(safe-area-inset-left)) calc(5px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-right))!important;
+  background:rgba(8,10,16,.94)!important;
+  border-top:1px solid rgba(221,190,119,.30)!important;
+  box-shadow:0 -8px 28px rgba(0,0,0,.30);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  scrollbar-width:none;
+}
+#nav::-webkit-scrollbar{display:none}
+#nav button{
+  min-width:58px!important;
+  padding:8px 5px 7px!important;
+  border-radius:10px 10px 5px 5px;
+  font-size:10px!important;
+  transition:background .18s ease,color .18s ease,transform .18s ease;
+}
+#nav button.active{
+  color:#f3d78e!important;
+  background:linear-gradient(180deg,rgba(201,162,75,.17),rgba(201,162,75,.035));
+}
+#nav button.active .ic{filter:drop-shadow(0 0 8px rgba(255,208,105,.48))}
+.region,.enemy-card,.item-row,.stat-box,.equip-slot-row,.pick-card,.action-btn,.combat-log,
+#power-panel,.empty-note,.quest-card,.shop-card,.chat-panel,.social-panel{
+  border-color:rgba(221,190,119,.24)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
+}
+.region,.enemy-card,.item-row,.stat-box,.equip-slot-row,.pick-card,.action-btn,#power-panel{
+  background:rgba(13,16,23,.78)!important;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+}
+.region.current{border-color:rgba(243,205,117,.78)!important;box-shadow:inset 0 0 0 1px rgba(243,205,117,.24),0 8px 24px rgba(0,0,0,.20)!important}
+button.primary,button.secondary,.shop-tab,.chat-tab{
+  transition:filter .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+button.primary{box-shadow:0 5px 16px rgba(110,24,34,.22)}
+button.secondary{background:rgba(16,18,25,.86)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+button:focus-visible{outline:2px solid #e8c56f;outline-offset:2px}
+#screen-map h1,#screen-map h2,#screen-worldmap h1,#screen-worldmap h2,
+#screen-battle h1,#screen-battle h2,#screen-shop h1,#screen-shop h2{
+  text-shadow:0 2px 14px rgba(0,0,0,.55);
+}
+@media(max-width:380px){
+  #nav button{min-width:54px!important;font-size:9px!important}
+  .screen{padding-left:12px;padding-right:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  #nav button,button.primary,button.secondary,.shop-tab,.chat-tab{transition:none!important}
+}
