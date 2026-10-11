@@ -915,16 +915,24 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
         <button class="secondary" id="open-quest-btn" style="flex:1;">📜 Questها</button>
         <button class="secondary" id="open-transfer-btn" style="flex:1;">💸 اقتصاد</button>
       </div>
-      <button class="secondary" id="open-worldmap-btn" style="width:100%; margin-bottom:10px;">🌍 مشاهده World Map</button>
+      <button class="secondary" id="open-worldmap-btn" style="width:100%; margin-bottom:6px;">🌍 مشاهده World Map</button>
+      <button class="primary" id="open-regions-btn" style="width:100%; margin-bottom:10px;">🧭 مناطق جهان و سفر</button>
       <div id="world-event-banner"></div>
       <div class="admin-unlock" id="weekly-history-toggle" style="margin-bottom:10px;">🏆 قهرمانان هفته‌های قبل</div>
       <div id="weekly-history-box" style="display:none; margin-bottom:10px;"></div>
-      <div id="region-list"></div>
       <h3 style="color:var(--gold); font-size:14px; margin-top:18px; margin-bottom:8px;">📅 فعالیت‌های روزانه</h3>
       <div id="daily-panel"></div>
       <div id="village-npcs"></div>
       <h3 style="color:var(--gold); font-size:14px; margin-top:18px; margin-bottom:8px;">📢 اعلان‌های جهانی</h3>
       <div id="notif-feed"></div>
+    </div>
+
+    <!-- REGIONS: صفحه مستقل برای دیدن مناطق و سفر؛ منطق اصلی مناطق حفظ می‌شود -->
+    <div class="screen" id="screen-regions">
+      <h2 class="section-title">🧭 مناطق جهان</h2>
+      <div class="empty-note" style="padding:4px 4px 12px; text-align:right;">منطقه‌های کشف‌شده را ببین، سطح خطر و شرط ورود را بررسی کن و برای سفر انتخابشان کن. پیشرفت و قفل‌های قبلی حفظ می‌شوند.</div>
+      <button class="secondary" id="regions-back-btn" style="width:100%; margin-bottom:10px;">🔙 بازگشت به خانه</button>
+      <div id="region-list"></div>
     </div>
 
     <!-- Update 20: Quest به‌عنوان صفحه‌ی مستقل (قبلاً ته صفحه‌ی نقشه گم می‌شد) -->
@@ -5531,6 +5539,7 @@ function switchScreenCore(name){
   if(name==='battle' && !state.battle){ showBattleIdle(); }
   if(name==='battle' && state.battle){ renderBattleUI(); }
   if(name==='map'){ renderMap(); renderVillage(); renderNotifFeed(); renderWorldEventBanner(); }
+  if(name==='regions'){ renderMap(); }
   if(name==='char'){ renderChar(); renderRegistry(); renderAchievements(); renderTitles(); renderReputation(); checkReferralRewards(); claimAuctionPayouts(); claimPendingTransfers(); applyPendingAdminActions(); }
   if(name==='social'){
     $('#trade-panel').style.display='none';
@@ -7598,6 +7607,8 @@ $('#admin-unlock-link').addEventListener('click', tryAdminUnlock);
 $('#blacksmith-back-btn').addEventListener('click', ()=> switchScreen('map'));
 $('#village-map-back-btn').addEventListener('click', ()=> switchScreen('map'));
 $('#open-worldmap-btn').addEventListener('click', ()=> switchScreen('worldmap'));
+$('#open-regions-btn').addEventListener('click', ()=> switchScreen('regions'));
+$('#regions-back-btn').addEventListener('click', ()=> switchScreen('map'));
 $('#open-pvp-btn').addEventListener('click', ()=> switchScreen('pvp'));
 $('#open-job-btn').addEventListener('click', ()=> switchScreen('job'));
 $('#open-quest-btn').addEventListener('click', ()=> switchScreen('quest'));
