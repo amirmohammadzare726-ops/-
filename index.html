@@ -8958,8 +8958,8 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
    const source=document.getElementById('village-npcs');if(!source){out.innerHTML='<div>فعلاً کالای NPC در دسترس نیست.</div>';return;}
    const groups=[];
    source.querySelectorAll('.npc-card').forEach(card=>{const rows=Array.from(card.querySelectorAll('.shop-item'));if(!rows.length)return;groups.push({name:card.querySelector('.npc-name')?.textContent?.trim()||'بازرگان محلی',rows});});
+   if(!groups.length){if(!out.querySelector('.shop-item'))out.innerHTML='<div>در منطقه فعلی کالای اختصاصی NPC موجود نیست. با تغییر منطقه، فهرست به‌روز می‌شود.</div>';return;}
    out.replaceChildren();
-   if(!groups.length){out.innerHTML='<div>در منطقه فعلی کالای اختصاصی NPC موجود نیست. با تغییر منطقه، فهرست به‌روز می‌شود.</div>';return;}
    groups.forEach(g=>{const h=document.createElement('div');h.className='wh-npc-goods-vendor';h.textContent='👤 '+g.name;out.appendChild(h);g.rows.forEach(row=>{row.style.display='';out.appendChild(row);});});
   }
   window.whRenderNpcGoods=renderNpcGoods;
