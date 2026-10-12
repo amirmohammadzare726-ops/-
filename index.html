@@ -8926,7 +8926,7 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
   if(worldMapButton&&worldMapButton.parentElement!==regions)after(worldMapButton,regions.querySelector('.wh-regions-intro'));
   const intro=regions.querySelector('.wh-regions-intro');
   if(intro)intro.textContent='نقشه را بررسی کن، منطقه‌های کشف‌شده را انتخاب کن و برای سفر یا کاوش آماده شو.';
-  const desired='<button type="button" data-go="regions">🧭 مناطق جهان و سفر</button><button type="button" data-go="worldmap">🌍 نقشه جهان</button><button type="button" data-go="battle">⚔️ ورود به فایت</button><button type="button" data-go="quest">📜 مأموریت‌ها</button><button type="button" data-go="inv">🎒 تجهیزات و موجودی</button><button type="button" data-go="transfer">💰 اقتصاد</button>';
+  const desired='<button type="button" data-go="regions">🧭 مناطق جهان و سفر</button><button type="button" data-go="worldmap">🌍 نقشه جهان</button><button type="button" data-go="job">💼 شغل</button><button type="button" data-go="pvp">⚔️ PvP</button><button type="button" data-go="battle">⚔️ ورود به فایت</button><button type="button" data-go="quest">📜 مأموریت‌ها</button><button type="button" data-go="inv">🎒 تجهیزات و موجودی</button><button type="button" data-go="transfer">💰 اقتصاد</button>';
   if(quick.dataset.whReorg!=='1'){quick.innerHTML=desired;quick.dataset.whReorg='1';}
   quick.querySelectorAll('button[data-go]').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();if(typeof window.switchScreen==='function')window.switchScreen(b.dataset.go);};});
   const banner=document.getElementById('world-event-banner');
