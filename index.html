@@ -8908,8 +8908,8 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
 #screen-shop #wh-npc-goods-panel .shop-item{margin:6px 0}
 #screen-shop.wh-npc-goods-open #shop-tabs,#screen-shop.wh-npc-goods-open #wh-shop-ai-launch,#screen-shop.wh-npc-goods-open #shop-list{display:none!important}
 #screen-shop.wh-npc-goods-open #wh-npc-goods-panel{display:block!important}
-#screen-map #daily-panel,#screen-map #notif-feed,#screen-map #village-npcs{max-width:100%}
-#screen-map #village-npcs{margin-top:10px}
+#screen-map #daily-panel,#screen-map #notif-feed{max-width:100%}
+#screen-map #village-npcs{display:none!important}
 </style>
 <script id="wh-home-regions-shop-reorg-v1">
 (function(){
@@ -8921,12 +8921,12 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
   const home=document.getElementById('screen-map'),regions=document.getElementById('screen-regions'),quick=home&&home.querySelector('.wh-v8-quick'),shop=document.getElementById('screen-shop');
   if(!home||!regions||!quick||!shop)return;
   const oldShortcuts=document.getElementById('open-pvp-btn')?.parentElement;
-  if(oldShortcuts)oldShortcuts.style.display='none';
+  if(oldShortcuts)oldShortcuts.style.display='';
   const worldMapButton=document.getElementById('open-worldmap-btn');
   if(worldMapButton&&worldMapButton.parentElement!==regions)after(worldMapButton,regions.querySelector('.wh-regions-intro'));
   const intro=regions.querySelector('.wh-regions-intro');
   if(intro)intro.textContent='نقشه را بررسی کن، منطقه‌های کشف‌شده را انتخاب کن و برای سفر یا کاوش آماده شو.';
-  const desired='<button type="button" data-go="job">💼 شغل‌ها</button><button type="button" data-go="pvp">⚔️ میدان PvP</button><button type="button" data-go="shop">🏪 فروشگاه</button><button type="button" data-go="regions">🧭 مناطق و سفر</button><button type="button" data-go="quest">📜 مأموریت‌ها</button><button type="button" data-go="transfer">💰 اقتصاد</button>';
+  const desired='<button type="button" data-go="regions">🧭 مناطق جهان و سفر</button><button type="button" data-go="worldmap">🌍 نقشه جهان</button><button type="button" data-go="battle">⚔️ ورود به فایت</button><button type="button" data-go="quest">📜 مأموریت‌ها</button><button type="button" data-go="inv">🎒 تجهیزات و موجودی</button><button type="button" data-go="transfer">💰 اقتصاد</button>';
   if(quick.dataset.whReorg!=='1'){quick.innerHTML=desired;quick.dataset.whReorg='1';}
   quick.querySelectorAll('button[data-go]').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();if(typeof window.switchScreen==='function')window.switchScreen(b.dataset.go);};});
   const banner=document.getElementById('world-event-banner');
@@ -8941,7 +8941,7 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
   if(dailyTitle&&dailyTitle.parentElement!==home)home.appendChild(dailyTitle);
   if(daily&&daily.parentElement!==home)home.appendChild(daily);
   const npcs=document.getElementById('village-npcs');
-  if(npcs&&npcs.parentElement!==home)home.appendChild(npcs);
+  if(npcs){npcs.style.display='none';}
   const weeklyToggle=document.getElementById('weekly-history-toggle'),weeklyBox=document.getElementById('weekly-history-box');
   if(weeklyToggle&&weeklyToggle.parentElement!==home)home.appendChild(weeklyToggle);
   if(weeklyBox&&weeklyBox.parentElement!==home)home.appendChild(weeklyBox);
