@@ -8816,7 +8816,7 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
     const regionList=document.getElementById('region-list');
     if(regionList&&regionList.parentElement!==regions)regions.appendChild(regionList);
     const shortcuts=document.getElementById('open-pvp-btn')?.parentElement;
-    if(shortcuts&&shortcuts.parentElement!==regions)regions.insertBefore(shortcuts,regionList||null);
+    if(shortcuts){if(shortcuts.parentElement!==home)home.appendChild(shortcuts);shortcuts.classList.add('wh-home-action-row');shortcuts.style.setProperty('display','flex','important');shortcuts.style.setProperty('width','100%','important');shortcuts.style.setProperty('gap','6px','important');}
     const worldMapButton=document.getElementById('open-worldmap-btn');
     if(worldMapButton&&worldMapButton.parentElement!==regions)regions.insertBefore(worldMapButton,regionList||null);
     const dailyTitle=Array.from(home.querySelectorAll('h3')).find(e=>e.textContent.includes('فعالیت‌های روزانه'));
@@ -10889,4 +10889,4 @@ window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,
  craft_wh_charm_rune:{name:'آویز رونیک',resultId:'wh_charm_rune',levelReq:10,jobReq:{job:'enchanter',level:4},cost:{gold:180,materials:[{id:'mat_rune_fragment',qty:2},{id:'mat_arcane_dust',qty:2},{id:'mat_spirit_ash',qty:1}]}}
  });
 })();
-</script>
+</script>\n<style id="wh-home-action-row-fix">#screen-map .wh-home-action-row{display:flex!important;width:100%!important;gap:6px!important;margin:8px 0!important;position:relative!important;z-index:3!important;flex-shrink:0!important}#screen-map .wh-home-action-row button{display:flex!important;visibility:visible!important;opacity:1!important;flex:1 1 0!important;min-width:0!important;justify-content:center!important;align-items:center!important}</style>\n
