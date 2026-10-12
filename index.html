@@ -10789,3 +10789,24 @@ window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,
  });
 })();
 </script>
+
+<script id="wh-profession-gear-v1">
+(function(){
+ if(window.whProfessionGearV1)return;window.whProfessionGearV1=true;
+ const gear=[
+ {id:'wh_ring_crystal',name:'حلقه بلور ژرف',cat:'JobExclusive',rarity:'rare',price:0,type:'Accessories',slot:'accessory',mod:{magic:4,def:2},levelReq:8,desc:'حلقه‌ای از بلورهای ژرف؛ فقط از راه ساخت جواهرساز.'},
+ {id:'wh_cloak_leather',name:'شنل چرم‌دوزی‌شده',cat:'JobExclusive',rarity:'uncommon',price:0,type:'Armor',slot:'cloak',mod:{def:3,spd:1},levelReq:5,desc:'شنلی سبک از چرم دباغی‌شده؛ فقط از راه ساخت دباغ.'},
+ {id:'wh_staff_wood',name:'عصای چوب جادویی',cat:'JobExclusive',rarity:'rare',price:0,type:'Weapon',slot:'weapon',mod:{atk:2,magic:4},levelReq:7,desc:'عصایی از چوب جادویی؛ فقط از راه ساخت نجار.'},
+ {id:'wh_talisman_relic',name:'طلسم یادگار باستانی',cat:'JobExclusive',rarity:'epic',price:0,type:'Accessories',slot:'talisman',mod:{magic:5,def:2},levelReq:10,desc:'طلسمی از آثار باستانی رمزگذاری‌شده؛ فقط از راه ساخت پژوهشگر آثار.'},
+ {id:'wh_charm_rune',name:'آویز رونیک',cat:'JobExclusive',rarity:'epic',price:0,type:'Accessories',slot:'accessory',mod:{magic:5,def:1},levelReq:10,desc:'آویزی آغشته به گرد جادویی و قطعات رونیک؛ فقط از راه ساخت افسونگر.'}
+ ];
+ gear.forEach(d=>{if(!SHOP_ITEMS.some(x=>x.id===d.id))SHOP_ITEMS.push(d);});
+ Object.assign(CRAFTING_RECIPES,{
+ craft_wh_ring_crystal:{name:'حلقه بلور ژرف',resultId:'wh_ring_crystal',levelReq:8,jobReq:{job:'jeweler',level:3},cost:{gold:120,materials:[{id:'mat_uncut_gem',qty:2},{id:'mat_crystal',qty:1},{id:'mat_arcane_dust',qty:1}]}},
+ craft_wh_cloak_leather:{name:'شنل چرم‌دوزی‌شده',resultId:'wh_cloak_leather',levelReq:5,jobReq:{job:'tanner',level:3},cost:{gold:60,materials:[{id:'mat_fur',qty:2},{id:'mat_leather',qty:3},{id:'mat_bark',qty:1}]}},
+ craft_wh_staff_wood:{name:'عصای چوب جادویی',resultId:'wh_staff_wood',levelReq:7,jobReq:{job:'carpenter',level:3},cost:{gold:80,materials:[{id:'mat_raw_wood',qty:3},{id:'mat_wood_plank',qty:2},{id:'mat_magic_wood',qty:1}]}},
+ craft_wh_talisman_relic:{name:'طلسم یادگار باستانی',resultId:'wh_talisman_relic',levelReq:10,jobReq:{job:'archaeologist',level:4},cost:{gold:180,materials:[{id:'mat_relic_fragment',qty:3},{id:'mat_ancient_dust',qty:2},{id:'mat_rune_fragment',qty:1}]}},
+ craft_wh_charm_rune:{name:'آویز رونیک',resultId:'wh_charm_rune',levelReq:10,jobReq:{job:'enchanter',level:4},cost:{gold:180,materials:[{id:'mat_rune_fragment',qty:2},{id:'mat_arcane_dust',qty:2},{id:'mat_spirit_ash',qty:1}]}}
+ });
+})();
+</script>
