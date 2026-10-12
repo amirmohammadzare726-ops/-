@@ -8895,6 +8895,86 @@ html,body{width:100%;height:100%;overflow:hidden!important;overscroll-behavior:n
   else start();
 })();
 </script>
+
+<style id="wh-home-regions-shop-reorg-v1">
+#screen-map .wh-v8-quick button[data-go="job"],#screen-map .wh-v8-quick button[data-go="pvp"]{border-color:rgba(220,80,76,.55)!important}
+#screen-map .wh-v8-quick button[data-go="shop"]{border-color:rgba(226,190,112,.5)!important}
+#screen-regions .wh-regions-intro{font-size:12px;line-height:1.8}
+#screen-regions #region-list{margin-top:8px}
+#screen-shop #wh-npc-goods-toggle{width:100%;margin:0 0 8px;padding:10px;border:1px solid #b8944c;border-radius:10px;background:linear-gradient(135deg,#38251e,#15121a);color:#ffe7b2;font-weight:800}
+#screen-shop #wh-npc-goods-panel{display:none;flex:1 1 auto;min-height:0;overflow:auto;padding:10px;border:1px solid rgba(226,187,103,.25);border-radius:12px;background:linear-gradient(145deg,rgba(25,19,23,.98),rgba(9,10,16,.98));color:#eee0c4}
+#screen-shop #wh-npc-goods-panel .wh-npc-goods-title{font-size:14px;color:#f0d08a;font-weight:800;margin:4px 0 10px}
+#screen-shop #wh-npc-goods-panel .wh-npc-goods-vendor{padding:8px 0 3px;margin-top:8px;border-top:1px solid rgba(226,187,103,.2);color:#e9c779;font-weight:800;font-size:12px}
+#screen-shop #wh-npc-goods-panel .shop-item{margin:6px 0}
+#screen-shop.wh-npc-goods-open #shop-tabs,#screen-shop.wh-npc-goods-open #wh-shop-ai-launch,#screen-shop.wh-npc-goods-open #shop-list{display:none!important}
+#screen-shop.wh-npc-goods-open #wh-npc-goods-panel{display:block!important}
+#screen-map #daily-panel,#screen-map #notif-feed,#screen-map #village-npcs{max-width:100%}
+#screen-map #village-npcs{margin-top:10px}
+</style>
+<script id="wh-home-regions-shop-reorg-v1">
+(function(){
+ 'use strict';
+ if(window.__whHomeRegionsShopReorgV1)return;
+ window.__whHomeRegionsShopReorgV1=true;
+ function after(node,ref){if(node&&ref&&ref.parentNode)ref.parentNode.insertBefore(node,ref.nextSibling);}
+ function setup(){
+  const home=document.getElementById('screen-map'),regions=document.getElementById('screen-regions'),quick=home&&home.querySelector('.wh-v8-quick'),shop=document.getElementById('screen-shop');
+  if(!home||!regions||!quick||!shop)return;
+  const oldShortcuts=document.getElementById('open-pvp-btn')?.parentElement;
+  if(oldShortcuts)oldShortcuts.style.display='none';
+  const worldMapButton=document.getElementById('open-worldmap-btn');
+  if(worldMapButton&&worldMapButton.parentElement!==regions)after(worldMapButton,regions.querySelector('.wh-regions-intro'));
+  const intro=regions.querySelector('.wh-regions-intro');
+  if(intro)intro.textContent='نقشه را بررسی کن، منطقه‌های کشف‌شده را انتخاب کن و برای سفر یا کاوش آماده شو.';
+  const desired='<button type="button" data-go="job">💼 شغل‌ها</button><button type="button" data-go="pvp">⚔️ میدان PvP</button><button type="button" data-go="shop">🏪 فروشگاه</button><button type="button" data-go="regions">🧭 مناطق و سفر</button><button type="button" data-go="quest">📜 مأموریت‌ها</button><button type="button" data-go="transfer">💰 اقتصاد</button>';
+  if(quick.dataset.whReorg!=='1'){quick.innerHTML=desired;quick.dataset.whReorg='1';}
+  quick.querySelectorAll('button[data-go]').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();if(typeof window.switchScreen==='function')window.switchScreen(b.dataset.go);};});
+  const banner=document.getElementById('world-event-banner');
+  const dailyTitle=Array.from(document.querySelectorAll('h3')).find(e=>e.textContent.includes('فعالیت‌های روزانه'));
+  const daily=document.getElementById('daily-panel');
+  const notifTitle=Array.from(document.querySelectorAll('h3')).find(e=>e.textContent.includes('اعلان‌های جهانی'));
+  const feed=document.getElementById('notif-feed');
+  if(notifTitle&&notifTitle.parentElement!==home)home.appendChild(notifTitle);
+  if(feed&&feed.parentElement!==home)home.appendChild(feed);
+  if(banner&&banner.parentElement===home){if(notifTitle)after(notifTitle,banner);if(feed)after(feed,notifTitle||banner);}
+  else if(banner&&banner.parentElement){if(notifTitle)after(notifTitle,banner);if(feed)after(feed,notifTitle||banner);}
+  if(dailyTitle&&dailyTitle.parentElement!==home)home.appendChild(dailyTitle);
+  if(daily&&daily.parentElement!==home)home.appendChild(daily);
+  const npcs=document.getElementById('village-npcs');
+  if(npcs&&npcs.parentElement!==home)home.appendChild(npcs);
+  const weeklyToggle=document.getElementById('weekly-history-toggle'),weeklyBox=document.getElementById('weekly-history-box');
+  if(weeklyToggle&&weeklyToggle.parentElement!==home)home.appendChild(weeklyToggle);
+  if(weeklyBox&&weeklyBox.parentElement!==home)home.appendChild(weeklyBox);
+  let toggle=document.getElementById('wh-npc-goods-toggle');
+  if(!toggle){
+   toggle=document.createElement('button');toggle.type='button';toggle.id='wh-npc-goods-toggle';toggle.textContent='🧑‍🌾 اجناس اختصاصی NPCها';
+   const tabs=document.getElementById('shop-tabs');if(tabs)tabs.parentNode.insertBefore(toggle,tabs);
+   toggle.addEventListener('click',()=>{const open=shop.classList.toggle('wh-npc-goods-open');toggle.textContent=open?'↩️ بازگشت به فروشگاه اصلی':'🧑‍🌾 اجناس اختصاصی NPCها';renderNpcGoods();});
+  }
+  let panel=document.getElementById('wh-npc-goods-panel');
+  if(!panel){panel=document.createElement('div');panel.id='wh-npc-goods-panel';panel.innerHTML='<div class="wh-npc-goods-title">🧑‍🌾 اجناس اختصاصی بازرگانان</div><div style="font-size:11px;color:#b8a68c;line-height:1.7;margin-bottom:8px">کالاهای NPC از فهرست اصلی آیتم‌ها می‌آیند و خرید با همان دکمه و منطق خرید اصلی انجام می‌شود.</div><div id="wh-npc-goods-items"></div>';shop.appendChild(panel);}
+  function renderNpcGoods(){
+   const out=document.getElementById('wh-npc-goods-items');if(!out)return;
+   const source=document.getElementById('village-npcs');if(!source){out.innerHTML='<div>فعلاً کالای NPC در دسترس نیست.</div>';return;}
+   const groups=[];
+   source.querySelectorAll('.npc-card').forEach(card=>{const rows=Array.from(card.querySelectorAll('.shop-item'));if(!rows.length)return;groups.push({name:card.querySelector('.npc-name')?.textContent?.trim()||'بازرگان محلی',rows});});
+   out.replaceChildren();
+   if(!groups.length){out.innerHTML='<div>در منطقه فعلی کالای اختصاصی NPC موجود نیست. با تغییر منطقه، فهرست به‌روز می‌شود.</div>';return;}
+   groups.forEach(g=>{const h=document.createElement('div');h.className='wh-npc-goods-vendor';h.textContent='👤 '+g.name;out.appendChild(h);g.rows.forEach(row=>{row.style.display='';out.appendChild(row);});});
+  }
+  window.whRenderNpcGoods=renderNpcGoods;
+  if(typeof window.renderVillage==='function'&&!window.renderVillage.__whNpcGoodsWrapped){
+   const old=window.renderVillage;
+   const wrapped=async function(){const v=await old.apply(this,arguments);try{renderNpcGoods();}catch(e){console.warn('NPC goods UI',e)}return v;};
+   wrapped.__whNpcGoodsWrapped=true;window.renderVillage=wrapped;
+  }
+  renderNpcGoods();
+ }
+ function start(){setup();let n=0;const timer=setInterval(()=>{setup();if(++n>12)clearInterval(timer)},700);}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
+
 </body>
 
 <style id="wh-game-ui-final">
