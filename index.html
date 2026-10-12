@@ -5702,7 +5702,7 @@ async function exploreAction(){
   const undiscoveredRegions = REGION_DISCOVERY_ORDER.filter(id=> !(state.discoveredRegions||[]).includes(id) && REGIONS[id] && REGIONS[id].minLevel <= state.level+2);
   const currentHidden = Object.entries(HIDDEN_LOCATIONS).filter(([hid,h])=> h.region===state.region && !state.discoveredLocations.includes(hid) && state.level>=h.minLevel);
   const hasExploreTool = Object.values(state.equipment||{}).some(id=>{ const d=SHOP_ITEMS.find(s=>s.id===id); return d && d.toolEffect==='exploreBonus'; });
-  const chance = 0.35 + (hasExploreTool?0.15:0);
+  const explorePotionActive = !!(state.whPotionBuffs && state.whPotionBuffs.exploreCharges > 0); const chance = 0.35 + (hasExploreTool?0.15:0) + (explorePotionActive?0.2:0); if(explorePotionActive) state.whPotionBuffs.exploreCharges = Math.max(0,state.whPotionBuffs.exploreCharges-1);
   if(Math.random() > chance){ showToast('چیزی پیدا نکردید — دوباره تلاش کنید.'); return; }
   // Update 11: هر تلاش موفق Exploration Progress منطقه فعلی را افزایش می‌دهد (فقط برای مناطق غیر-Hub معنا دارد)
   if(!REGIONS[state.region].hub){
@@ -10714,5 +10714,78 @@ aiNarrate=async function(context){
  }catch(e){console.warn('Warnehold AI narration unavailable; using deterministic fallback.',e);return null;}
 };
 window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,acceptContract:acceptJobContract,claimContract:claimJobContract};
+})();
+</script>
+
+
+<script id="wh-potion-overhaul-v1">
+(function(){
+ if(window.whPotionOverhaulV1)return;window.whPotionOverhaulV1=true;
+ const defs=[
+ {id:'wh_potion_lifebloom',name:'اکسیر شکوفه جان',cat:'Potions',rarity:'uncommon',price:90,type:'Consumables',desc:'بازیابی ۳۵ جان؛ ترمیم سریع پس از درگیری.',consumable:true},
+ {id:'wh_potion_gather',name:'دم‌نوش برداشت',cat:'Potions',rarity:'rare',price:110,type:'Consumables',desc:'۱۵ انرژی + مواد بیشتر در ۳ نوبت شغلی.',consumable:true},
+ {id:'wh_potion_stride',name:'تونیک استقامت',cat:'Potions',rarity:'uncommon',price:100,type:'Consumables',desc:'۱۵ انرژی + کاهش هزینه انرژی ۳ نوبت شغلی.',consumable:true},
+ {id:'wh_potion_scout',name:'معجون دیده‌بان',cat:'Potions',rarity:'rare',price:125,type:'Consumables',desc:'۱۵ انرژی + افزایش شانس کاوش در ۳ تلاش.',consumable:true},
+ {id:'wh_potion_fortune',name:'اکسیر بخت',cat:'Potions',rarity:'rare',price:140,type:'Consumables',desc:'۲۰ انرژی + طلای بیشتر در ۳ کار بعدی.',consumable:true},
+ {id:'wh_potion_cleansing',name:'معجون پاک‌سازی',cat:'Potions',rarity:'uncommon',price:95,type:'Consumables',desc:'۲۵ جان و پاک‌کردن اثرهای منفی ثبت‌شده.',consumable:true}
+ ];
+ defs.forEach(d=>{if(!SHOP_ITEMS.some(x=>x.id===d.id))SHOP_ITEMS.push(d);});
+ Object.assign(CONSUMABLE_EFFECTS,{
+ wh_potion_lifebloom:{kind:'heal',amount:35,battleOnly:false,label:'بازیابی ۳۵ HP'},
+ wh_potion_gather:{kind:'energy',amount:15,battleOnly:false,label:'بازیابی ۱۵ انرژی',special:'job_gather'},
+ wh_potion_stride:{kind:'energy',amount:15,battleOnly:false,label:'بازیابی ۱۵ انرژی',special:'job_energy_discount'},
+ wh_potion_scout:{kind:'energy',amount:15,battleOnly:false,label:'بازیابی ۱۵ انرژی',special:'explore_bonus'},
+ wh_potion_fortune:{kind:'energy',amount:20,battleOnly:false,label:'بازیابی ۲۰ انرژی',special:'job_gold_bonus'},
+ wh_potion_cleansing:{kind:'heal',amount:25,battleOnly:false,label:'بازیابی ۲۵ HP',special:'cleanse'}
+ });
+ const oldUse=useConsumable;
+ useConsumable=async function(id){
+  const e=CONSUMABLE_EFFECTS[id];if(!e||!e.special)return oldUse(id);
+  const item=state.inventory.find(x=>x.id===id);if(!item||item.qty<=0)return;
+  if(!window.warneholdShopAction){showToast('ارتباط امن فروشگاه آماده نیست');return;}
+  try{
+   const r=await window.warneholdShopAction('consume',id);
+   if(!r||!r.ok||!r.character)throw new Error(r?.error||'مصرف آیتم تأیید نشد');
+   state={...state,...r.character};if(!state.whPotionBuffs)state.whPotionBuffs={};
+   if(e.special==='job_gather')state.whPotionBuffs.gatherCharges=3;
+   if(e.special==='job_energy_discount')state.whPotionBuffs.energyDiscountCharges=3;
+   if(e.special==='explore_bonus')state.whPotionBuffs.exploreCharges=3;
+   if(e.special==='job_gold_bonus')state.whPotionBuffs.goldBonusCharges=3;
+   if(e.special==='cleanse'){
+    ['activeDebuffs','statusEffects','negativeEffects'].forEach(k=>{
+     if(Array.isArray(state[k]))state[k]=state[k].filter(x=>!(x&&typeof x==='object'&&(x.negative===true||x.type==='debuff'||x.kind==='debuff')));
+     else if(state[k]&&typeof state[k]==='object')state[k]={};
+    });
+   }
+   await saveState();renderHUD();renderInventory();
+   showToast(e.special==='job_gather'?'دم‌نوش برداشت فعال شد: ۳ کار با مواد بیشتر':
+    e.special==='job_energy_discount'?'تونیک استقامت فعال شد: ۳ کار کم‌مصرف‌تر':
+    e.special==='explore_bonus'?'معجون دیده‌بان فعال شد: ۳ تلاش کاوش تقویت شد':
+    e.special==='job_gold_bonus'?'اکسیر بخت فعال شد: ۳ کار با طلای بیشتر':
+    'معجون پاک‌سازی مصرف شد');
+  }catch(err){showToast(err?.message||'مصرف آیتم انجام نشد');}
+ };
+ const oldWork=workJob;
+ workJob=async function(){
+  if(!state.job)return oldWork();
+  const job=JOBS[state.job],energy0=Number(state.energy)||0,gold0=Number(state.gold)||0,before={};
+  (state.inventory||[]).forEach(i=>before[i.id]=Number(i.qty)||0);
+  const b=state.whPotionBuffs||{},g=(b.gatherCharges||0)>0,d=(b.energyDiscountCharges||0)>0,f=(b.goldBonusCharges||0)>0;
+  await oldWork();
+  const spent=Math.max(0,energy0-(Number(state.energy)||0));if(spent<=0||!job)return;
+  let changed=false;
+  if(d){state.energy=Math.min(Number(state.energyMax)||Number(state.energy)||0,(Number(state.energy)||0)+Math.ceil(spent*.25));state.whPotionBuffs.energyDiscountCharges=Math.max(0,(state.whPotionBuffs.energyDiscountCharges||0)-1);changed=true;}
+  if(f){const gain=Math.max(0,(Number(state.gold)||0)-gold0);if(gain)state.gold+=Math.max(1,Math.floor(gain*.25));state.whPotionBuffs.goldBonusCharges=Math.max(0,(state.whPotionBuffs.goldBonusCharges||0)-1);changed=true;}
+  if(g){(state.inventory||[]).slice().forEach(it=>{const delta=(Number(it.qty)||0)-(before[it.id]||0);if(delta>0&&MATERIALS[it.id])addLootToInventory({type:'material',id:it.id,name:MATERIALS[it.id],qty:Math.max(1,Math.floor(delta*.5))});});state.whPotionBuffs.gatherCharges=Math.max(0,(state.whPotionBuffs.gatherCharges||0)-1);changed=true;}
+  if(changed){await saveState();renderHUD();renderInventory();renderJobPanel();}
+ };
+ Object.assign(CRAFTING_RECIPES,{
+ craft_wh_lifebloom:{name:'اکسیر شکوفه جان',resultId:'wh_potion_lifebloom',levelReq:2,jobReq:{job:'alchemist',level:2},cost:{gold:25,materials:[{id:'mat_healing_herb',qty:2},{id:'mat_pure_water',qty:1}]}},
+ craft_wh_gather:{name:'دم‌نوش برداشت',resultId:'wh_potion_gather',levelReq:3,jobReq:{job:'alchemist',level:3},cost:{gold:35,materials:[{id:'mat_mana_bloom',qty:2},{id:'mat_ancient_leaf',qty:1}]}},
+ craft_wh_stride:{name:'تونیک استقامت',resultId:'wh_potion_stride',levelReq:3,jobReq:{job:'alchemist',level:3},cost:{gold:30,materials:[{id:'mat_healing_herb',qty:1},{id:'mat_magic_mushroom',qty:2}]}},
+ craft_wh_scout:{name:'معجون دیده‌بان',resultId:'wh_potion_scout',levelReq:4,jobReq:{job:'alchemist',level:4},cost:{gold:40,materials:[{id:'mat_shadow_root',qty:1},{id:'mat_ink',qty:1}]}},
+ craft_wh_fortune:{name:'اکسیر بخت',resultId:'wh_potion_fortune',levelReq:4,jobReq:{job:'alchemist',level:4},cost:{gold:45,materials:[{id:'mat_fire_blossom',qty:1},{id:'mat_arcane_dust',qty:1}]}},
+ craft_wh_cleanse:{name:'معجون پاک‌سازی',resultId:'wh_potion_cleansing',levelReq:3,jobReq:{job:'alchemist',level:3},cost:{gold:30,materials:[{id:'mat_pure_water',qty:2},{id:'mat_healing_herb',qty:1}]}}
+ });
 })();
 </script>
