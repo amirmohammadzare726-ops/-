@@ -10591,3 +10591,128 @@ setInterval(start,2500);
   #screen-shop.wh-shop-v2 .wh-item-price {justify-self:start!important}
 }
 </style>
+
+<script id="wh-job-overhaul-v1">
+(function(){
+'use strict';
+if(window.__whJobOverhaulV1)return;
+window.__whJobOverhaulV1=true;
+Object.assign(MATERIALS,{
+mat_healing_herb:'گیاه شفابخش',mat_mana_bloom:'گل مانا',mat_shadow_root:'ریشه سایه',mat_fire_blossom:'گل آتشین',mat_magic_mushroom:'قارچ جادویی',mat_ancient_leaf:'برگ کهن',
+mat_river_fish:'ماهی رودخانه‌ای',mat_glow_fish:'ماهی درخشان',mat_rare_scale:'فلس کمیاب',mat_magic_roe:'تخم ماهی جادویی',mat_leather:'چرم فرآوری‌شده',mat_uncut_gem:'کریستال تراش‌نخورده',
+mat_rune_fragment:'قطعه رون',mat_arcane_dust:'گرد جادویی',mat_magic_wood:'چوب جادویی',mat_beast_lure:'طعمه رام‌کردن',mat_beast_bond:'نشان پیوند جانوری',
+mat_map_fragment:'تکه نقشه',mat_ink:'جوهر نقشه‌نگاری',mat_pure_water:'آب زلال',mat_raw_wood:'چوب خام',mat_wood_plank:'تخته چوب فرآوری‌شده',
+mat_relic_fragment:'قطعه اثر باستانی',mat_guild_seal:'مهر انجمن'
+});
+Object.assign(JOBS,{
+herbalist:{name:'گیاه‌شناس',icon:'🌿',regions:['forest','cursed_swamp','village'],energyCost:14,goldRange:[4,10],description:'گیاه‌های درمانی و جادویی را در زیستگاه مناسب جمع‌آوری می‌کند.',materials:[{id:'mat_healing_herb',chance:0.85,min:1,max:2},{id:'mat_mana_bloom',chance:0.28,min:1,max:1},{id:'mat_shadow_root',chance:0.12,min:1,max:1}]},
+fisher:{name:'ماهیگیر',icon:'🎣',regions:['lake','mist_isles'],energyCost:13,goldRange:[4,9],description:'صید معمولی و کمیاب؛ مواد خام موردنیاز آشپزی و سفارش‌های خاص.',materials:[{id:'mat_river_fish',chance:0.82,min:1,max:3},{id:'mat_glow_fish',chance:0.24,min:1,max:1},{id:'mat_rare_scale',chance:0.12,min:1,max:1}]},
+tanner:{name:'دباغ',icon:'🐾',regions:['village','capital','forest'],energyCost:14,goldRange:[4,9],description:'پوست‌های شکار را به چرم قابل استفاده در ساخت تجهیزات تبدیل می‌کند.',materials:[{id:'mat_fur',chance:0.42,min:1,max:2},{id:'mat_leather',chance:0.78,min:1,max:2}]},
+jeweler:{name:'جواهرساز',icon:'💎',regions:['capital','cave','crystal_realm'],energyCost:16,goldRange:[3,8],description:'سنگ‌های قیمتی و کریستال‌های تراش‌نخورده را آماده ساخت جواهر می‌کند.',materials:[{id:'mat_uncut_gem',chance:0.62,min:1,max:2},{id:'mat_crystal',chance:0.34,min:1,max:1}]},
+enchanter:{name:'افسونگر',icon:'✨',regions:['capital','ruins','spiritlands'],energyCost:18,goldRange:[3,8],description:'مواد رون و گرد جادویی جمع می‌کند؛ افسون تجهیزات فقط با دستور معتبر انجام می‌شود.',materials:[{id:'mat_rune_fragment',chance:0.58,min:1,max:2},{id:'mat_arcane_dust',chance:0.35,min:1,max:1},{id:'mat_spirit_ash',chance:0.15,min:1,max:1}]},
+beast_tamer:{name:'رام‌کننده موجودات',icon:'🐺',regions:['forest','mountain','snow'],energyCost:17,goldRange:[3,8],description:'رد موجودات را دنبال می‌کند و مواد لازم برای فعالیت‌های رام‌کردن را به دست می‌آورد.',materials:[{id:'mat_beast_lure',chance:0.62,min:1,max:2},{id:'mat_beast_bond',chance:0.22,min:1,max:1},{id:'mat_fang',chance:0.2,min:1,max:1}]},
+cartographer:{name:'نقشه‌نگار',icon:'🗺️',regions:['capital','ruins','mist_isles','riftlands'],energyCost:12,goldRange:[4,9],description:'تکه‌نقشه و جوهر به دست می‌آورد تا به مسیرها و مأموریت‌های اکتشافی کمک کند.',materials:[{id:'mat_map_fragment',chance:0.7,min:1,max:2},{id:'mat_ink',chance:0.48,min:1,max:2}]},
+healer:{name:'درمانگر',icon:'🩺',regions:['village','capital','spiritlands'],energyCost:15,goldRange:[3,8],description:'مواد اولیه درمانی و آب زلال تهیه می‌کند؛ درمان و معجون‌سازی تابع قوانین بازی است.',materials:[{id:'mat_healing_herb',chance:0.62,min:1,max:2},{id:'mat_pure_water',chance:0.62,min:1,max:2}]},
+carpenter:{name:'نجار',icon:'🪵',regions:['forest','village','village_snow','village_volcanic'],energyCost:13,goldRange:[4,9],description:'چوب خام و تخته فرآوری‌شده برای ابزارها و دستورهای ساخت تهیه می‌کند.',materials:[{id:'mat_raw_wood',chance:0.78,min:1,max:3},{id:'mat_wood_plank',chance:0.34,min:1,max:2},{id:'mat_magic_wood',chance:0.1,min:1,max:1}]},
+archaeologist:{name:'پژوهشگر آثار باستانی',icon:'🏺',regions:['ruins','cave','spiritlands','crystal_realm'],energyCost:17,goldRange:[3,8],description:'آثار باستانی و نشانه‌های تاریخی را بررسی می‌کند و مواد پژوهشی به دست می‌آورد.',materials:[{id:'mat_relic_fragment',chance:0.58,min:1,max:2},{id:'mat_ancient_dust',chance:0.45,min:1,max:1},{id:'mat_stone_shard',chance:0.22,min:1,max:1}]}
+});
+const jobDescriptions={
+blacksmith:'ساخت و آماده‌سازی تجهیزات با مواد معدنی.',miner:'استخراج سنگ معدن و مواد معدنی در مناطق مجاز.',farmer:'تولید محصولات خام برای آشپزی و سفارش‌ها.',hunter:'ردیابی موجودات و جمع‌آوری مواد جانوری.',
+alchemist:'تهیه مواد کیمیاگری و ساخت مصرفی‌های معتبر.',cook:'تبدیل مواد غذایی به خوراکی‌های قابل استفاده.',courier:'تحویل سفارش‌ها و جابه‌جایی محموله‌ها.',merchant:'مدیریت معامله و یافتن فرصت‌های خریدوفروش.'
+};
+Object.entries(jobDescriptions).forEach(([id,desc])=>{if(JOBS[id]&&!JOBS[id].description)JOBS[id].description=desc;});
+function countItem(id){return (state.inventory||[]).reduce((n,x)=>n+(x.id===id?Math.max(0,Number(x.qty)||0):0),0);}
+function getContractDefinition(jobId){
+ const job=JOBS[jobId];if(!job)return null;
+ const target=(job.materials&&job.materials[0]&&job.materials[0].id)||null;
+ return {title:target?'سفارش تأمین '+(MATERIALS[target]||target):'قرارداد فعالیت حرفه‌ای',targetItem:target,required:target?4:3,objective:target?'جمع‌آوری '+(MATERIALS[target]||target):'انجام فعالیت شغلی در منطقه مجاز'};
+}
+function getContract(jobId){
+ if(!state.jobContracts)state.jobContracts={};
+ let c=state.jobContracts[jobId];
+ if(!c){const d=getContractDefinition(jobId);c=state.jobContracts[jobId]={status:'available',progress:0,required:d.required,targetItem:d.targetItem,completedCount:0,title:d.title,objective:d.objective};}
+ return c;
+}
+function addJobXp(jobId,amount){
+ if(!state.jobProgress)state.jobProgress={};if(!state.jobProgress[jobId])state.jobProgress[jobId]={xp:0,level:1};
+ const p=state.jobProgress[jobId];p.xp=(Number(p.xp)||0)+amount;
+ while(p.level<10&&p.xp>=jobXpToNext(p.level)){p.xp-=jobXpToNext(p.level);p.level++;}
+}
+async function acceptJobContract(jobId){
+ if(state.job!==jobId){showToast('برای گرفتن این قرارداد، ابتدا همان شغل را انتخاب کن.');return;}
+ const job=JOBS[jobId];if(!job||!job.regions.includes(state.region)){showToast('این قرارداد فقط در منطقه مجاز شغل قابل شروع است.');return;}
+ const c=getContract(jobId);if(c.status==='active'||c.status==='ready'){showToast('یک قرارداد فعال داری؛ اول همان را کامل کن.');return;}
+ const d=getContractDefinition(jobId);c.status='active';c.progress=0;c.targetItem=d.targetItem;c.required=d.required+Math.min((Number(c.completedCount)||0)*2,8);c.title=d.title;c.objective=d.objective;
+ await saveState();renderJobPanel();showToast('📜 قرارداد شغلی پذیرفته شد.');
+}
+async function claimJobContract(jobId){
+ const c=getContract(jobId);if(c.status!=='ready'||c.progress<c.required){showToast('شرایط قرارداد هنوز کامل نشده.');return;}
+ c.status='claimed';c.completedCount=(Number(c.completedCount)||0)+1;addJobXp(jobId,12);
+ if(!state.jobReputation)state.jobReputation={};state.jobReputation[jobId]=(Number(state.jobReputation[jobId])||0)+1;
+ addLootToInventory({id:'mat_guild_seal',name:MATERIALS.mat_guild_seal,type:'material',qty:1});
+ await saveState();renderHUD();renderInventory();renderJobPanel();showToast('🏅 قرارداد کامل شد: ۱۲ XP شغلی و یک مهر انجمن دریافت کردی.');
+}
+async function askJobMaster(jobId){
+ const job=JOBS[jobId],p=(state.jobProgress&&state.jobProgress[jobId])||{level:1,xp:0},out=$('#job-ai-dialogue'),btn=$('#job-ai-master-btn');
+ if(!job||!out)return;
+ if(typeof window.warneholdAIModule!=='function'){out.textContent='راهنمای هوشمند فعلاً در دسترس نیست؛ فعالیت و قراردادهای شغلی همچنان قابل استفاده‌اند.';return;}
+ if(btn){btn.disabled=true;btn.textContent='⏳ استاد در حال پاسخ است...';}
+ out.textContent='استاد شغل دارد وضعیت حرفه‌ات را بررسی می‌کند...';
+ try{
+  const answer=await window.warneholdAIModule('npc','در نقش استاد شغل وارنهولد، با توجه به اطلاعات واقعی زیر یک راهنمای کوتاه و طبیعی در ۲ تا ۴ جمله بده. فقط مسیر، مواد یا قدم بعدی را پیشنهاد کن. هیچ آیتم، طلا، تجربه یا مأموریت را ثبت‌شده اعلام نکن و هیچ پاداشی جعل نکن. شغل: '+job.name+'. شرح: '+job.description+'. سطح شغل: '+p.level+'. منطقه فعلی: '+(REGIONS[state.region]?.name||state.region)+'. انرژی فعلی: '+state.energy+'. موجودی مرتبط: '+(job.materials||[]).map(m=>(MATERIALS[m.id]||m.id)+' ×'+countItem(m.id)).join('، ')+'.',{jobId,jobName:job.name,jobLevel:p.level,region:state.region,energy:Number(state.energy)||0,profession:'job_master'});
+  out.textContent=String(answer||'استاد فعلاً پاسخی ندارد.').slice(0,1800);
+ }catch(e){out.textContent='ارتباط با استاد شغل برقرار نشد. بعداً دوباره امتحان کن.';}
+ finally{if(btn){btn.disabled=false;btn.textContent='🤖 گفت‌وگو با استاد شغل';}}
+}
+function renderJobPanelV1(){
+ const box=$('#job-panel');if(!box)return;
+ const current=state.job&&JOBS[state.job]?state.job:null,progress=current?currentJobProgress():{xp:0,level:1};
+ const eligible=Object.entries(JOBS).filter(([id,j])=>j.regions.includes(state.region));let html='';
+ if(current){
+  const job=JOBS[current],pct=Math.min(100,Math.round((Number(progress.xp)||0)/jobXpToNext(progress.level)*100)),contract=getContract(current),rep=(state.jobReputation&&state.jobReputation[current])||0;
+  const statusLabel={available:'آماده پذیرش',active:'در حال انجام',ready:'آماده دریافت پاداش',claimed:'تکمیل‌شده'}[contract.status]||'آماده پذیرش';
+  html+='<div class="craft-card wh-job-active"><b>'+job.icon+' شغل فعلی: '+job.name+' — سطح '+progress.level+'/10</b>'+
+   '<div class="bar-track" style="margin:7px 0"><div class="bar-fill xp" style="width:'+pct+'%"></div></div>'+
+   '<div class="sdesc">'+(Number(progress.xp)||0)+'/'+jobXpToNext(progress.level)+' XP شغلی · شهرت حرفه‌ای '+rep+'</div>'+
+   '<div class="sdesc" style="margin-top:7px;line-height:1.7">'+job.description+'</div>'+
+   (job.regions.includes(state.region)?'<button class="primary" id="work-job-btn" style="width:100%;margin-top:9px">'+job.icon+' انجام فعالیت ('+job.energyCost+' انرژی)</button>':'<div class="empty-note" style="padding:7px;margin-top:8px">برای کار باید به '+job.regions.map(r=>REGIONS[r]?.name||r).join('، ')+' بروی.</div>')+
+   '<div id="job-narrative" style="margin-top:8px;font-size:12px;color:var(--gold-dim)"></div>'+
+   '<div class="equip-slot-row" style="display:block;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:8px"><b>📜 '+contract.title+'</b><div class="sdesc" style="line-height:1.7;margin:5px 0">'+contract.objective+'</div>'+
+   '<div class="sdesc">وضعیت: '+statusLabel+(contract.targetItem?' · پیشرفت: '+Math.min(contract.progress,contract.required)+'/'+contract.required:' · پیشرفت فعالیت: '+Math.min(contract.progress,contract.required)+'/'+contract.required)+'</div>'+
+   (contract.status==='available'||contract.status==='claimed'?'<button class="secondary" data-job-contract="accept" style="width:100%;margin-top:8px">'+(contract.status==='claimed'?'📜 گرفتن قرارداد بعدی':'📜 پذیرش قرارداد')+'</button>':contract.status==='ready'?'<button class="primary" data-job-contract="claim" style="width:100%;margin-top:8px">🏅 دریافت پاداش حرفه‌ای</button>':'<div class="sdesc" style="margin-top:7px">برای پیشرفت، فعالیت همین شغل را انجام بده.</div>')+'</div>'+
+   '<button class="secondary" id="job-ai-master-btn" style="width:100%;margin-top:9px">🤖 گفت‌وگو با استاد شغل</button>'+
+   '<div class="npc-dialogue" id="job-ai-dialogue" style="margin-top:7px;white-space:pre-wrap;line-height:1.7">استاد می‌تواند درباره مواد، منطقه و مسیر پیشرفت راهنمایی بدهد؛ پاداش‌ها را فقط خود بازی تعیین می‌کند.</div></div>';
+ }else html+='<div class="empty-note" style="padding:8px">هنوز شغلی انتخاب نکرده‌ای.</div>';
+ html+='<h3 style="color:var(--gold);font-size:13px;margin:14px 0 8px">مشاغل قابل‌انتخاب در '+(REGIONS[state.region]?.name||state.region)+'</h3>';
+ if(!eligible.length)html+='<div class="empty-note" style="padding:8px">هیچ شغلی در این منطقه قابل انتخاب نیست.</div>';
+ else html+=eligible.map(([id,j])=>{const p=(state.jobProgress&&state.jobProgress[id])||{level:1,xp:0};return '<div class="equip-slot-row" style="align-items:flex-start"><div style="flex:1;min-width:0"><b>'+j.icon+' '+j.name+'</b><div class="sdesc" style="font-size:11px;line-height:1.6;margin-top:3px">'+j.description+'</div><div class="sdesc" style="font-size:10px;margin-top:3px">سطح '+p.level+'/10 · انرژی '+j.energyCost+'</div></div><button class="mini-btn '+(current===id?'active':'')+'" data-choosejob="'+id+'">'+(current===id?'✅ فعال':'انتخاب')+'</button></div>';}).join('');
+ box.innerHTML=html;const workBtn=$('#work-job-btn');if(workBtn)workBtn.onclick=workJob;
+ box.querySelectorAll('[data-choosejob]').forEach(b=>b.onclick=()=>chooseJob(b.dataset.choosejob));
+ box.querySelectorAll('[data-job-contract]').forEach(b=>b.onclick=()=>b.dataset.jobContract==='accept'?acceptJobContract(current):claimJobContract(current));
+ const aiBtn=$('#job-ai-master-btn');if(aiBtn)aiBtn.onclick=()=>askJobMaster(current);
+}
+renderJobPanel=renderJobPanelV1;
+const previousWorkJob=workJob;
+workJob=async function(){
+ const jobId=state&&state.job,job=jobId&&JOBS[jobId],energyBefore=Number(state&&state.energy)||0;
+ const beforeContract=job?getContract(jobId):null,targetId=beforeContract&&beforeContract.targetItem,beforeCount=targetId?countItem(targetId):0;
+ await previousWorkJob();
+ if(!job||!state||state.job!==jobId||Number(state.energy)>=energyBefore)return;
+ const c=getContract(jobId);if(c.status!=='active')return;
+ if(c.targetItem){const gained=Math.max(0,countItem(c.targetItem)-beforeCount);c.progress=Math.min(c.required,(Number(c.progress)||0)+gained);}
+ else c.progress=Math.min(c.required,(Number(c.progress)||0)+1);
+ if(c.progress>=c.required)c.status='ready';
+ await saveState();renderJobPanel();
+};
+aiNarrate=async function(context){
+ try{
+  if(typeof window.warneholdAIModule!=='function')return null;
+  const event=String(context&&context.event||''),mode=/battle|pvp/.test(event)?'battle':(event==='job_work'?'npc':'world');
+  const prompt='تو راوی کوتاه و بی‌طرف وارنهولد هستی. نتیجه بازی از قبل توسط موتور محاسبه شده؛ فقط همان اتفاق را در حداکثر دو جمله فارسی طبیعی روایت کن. هیچ عدد، آیتم، پاداش، نتیجه مبارزه یا تغییری در state اختراع نکن. داده قطعی رویداد: '+JSON.stringify(context||{});
+  const answer=await window.warneholdAIModule(mode,prompt,{narrationEvent:event,gameEvent:context||{}});
+  return String(answer||'').trim()||null;
+ }catch(e){console.warn('Warnehold AI narration unavailable; using deterministic fallback.',e);return null;}
+};
+window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,acceptContract:acceptJobContract,claimContract:claimJobContract};
+})();
+</script>
