@@ -6275,6 +6275,7 @@ async function bumpEconomyPrice(itemId, direction){
 
 let shopTab = 'Weapons';
 let shopMode = 'buy';
+let shopSearch = '';
 async function renderShop(){
   await loadEconomyPrices();
   const tabs = $('#shop-tabs'); tabs.innerHTML='';
@@ -6288,6 +6289,10 @@ async function renderShop(){
     modeRow.appendChild(b);
   });
   tabs.appendChild(modeRow);
+  const wallet = document.createElement('div');
+  wallet.className = 'wh-shop-wallet';
+  wallet.innerHTML = `<div class="wh-shop-wallet-label">دارایی شما</div><div class="wh-shop-wallet-values"><span>🪙 <b>${Number(state.gold||0).toLocaleString('fa-IR')}</b> ین</span><span>💎 <b>${Number(state.gems||0).toLocaleString('fa-IR')}</b> جم</span><span>⚔️ Level <b>${Number(state.level||1).toLocaleString('fa-IR')}</b></span></div>`;
+  tabs.appendChild(wallet);
   if(shopMode==='buy'){
     const catRow = document.createElement('div');
     catRow.style.cssText='display:flex; gap:4px; flex-wrap:wrap;';
@@ -6300,6 +6305,17 @@ async function renderShop(){
     });
     tabs.appendChild(catRow);
   }
+  const searchWrap = document.createElement('label');
+  searchWrap.className = 'wh-shop-search-wrap';
+  searchWrap.innerHTML = '<span aria-hidden="true">⌕</span>';
+  const searchInput = document.createElement('input');
+  searchInput.type = 'search';
+  searchInput.className = 'wh-shop-search';
+  searchInput.placeholder = shopMode==='buy' ? 'جست‌وجوی آیتم در این دسته…' : 'جست‌وجو بین آیتم‌های کوله‌پشتی…';
+  searchInput.setAttribute('aria-label','جست‌وجو در فروشگاه');
+  searchInput.value = shopSearch;
+  searchWrap.appendChild(searchInput);
+  tabs.appendChild(searchWrap);
   const list = $('#shop-list'); list.innerHTML='';
   if(shopMode==='buy'){
     SHOP_ITEMS.filter(it=>it.cat===shopTab).forEach(it=>{
@@ -6308,9 +6324,12 @@ async function renderShop(){
       const price = getItemPrice(it.id, it.price);
       const req = itemLevelReq(it);
       row.innerHTML = `
-        <div>
-          <div class="sname"><span class="rarity-badge r-${it.rarity}">${it.rarity}</span>${it.name}</div>
-          <div class="sdesc">${it.desc}${it.slot?` · نیاز به Level ${req}`:''}</div>
+        <div class="wh-shop-item-main">
+          <div class="wh-shop-art" aria-hidden="true">${it.icon||'📦'}</div>
+          <div class="wh-shop-item-copy">
+            <div class="sname"><span class="rarity-badge r-${it.rarity}">${it.rarity}</span>${it.name}</div>
+            <div class="sdesc">${it.desc}${it.slot?` · نیاز به Level ${req}`:''}</div>
+          </div>
         </div>
         <div class="shop-buy-actions">
           <button class="buy-btn mono coin-buy" ${state.gold<price?'disabled':''}>${price} ین</button>
@@ -6328,16 +6347,42 @@ async function renderShop(){
       const sellPrice = Math.round(getItemBaseValue(item.id) * 0.9);
       const row = document.createElement('div');
       row.className='shop-item';
+      const itemDef = SHOP_ITEMS.find(x=>x.id===item.id);
       row.innerHTML = `
-        <div>
-          <div class="sname">${item.name} <span class="mono">×${sellableQty}</span></div>
-          <div class="sdesc">قیمت فروش (۹۰٪ ارزش پایه): ${sellPrice} ین${equippedCount?' (یک عدد تجهیز شده، قابل فروش نیست)':''}</div>
+        <div class="wh-shop-item-main">
+          <div class="wh-shop-art" aria-hidden="true">${itemDef?.icon||'📦'}</div>
+          <div class="wh-shop-item-copy">
+            <div class="sname">${item.name} <span class="mono">×${sellableQty}</span></div>
+            <div class="sdesc">قیمت فروش (۹۰٪ ارزش پایه): ${sellPrice} ین${equippedCount?' (یک عدد تجهیز شده، قابل فروش نیست)':''}</div>
+          </div>
         </div>
         <button class="buy-btn mono" ${sellableQty<=0?'disabled':''}>فروش</button>`;
       row.querySelector('.buy-btn').onclick = ()=> sellItem(item.id);
       list.appendChild(row);
     });
   }
+  const applyShopSearch = ()=>{
+    const rows = Array.from(list.querySelectorAll('.shop-item'));
+    let visible = 0;
+    rows.forEach(row=>{
+      const match = !shopSearch.trim() || row.textContent.toLocaleLowerCase().includes(shopSearch.trim().toLocaleLowerCase());
+      row.hidden = !match;
+      if(match) visible++;
+    });
+    let empty = list.querySelector('.wh-shop-no-results');
+    if(rows.length && !empty){
+      empty = document.createElement('div');
+      empty.className = 'empty-note wh-shop-no-results';
+      empty.textContent = 'موردی با این عبارت پیدا نشد.';
+      list.appendChild(empty);
+    }
+    if(empty) empty.hidden = !rows.length || visible>0;
+  };
+  searchInput.addEventListener('input',()=>{
+    shopSearch = searchInput.value;
+    applyShopSearch();
+  });
+  applyShopSearch();
 }
 
 function getItemGemPrice(it){
@@ -10976,3 +11021,68 @@ window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,
   else start();
 })();
 </script>
+
+
+<style id="wh-fullscreen-shop-polish-v2">
+/* Full-screen section update: richer mobile shop layout, presentation-only. */
+#screen-shop.wh-immersive-panel.active>.section-title,
+#screen-inv.wh-immersive-panel.active>.section-title,
+#screen-job.wh-immersive-panel.active>.section-title,
+#screen-quest.wh-immersive-panel.active>.section-title,
+#screen-char.wh-immersive-panel.active>.section-title,
+#screen-animeshop.wh-immersive-panel.active>.section-title,
+#screen-collection.wh-immersive-panel.active>.section-title{
+  margin:0 -12px 14px!important;
+  padding:13px 14px 15px!important;
+  border-bottom:1px solid rgba(201,162,75,.28)!important;
+  background:linear-gradient(110deg,rgba(201,162,75,.13),rgba(12,15,23,.94) 62%)!important;
+  color:#f0cf82!important;
+  font-size:19px!important;
+  letter-spacing:.2px!important;
+}
+#screen-shop.wh-immersive-panel.active #shop-tabs{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;padding:0;}
+#screen-shop .wh-shop-wallet{
+  border:1px solid rgba(201,162,75,.25);border-radius:12px;padding:10px 12px;
+  background:linear-gradient(135deg,rgba(201,162,75,.10),rgba(20,24,34,.92));
+}
+#screen-shop .wh-shop-wallet-label{font-size:10px;color:var(--dim);margin-bottom:6px;letter-spacing:.7px}
+#screen-shop .wh-shop-wallet-values{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:#e8e4dc}
+#screen-shop .wh-shop-wallet-values b{color:var(--gold);font-variant-numeric:tabular-nums}
+#screen-shop .wh-shop-search-wrap{
+  display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid var(--line);
+  border-radius:10px;background:rgba(19,23,32,.96);color:var(--gold);font-size:23px;
+}
+#screen-shop .wh-shop-search{width:100%;min-width:0;background:transparent!important;border:0!important;outline:none!important;box-shadow:none!important;color:var(--text,#f4f1e9)!important;padding:12px 0!important;margin:0!important;font-size:14px!important}
+#screen-shop .wh-shop-search::placeholder{color:var(--dim);font-size:12px}
+#screen-shop #shop-list{display:flex;flex-direction:column;gap:9px;padding-bottom:10px}
+#screen-shop .shop-item{
+  display:flex;align-items:center;gap:10px;justify-content:space-between;
+  border:1px solid rgba(130,139,158,.20);border-radius:13px;padding:12px;
+  margin:0;background:linear-gradient(145deg,rgba(24,29,41,.98),rgba(12,15,22,.98));
+  box-shadow:0 5px 18px rgba(0,0,0,.16);
+}
+#screen-shop .wh-shop-item-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+#screen-shop .wh-shop-art{
+  display:flex;align-items:center;justify-content:center;flex:0 0 46px;width:46px;height:46px;
+  border:1px solid rgba(201,162,75,.28);border-radius:11px;background:radial-gradient(circle at 30% 20%,rgba(201,162,75,.18),rgba(8,10,15,.95) 72%);
+  font-size:25px;box-shadow:inset 0 0 16px rgba(201,162,75,.06)
+}
+#screen-shop .wh-shop-item-copy{min-width:0;overflow-wrap:anywhere}
+#screen-shop .shop-item .sname{font-family:inherit;font-size:13px;line-height:1.6;color:#f0eee8}
+#screen-shop .shop-item .sdesc{font-size:11px;line-height:1.65;margin-top:3px}
+#screen-shop .shop-buy-actions{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+#screen-shop .buy-btn{min-width:82px;padding:9px 8px;border-radius:8px;font-size:11px}
+#screen-shop .buy-btn:active{transform:scale(.97)}
+#screen-shop .shop-tab{border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12px}
+#screen-shop .shop-tabs{gap:6px}
+#screen-shop .wh-shop-no-results{margin:0;text-align:center;padding:22px 12px}
+#screen-shop .shop-item[hidden],#screen-shop .wh-shop-no-results[hidden]{display:none!important}
+@media(max-width:360px){
+ #screen-shop .shop-item{padding:9px;gap:7px}
+ #screen-shop .wh-shop-art{flex-basis:38px;width:38px;height:38px;font-size:21px}
+ #screen-shop .buy-btn{min-width:70px;padding:8px 5px}
+ #screen-shop .wh-shop-wallet-values{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){#screen-shop .shop-item,#screen-shop .buy-btn{transition:none!important}}
+</style>
+
