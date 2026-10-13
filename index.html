@@ -706,7 +706,8 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
 #screen-auth .auth-note{
   text-shadow:0 3px 14px rgba(0,0,0,.95),0 0 28px rgba(0,0,0,.65);
 }
-</style>\n<style id="wh-welcome-real-layer-fix">
+</style>
+<style id="wh-welcome-real-layer-fix">
 /* FINAL: welcome is directly on the artwork; no black card/panel */
 #screen-auth{
   background-image:url('https://cdn.creativeclaw.co/u/3f8a5c32/images/44059d6d-ae2f-4a38-807e-d23b59fd3efc.jpg') !important;
@@ -730,7 +731,7 @@ body.wh-settings-open #wh-settings-btn{display:none!important}
 #screen-auth .auth-panel{
   padding:24px 18px 20px !important;
 }
-</style>\n
+</style>
 <style id="wh-boss-event-v1">
 #screen-boss-event{padding:0 12px 88px;min-height:100svh;background:radial-gradient(circle at 50% 8%,rgba(201,162,75,.13),transparent 32%),linear-gradient(180deg,#090709,#160c0d 55%,#090709);overflow:hidden}
 .wh-boss-shell{position:relative;min-height:calc(100svh - 88px);display:flex;flex-direction:column;gap:9px}
@@ -9552,7 +9553,8 @@ window.whWarneholdSfx=s;
 window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_sound',enabled?'on':'off');if(enabled)init()},get(){return enabled}};
 })();
 </script>
-\n<!-- wh-v4-ready -->
+
+<!-- wh-v4-ready -->
 <style id="wh-gem-purchase-v13">
 .shop-buy-actions{display:flex;gap:5px;align-items:center;flex-shrink:0}
 .shop-buy-actions .buy-btn{min-width:62px;padding:8px 7px;font-size:10px;transition:transform .14s,filter .14s,box-shadow .2s}
@@ -10296,7 +10298,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 setInterval(()=>{try{if(window.state)init();}catch(e){console.debug("WW init",e)}},3000);
 window.whLivingWorld={npcs:NPCS,missions:MISSIONS,events:EVENTS,open:openWorld,render:renderLivingWorld,activeEvent:activeEvent};
 })();
-</script>\n
+</script>
 <style id="wh-regions-expedition-v1">
 #wh-region-expedition{margin:12px 0 16px;padding:12px;border:1px solid rgba(201,162,75,.28);border-radius:14px;background:linear-gradient(145deg,rgba(17,25,27,.97),rgba(14,13,22,.98));}
 .wh-exp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
@@ -10671,7 +10673,7 @@ setInterval(start,2500);
 }
 </style>
 
-</html>
+
 
 
 <style id="wh-shop-list-only-fix-v1">
@@ -10934,7 +10936,8 @@ window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,
  craft_wh_charm_rune:{name:'آویز رونیک',resultId:'wh_charm_rune',levelReq:10,jobReq:{job:'enchanter',level:4},cost:{gold:180,materials:[{id:'mat_rune_fragment',qty:2},{id:'mat_arcane_dust',qty:2},{id:'mat_spirit_ash',qty:1}]}}
  });
 })();
-</script>\n<style id="wh-home-action-row-fix">#screen-map .wh-home-action-row{display:flex!important;width:100%!important;gap:6px!important;margin:8px 0!important;position:relative!important;z-index:3!important;flex-shrink:0!important}#screen-map .wh-home-action-row button{display:flex!important;visibility:visible!important;opacity:1!important;flex:1 1 0!important;min-width:0!important;justify-content:center!important;align-items:center!important}</style>\n
+</script>
+<style id="wh-home-action-row-fix">#screen-map .wh-home-action-row{display:flex!important;width:100%!important;gap:6px!important;margin:8px 0!important;position:relative!important;z-index:3!important;flex-shrink:0!important}#screen-map .wh-home-action-row button{display:flex!important;visibility:visible!important;opacity:1!important;flex:1 1 0!important;min-width:0!important;justify-content:center!important;align-items:center!important}</style>\n
 <!-- WARNEHOLD FULLSCREEN SECTION LAYER v1 -->
 <style id="wh-fullscreen-sections-v1">
 /* Presentation-only layer: expand information-heavy screens without replacing game logic. */
@@ -11085,4 +11088,5 @@ window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,
 }
 @media(prefers-reduced-motion:reduce){#screen-shop .shop-item,#screen-shop .buy-btn{transition:none!important}}
 </style>
-
+</body>
+</html>
