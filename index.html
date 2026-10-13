@@ -11088,5 +11088,35 @@ window.whJobSystem={version:1,jobs:()=>Object.keys(JOBS),askMaster:askJobMaster,
 }
 @media(prefers-reduced-motion:reduce){#screen-shop .shop-item,#screen-shop .buy-btn{transition:none!important}}
 </style>
+
+<style id="wh-auth-start-click-recovery">
+#screen-auth .auth-shell,#screen-auth .auth-panel,#screen-auth .auth-step{position:relative;z-index:5;pointer-events:auto}
+#screen-auth .auth-actions,#screen-auth .auth-actions button{position:relative;z-index:10;pointer-events:auto;touch-action:manipulation}
+#screen-auth::before,#screen-auth::after{pointer-events:none!important}
+</style>
+<script id="wh-auth-start-click-recovery-js">
+(function(){
+  function install(){
+    var welcome=document.getElementById('auth-welcome-next');
+    var story=document.getElementById('auth-story-step');
+    var first=document.getElementById('auth-welcome-step');
+    if(!welcome||!story||!first||welcome.dataset.whRecoveryBound)return;
+    welcome.dataset.whRecoveryBound='1';
+    welcome.addEventListener('click',function(){
+      first.classList.remove('active');
+      story.classList.add('active');
+      story.style.display='flex';
+      first.style.display='none';
+      var text=document.getElementById('auth-story-text');
+      if(text&&!text.textContent){
+        text.textContent='وارنهولد سرزمینی پر از راز، ماجراجویی و انتخاب‌های سرنوشت‌ساز است. مسیرت هنوز نوشته نشده؛ می‌توانی مسیر خودت را بسازی، قدرت پیدا کنی، همراه پیدا کنی و جایگاه خودت را در وارنهولد به دست بیاوری.';
+      }
+    },true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
+  else install();
+})();
+</script>
+
 </body>
 </html>
