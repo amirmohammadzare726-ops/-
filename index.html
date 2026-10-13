@@ -9725,7 +9725,11 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
       html+='<div class="wh-boss-card"><h3>☠️ باس امروز</h3><div style="font-size:12px;color:var(--dim);line-height:1.55">'+esc(b.lore||b.eventText||'')+'</div><div class="wh-boss-tags" style="margin-top:7px"><span class="wh-boss-tag">ضعف: '+esc(b.weakness)+'</span><span class="wh-boss-tag">مقاومت: '+esc(b.resistance)+'</span><span class="wh-boss-tag">میدان: '+esc(b.arena)+'</span></div><div class="wh-boss-tags" style="margin-top:6px">'+(b.powers||[]).map(function(p){return '<span class="wh-boss-tag">'+esc(p.name)+'</span>'}).join('')+'</div></div>';
       if(run&&run.eventDate===ev.dateKey){
         html+='<div class="wh-boss-card"><h3>⚔️ فایت جاری · نوبت '+run.turn+'/5</h3><div class="wh-boss-dmg">+'+Math.round(run.damage||0)+' DMG</div><div class="wh-boss-log">'+(run.log||[]).map(function(x){return '<div>'+esc(x)+'</div>'}).join('')+'</div></div>';
-        html+='<div class="wh-boss-actions"><button data-boss-action="strike">⚔️ ضربه سنگین</button><button data-boss-action="power">✨ قدرت ویژه</button><button data-boss-action="guard">🛡️ دفاع</button><button class="danger" data-boss-action="risk">🔥 حمله پرریسک</button></div>';
+        var ownedPowers=(state.powers||[]).map(function(sp){var pd=PDEF(sp.id);return pd?{entry:sp,def:pd}:null}).filter(Boolean);
+        html+='<div class="wh-boss-card"><h3>✨ قدرت‌های شخصیت</h3><div style="font-size:11px;color:var(--dim);margin-bottom:8px">قدرت‌های واقعی شخصیتت را انتخاب کن؛ مصرف انرژی و زمان انتظار رعایت می‌شود.</div>';
+        if(ownedPowers.length){html+='<div class="wh-boss-actions">'+ownedPowers.map(function(x){var cd=Number((run.cooldowns||{})[x.entry.id]||0),ok=(state.energy||0)>=Number(x.def.energyCost||0)&&cd<=0;return '<button data-boss-power="'+esc(x.entry.id)+'" '+(ok?'':'disabled')+'>'+esc(x.def.name)+' · '+Number(x.def.energyCost||0)+' انرژی'+(cd>0?' · CD '+cd:'')+'</button>'}).join('')+'</div>'}
+        else html+='<div class="empty-note">هنوز قدرت قابل‌استفاده‌ای نداری؛ از حمله عادی استفاده کن.</div>';
+        html+='</div><div class="wh-boss-actions"><button data-boss-action="strike">⚔️ حمله عادی</button><button data-boss-action="guard">🛡️ دفاع</button><button class="danger" data-boss-action="risk">🔥 حمله پرریسک</button></div>';
       }else{
         if(Date.now()<cd)html+='<div class="wh-boss-cooldown">⏳ زمان باقی‌مانده تا فایت بعدی: '+fmt(cd-Date.now())+'</div>';
         if(w&&Date.now()<w.until)html+='<div class="wh-boss-cooldown">🩸 Wound فعال · '+fmt(w.until-Date.now())+' · شدت '+w.level+'</div>';
@@ -9737,6 +9741,7 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
       renderBossCanvas(ev);
       var start=document.getElementById('wh-boss-start');if(start)start.onclick=startBossFight;
       box.querySelectorAll('[data-boss-action]').forEach(function(btn){btn.onclick=function(){bossTurn(btn.dataset.bossAction)}});
+      box.querySelectorAll('[data-boss-power]').forEach(function(btn){btn.onclick=function(){bossTurn('power',btn.dataset.bossPower)}});
     }).catch(function(e){box.innerHTML='<div class="empty-note">خطا در بارگذاری Boss Event</div>';console.error(e)})
   }
   async function startBossFight(){
@@ -9746,14 +9751,14 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
       if(st.cd>now){showToast('هنوز زمان فایت بعدی نرسیده');return}
       if(st.wound&&st.wound.until>now){showToast('Wound هنوز فعال است');return}
       if(st.seals<1){showToast('Boss Seal کافی نیست');return}
-      state.bossSeals=st.seals-1;state.bossSealDate=dayKey();state.bossRun={eventDate:ev.dateKey,turn:0,damage:0,log:['ورود به محوطه باس'],guard:false};state.bossCooldownUntil=now+BOSS_COOLDOWN;
+      state.bossSeals=st.seals-1;state.bossSealDate=dayKey();state.bossRun={eventDate:ev.dateKey,turn:0,damage:0,log:['ورود به محوطه باس'],guard:false,weakenPct:0,critBonus:0,cooldowns:{}};state.bossCooldownUntil=now+BOSS_COOLDOWN;
       ev.participants=ev.participants||{};ev.participants[state.playerId]=ev.participants[state.playerId]||{name:state.name,damage:0,attempts:0};ev.participants[state.playerId].attempts++;
       await saveGlobalEvent(ev);await saveState();renderBossEvent();
     })
   }
   async function finishBossFight(ev,won,died){
     var run=state.bossRun;if(!run)return;
-    var dmg=Math.max(0,Math.round(run.damage||0));var p=ev.participants[state.playerId];if(p)p.damage=(p.damage||0)+dmg;
+    var dmg=Math.max(0,Math.round(run.damage||0));var p=ev.participants[state.playerId];
     var reward=Math.max(10,Math.round((ev.boss.baseReward||50)*(0.5+Math.min(.5,dmg/Math.max(1,ev.hpMax)))));
     state.gold=(state.gold||0)+reward;
     var rareChance=Math.min(.55,0.04+0.5*(dmg/Math.max(1,ev.hpMax)));
@@ -9775,16 +9780,42 @@ window.whWarneholdSound={set(v){enabled=!!v;localStorage.setItem('warnehold_soun
     else{await saveGlobalEvent(ev);showToast('فایت تمام شد · '+reward+' ین')}
     renderBossEvent();renderWorldEventBanner();
   }
-  async function bossTurn(action){
+  async function bossTurn(action,powerId){
     return withActionLock('boss-turn:'+state.playerId,async function(){
-      var ev=await loadGlobalEvent(),run=state.bossRun;if(!ev||ev.status!=='active'||!run)return;
-      run.turn=(run.turn||0)+1;var phase=phaseFor(ev),st=effectiveStats?effectiveStats():{atk:10,def:5};var mult=action==='risk'?2.0:action==='power'?1.55:action==='guard'?.72:1.15;
-      var dmg=Math.max(4,Math.round((st.atk||10)*mult-(Number(ev.boss.defense)||20)*.42+(Math.random()*12-6)));
-      if(action==='guard')run.guard=true;else run.guard=false;if(action==='risk'&&Math.random()<.18)dmg=Math.round(dmg*.35);
-      ev.hp=Math.max(0,ev.hp-dmg);run.damage+=dmg;addLog('⚔️ '+(action==='power'?'قدرت ویژه':action==='risk'?'حمله پرریسک':action==='guard'?'دفاع':'ضربه سنگین')+' · '+dmg+' DMG');
-      if(ev.participants[state.playerId])ev.participants[state.playerId].damage=(ev.participants[state.playerId].damage||0)+dmg;
-      ev.phase=phaseFor(ev);
-      var incoming=Math.max(3,Math.round((Number(ev.boss.difficulty)||45)*.65-(st.def||5)*.28+(Math.random()*8-4)));if(run.guard)incoming=Math.round(incoming*.4);
+      var ev=await loadGlobalEvent(),run=state.bossRun;if(!ev||ev.status!=='active'||!run||run.eventDate!==ev.dateKey)return;
+      var st=effectiveStats?effectiveStats():{atk:10,def:5},boss=ev.boss||fallbackBoss(ev.dateKey),label='حمله عادی',dmg=0,usedPower=null,spEntry=null,em=1;
+      run.cooldowns=run.cooldowns||{};run.guard=false;run.shieldPct=0;
+      if(action==='power'){
+        usedPower=PDEF(powerId);spEntry=(state.powers||[]).find(function(x){return x.id===powerId});
+        if(!usedPower||!spEntry){showToast('این قدرت متعلق به شخصیتت نیست');return}
+        if(Number(run.cooldowns[powerId]||0)>0){showToast('این قدرت هنوز آماده نیست');return}
+        if((state.energy||0)<Number(usedPower.energyCost||0)){showToast('انرژی کافی برای این قدرت نداری');return}
+        state.energy-=Number(usedPower.energyCost||0);run.cooldowns[powerId]=Math.max(0,Number(usedPower.cooldown)||0);
+        spEntry.mastery=(spEntry.mastery||0)+1;
+        if(spEntry.mastery>=5&&!spEntry.evolved){spEntry.evolved=true;addLog('⭐ '+usedPower.name+' تکامل یافت')}
+        em=typeof evoMult==='function'?evoMult(spEntry):1;label=usedPower.name;
+        if(usedPower.kind==='shield'){run.guard=true;run.shieldPct=Math.min(.85,Number(usedPower.shieldPct||.25)*em);addLog('🛡️ '+label+' فعال شد؛ آسیب حمله بعدی کاهش می‌یابد')}
+        else if(usedPower.kind==='weaken'){run.weakenPct=Math.min(.6,Number(usedPower.weakenPct||.2)*em);addLog('🌑 '+label+'؛ حمله بعدی باس ضعیف‌تر می‌شود')}
+        else if(usedPower.kind==='critbuff'){run.critBonus=Math.round(Number(usedPower.critBonus||0)*em);addLog('🎯 '+label+'؛ شانس ضربه بحرانی افزایش یافت')}
+        else if(usedPower.kind==='heal'){var heal=Math.round((state.hpMax||100)*Math.min(.6,Number(usedPower.healPct||.2)*em));state.hp=Math.min(state.hpMax||100,(state.hp||0)+heal);addLog('💚 '+label+'؛ '+heal+' HP بازیابی شد')}
+        else {
+          var style=usedPower.style||'',weak=style&&String(boss.weakness||'').toLowerCase()===String(style).toLowerCase(),resist=style&&String(boss.resistance||'').toLowerCase()===String(style).toLowerCase();
+          var base=Number(st[usedPower.statBase||'atk']||st.atk||10)*(Number(usedPower.mult||1)*em);
+          dmg=Math.max(3,Math.round(base-(Number(boss.defense)||20)*.5+(Math.random()*10-5)));
+          if(weak)dmg=Math.round(dmg*1.3);if(resist)dmg=Math.round(dmg*.7);
+          var critChance=Math.max(0,Math.min(1,(Number(st.crit||5)+Number(run.critBonus||0))/100));if(Math.random()<critChance)dmg=Math.round(dmg*1.75);run.critBonus=0;
+        }
+      }else{
+        if(action==='guard'){label='دفاع';run.guard=true;run.shieldPct=.6}
+        else if(action==='risk'){label='حمله پرریسک';dmg=Math.max(4,Math.round((st.atk||10)*2-(Number(boss.defense)||20)*.42+(Math.random()*12-6)));if(Math.random()<.18)dmg=Math.round(dmg*.35)}
+        else {label='حمله عادی';dmg=Math.max(3,Math.round((st.atk||10)*1.3-(Number(boss.defense)||20)*.5+(Math.random()*10-5)));if(Math.random()<Math.max(0,Math.min(1,(Number(st.crit||5)+Number(run.critBonus||0))/100)))dmg=Math.round(dmg*1.75);run.critBonus=0}
+      }
+      run.turn=(run.turn||0)+1;
+      if(dmg>0){ev.hp=Math.max(0,ev.hp-dmg);run.damage+=dmg;addLog('⚔️ '+label+' · '+dmg+' آسیب');if(ev.participants[state.playerId])ev.participants[state.playerId].damage=(ev.participants[state.playerId].damage||0)+dmg}
+      Object.keys(run.cooldowns).forEach(function(id){if(id!==powerId&&run.cooldowns[id]>0)run.cooldowns[id]--});
+      var incoming=Math.max(3,Math.round((Number(boss.difficulty)||45)*.65-(st.def||5)*.28+(Math.random()*8-4)));
+      if(run.guard)incoming=Math.round(incoming*(1-Math.min(.85,Number(run.shieldPct)||.4)));
+      if(run.weakenPct){incoming=Math.round(incoming*(1-run.weakenPct));run.weakenPct=0}
       if(action==='risk'&&Math.random()<.12)incoming=Math.round(incoming*1.45);
       state.hp=Math.max(0,(state.hp||1)-incoming);addLog('☠️ '+incoming+' آسیب از باس');
       if(window.warneholdAI&&window.warneholdAI.ask){try{var ai=await callBossAI('turn',ev);if(ai.narration)addLog('🧠 '+ai.narration);if(ai.bossMove)addLog('👑 '+ai.bossMove)}catch(e){}}
