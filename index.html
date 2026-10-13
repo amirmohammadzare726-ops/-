@@ -1398,21 +1398,13 @@ let authMode = 'register';
 async function accountRequest(payload){
   let lastError=null;
   for(let attempt=0;attempt<2;attempt++){
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),8000);
     try{
-      const res=await fetch(ACCOUNT_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify(payload),signal:controller.signal});
+      const res=await fetch(ACCOUNT_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify(payload)});
       const data=await res.json().catch(()=>({ok:false,error:'پاسخ نامعتبر از سرور حساب'}));
       if(!res.ok||!data.ok){const err=new Error(data.error||'خطا در حساب');err.status=res.status;throw err;}
       return data;
-    }catch(e){
-      lastError=e;
-      if(attempt===0) await new Promise(r=>setTimeout(r,700));
-    }finally{
-      clearTimeout(timer);
-    }
+    }catch(e){lastError=e;if(attempt===0)await new Promise(r=>setTimeout(r,700));}
   }
-  if(lastError && lastError.name==='AbortError') lastError.message='ارتباط با سرور حساب زمان‌بر شد. اینترنت را بررسی کن و دوباره تلاش کن.';
   throw lastError||new Error('خطا در حساب');
 }
 
@@ -1543,16 +1535,28 @@ function finishAuthGate(){
 }
 
 function ensureAccountGate(){
-  return new Promise(resolve=>{
-    let storyDone=false;
-    let authFinished=false;
-    const story = 'سال‌هاست وارنهولد بین روستاهای دورافتاده و شهرهای تاریک تقسیم شده. قدرت‌های عجیب در گوشه‌های این سرزمین بیدار شده‌اند و گروه‌های مختلف برای به‌دست آوردنشان با هم درگیرند. تو وارد جهانی می‌شوی که هنوز سرنوشتش نوشته نشده. می‌توانی مسیر خودت را بسازی، قدرت پیدا کنی، همراه پیدا کنی، وارد درگیری‌های بزرگ شوی و جایگاه خودت را در وارنهولد به دست بیاوری.';
+  return new Promise(async resolve=>{
+    // فقط اولین ورود بدون Session صفحه خوش‌آمدگویی و افکت ورود را نشان می‌دهد.
+    // اگر Session معتبر باشد، پلیر مستقیم از گیت حساب عبور می‌کند.
+    if(await restoreAccountSession()){
+      finishAuthGate();
+      resolve(true);
+      return;
+    }
 
-    // Bind all navigation immediately. Network/session checks must never block the welcome UI.
+    // این افکت فقط برای صفحه خوش‌آمدگوییِ اولین ورود اجرا می‌شود.
+    setTimeout(()=>playCinematicTransition(()=>{}),40);
+
+    const story = 'سال‌هاست وارنهولد بین روستاهای دورافتاده و شهرهای تاریک تقسیم شده. قدرت‌های عجیب در گوشه‌های این سرزمین بیدار شده‌اند و گروه‌های مختلف برای به‌دست آوردنشان با هم درگیرند. تو وارد جهانی می‌شوی که هنوز سرنوشتش نوشته نشده. می‌توانی مسیر خودت را بسازی، قدرت پیدا کنی، همراه پیدا کنی، وارد درگیری‌های بزرگ شوی و جایگاه خودت را در وارنهولد به دست بیاوری.';
+    let storyDone=false;
+
     $('#auth-welcome-next').onclick=()=>{
       showAuthStep('auth-story-step');
-      const storyText=$('#auth-story-text');
-      if(storyText) storyText.textContent=story;
+      $('#auth-story-text').textContent='';
+      const span=document.createElement('span');
+      span.textContent=story;
+      $('#auth-story-text').replaceWith(span);
+      span.id='auth-story-text';
     };
 
     const goAccount=()=>{
@@ -1560,16 +1564,16 @@ function ensureAccountGate(){
       storyDone=true;
       showAuthStep('auth-account-step');
       setAuthMode('register');
-      try{$('#auth-username').focus();}catch(_){}
+      $('#auth-username').focus();
     };
     $('#auth-story-next').onclick=goAccount;
     $('#auth-story-skip').onclick=goAccount;
+
     $('#auth-register-tab').onclick=()=>setAuthMode('register');
     $('#auth-login-tab').onclick=()=>setAuthMode('login');
 
     $('#auth-form').onsubmit=async e=>{
       e.preventDefault();
-      if(authFinished) return;
       showAuthError('');
       const username=$('#auth-username').value.trim();
       const password=$('#auth-password').value;
@@ -1583,33 +1587,26 @@ function ensureAccountGate(){
       $('#auth-submit').disabled=true;
       $('#auth-submit').textContent=authMode==='register'?'در حال ساخت حساب...':'در حال ورود...';
       try{
-        const legacyScope=localStorage.getItem('warnhold_device_id')||'';
-        const data=await accountRequest({action:authMode,username,password});
-        if(!data.accountId||!data.session||!data.username) throw new Error('پاسخ حساب کامل نیست؛ دوباره تلاش کن.');
+        // قبل از تغییر scope ذخیره، شناسه دستگاه قدیمی را نگه می‌داریم تا
+        // کاراکتر و Save قبلی بازیکن به حساب جدید منتقل شود.
+        const legacyScope = localStorage.getItem('warnhold_device_id') || '';
+        const data=await accountRequest({
+          action:authMode,
+          username,
+          password
+        });
         setAccountSession(data);
-        await migrateLegacyDeviceSave(legacyScope,accountId);
-        authFinished=true;
+        await migrateLegacyDeviceSave(legacyScope, accountId);
         finishAuthGate();
         resolve(true);
       }catch(err){
-        showAuthError(err&&err.name==='AbortError'
-          ?'ارتباط با سرور حساب زمان‌بر شد. اینترنت را بررسی کن و دوباره تلاش کن.'
-          :(err.message||'ورود انجام نشد؛ دوباره تلاش کن.'));
+        showAuthError(err.message);
       }finally{
         $('#auth-submit').disabled=false;
-        $('#auth-submit').textContent=authMode==='register'?'ساخت حساب و ادامه':'ورود به وارنهولد';
+        if(authMode==='register') $('#auth-submit').textContent='ساخت حساب و ادامه';
+        else $('#auth-submit').textContent='ورود به وارنهولد';
       }
     };
-
-    // Start session restore in the background, after the buttons have working handlers.
-    setTimeout(()=>playCinematicTransition(()=>{}),40);
-    restoreAccountSession().then(ok=>{
-      if(ok && !authFinished){
-        authFinished=true;
-        finishAuthGate();
-        resolve(true);
-      }
-    }).catch(err=>console.warn('account session restore failed',err));
   });
 }
 /* ========================================================================= */
